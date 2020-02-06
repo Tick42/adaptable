@@ -21,7 +21,7 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
   private isSendingData: boolean = false;
 
   private throttledRecomputeAndSendLiveDataEvent: (() => void) & _.Cancelable;
-
+  private columnsAsLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   constructor(adaptable: IAdaptable) {
     super(StrategyConstants.Glue42StrategyId, adaptable);
 
@@ -38,18 +38,34 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
     // currently we DONT send deltas or even check if the updated cell is in the current report  - we should
     // we simply send everything to iGlue42 every time any cell ticks....
     this.adaptable.DataService.on('DataChanged', (dataChangedInfo: DataChangedInfo) => {
-      if (this.adaptable.api.glue42Api.isGlue42Running()) {
-        let currentLiveIGlue42Report:
-          | Glue42Report
-          | undefined = this.adaptable.api.glue42Api.getCurrentLiveGlue42Report();
-        if (
-          currentLiveIGlue42Report &&
-          currentLiveIGlue42Report.ReportName !== SELECTED_CELLS_REPORT &&
-          currentLiveIGlue42Report.ReportName !== SELECTED_ROWS_REPORT
-        ) {
-          this.throttledRecomputeAndSendLiveDataEvent();
-        }
+      if (this.isSendingData) {
+        const columnIdIndex = this.adaptable.api.gridApi
+          .getGridState()
+          .Columns.map(column => column.ColumnId)
+          .findIndex(columnId => columnId === dataChangedInfo.ColumnId);
+
+        const columnAsLetter = this.columnsAsLetters[columnIdIndex];
+        const rowAsNumber = 2 + dataChangedInfo.PrimaryKeyValue;
+
+        this.adaptable.Glue42Service.applyUpdatedData(
+          dataChangedInfo.NewValue,
+          columnAsLetter,
+          rowAsNumber
+        );
       }
+
+      // if (this.adaptable.api.glue42Api.isGlue42Running()) {
+      //   let currentLiveIGlue42Report:
+      //     | Glue42Report
+      //     | undefined = this.adaptable.api.glue42Api.getCurrentLiveGlue42Report();
+      //   if (
+      //     currentLiveIGlue42Report &&
+      //     currentLiveIGlue42Report.ReportName !== SELECTED_CELLS_REPORT &&
+      //     currentLiveIGlue42Report.ReportName !== SELECTED_ROWS_REPORT
+      //   ) {
+      //     this.throttledRecomputeAndSendLiveDataEvent();
+      //   }
+      // }
     });
     // if the grid has refreshed then update all live reports
     this.adaptable._on('GridRefreshed', () => {
@@ -166,7 +182,7 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
     }
   }
 
-  public sendSnapshot(glue42Report: Glue42Report): void {
+  public sendSnapshot(glue42Report: Glue42Report, isLive: boolean = false): void {
     let report: Report = this.adaptable.api.exportApi.getReportByName(glue42Report.ReportName);
     if (report) {
       let data: any[] = this.ConvertReportToArray(report);
@@ -179,6 +195,7 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
             data,
             gridColumns,
             primaryKeyValues,
+            isLive,
           ]);
         }
       } catch (error) {
@@ -188,17 +205,20 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
   }
 
   public startLiveData(glue42Report: Glue42Report): void {
-    let report: Report = this.adaptable.api.exportApi.getReportByName(glue42Report.ReportName);
-    if (report) {
-      let page: string = 'Excel'; // presume we should get this from Glue42 service in async way??
-      let reportData: any[] = this.ConvertReportToArray(report);
-      this.adaptable.Glue42Service.openSheet(reportData).then(() => {
-        this.adaptable.api.glue42Api.startLiveData(glue42Report);
-        setTimeout(() => {
-          this.throttledRecomputeAndSendLiveDataEvent();
-        }, 500);
-      });
-    }
+    this.sendSnapshot(glue42Report, true);
+    this.isSendingData = !this.isSendingData;
+
+    // let report: Report = this.adaptable.api.exportApi.getReportByName(glue42Report.ReportName);
+    // if (report) {
+    //   let page: string = 'Excel'; // presume we should get this from Glue42 service in async way??
+    //   let reportData: any[] = this.ConvertReportToArray(report);
+    //   this.adaptable.Glue42Service.openSheet(reportData).then(() => {
+    //     this.adaptable.api.glue42Api.startLiveData(glue42Report);
+    //     setTimeout(() => {
+    //       this.throttledRecomputeAndSendLiveDataEvent();
+    //     }, 500);
+    //   });
+    // }
   }
 
   // Converts a Report into an array of array - first array is the column names and subsequent arrays are the values

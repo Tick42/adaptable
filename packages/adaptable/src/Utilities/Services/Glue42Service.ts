@@ -48,6 +48,9 @@ export class Glue42Service implements IGlue42Service {
     isResolved: false,
   };
 
+  private workbook: 'ab-g42';
+  private worksheet: 'sample-sheet';
+
   constructor(private adaptable: IAdaptable) {
     this.adaptable = adaptable;
 
@@ -80,7 +83,7 @@ export class Glue42Service implements IGlue42Service {
             ws: 'ws://localhost:8385',
           },
           auth: {
-            username: username,
+            username: 'kparushev',
             password: password,
           },
         },
@@ -113,7 +116,12 @@ export class Glue42Service implements IGlue42Service {
     }
   }
 
-  async exportData(data: any[], gridColumns: AdaptableColumn[], primaryKeys: any[]) {
+  async exportData(
+    data: any[],
+    gridColumns: AdaptableColumn[],
+    primaryKeys: any[],
+    isLive: boolean = false
+  ) {
     if (!this.glueInstance) {
       return;
     }
@@ -135,8 +143,8 @@ export class Glue42Service implements IGlue42Service {
       const rowTrigger = 'row' as any;
       const updateTrigger = [rowTrigger];
       const syncOptions: any = {
-        workbook: 'Glue42 Excel Integration Demo',
-        worksheet: 'Data Sheet',
+        workbook: 'ab-g42',
+        worksheet: 'sample-sheet',
         updateTrigger,
       };
       if (this.excelSyncTimeout) {
@@ -150,9 +158,15 @@ export class Glue42Service implements IGlue42Service {
       };
 
       const sheet = await this.glue4ExcelInstance.openSheet(sheetData);
-      sheet.onChanged(
-        this.getSheetChangeHandler(gridColumns, sentRows, exportColumns, primaryKeys)
-      );
+      if (isLive) {
+        sheet.onChanged((d: any, e: any, s: any, delta: any) => {
+          s();
+        });
+      } else {
+        sheet.onChanged(
+          this.getSheetChangeHandler(gridColumns, sentRows, exportColumns, primaryKeys)
+        );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -223,6 +237,18 @@ export class Glue42Service implements IGlue42Service {
     }
   }
 
+  applyUpdatedData(value: string, col: string, row: number) {
+    this.glueInstance.interop
+      .invoke('T42.ExcelScript.Worksheet.Write', {
+        command: 'overwrite',
+        values: JSON.stringify([{ col, row, value, type: 'string' }]),
+        workbook: 'ab-g42.xlsx',
+        worksheet: 'sample-sheet',
+      })
+      .then(console.log)
+      .catch(console.error);
+  }
+
   /**
    * Returns a callback, handling the Sheet Changed event.
    * Walks through the delta.
@@ -239,6 +265,8 @@ export class Glue42Service implements IGlue42Service {
       doneCallback: () => void,
       delta: any[]
     ) => {
+      console.log('changed in excel');
+
       let primaryKeyColumnFriendlyName = ColumnHelper.getFriendlyNameFromColumnId(
         this.adaptable.adaptableOptions.primaryKey,
         gridColumns
@@ -249,44 +277,46 @@ export class Glue42Service implements IGlue42Service {
 
       delta.forEach(deltaItem => {
         if (deltaItem.action === 'modified') {
-          deltaItem.row.forEach((change: any, changeIndex: number) => {
-            if (change !== null) {
-              const column = ColumnHelper.getColumnFromFriendlyName(
-                exportColumns[changeIndex],
-                gridColumns
-              );
+          Object.keys(deltaItem.row)
+            .map(key => deltaItem.row[key])
+            .forEach((change: any, changeIndex: number) => {
+              if (change !== null) {
+                const column = ColumnHelper.getColumnFromFriendlyName(
+                  exportColumns[changeIndex],
+                  gridColumns
+                );
 
-              const originalRow = sentRows[deltaItem.rowBeforeIndex - 1];
-              const originalValue = originalRow[exportColumns[changeIndex]];
+                const originalRow = sentRows[deltaItem.rowBeforeIndex - 1];
+                const originalValue = originalRow[exportColumns[changeIndex]];
 
-              let primaryKeyValue: any;
-              if (primaryKeys) {
-                primaryKeyValue = primaryKeys[deltaItem.rowBeforeIndex - 1];
-              } else {
-                primaryKeyValue = originalRow[primaryKeyColumnFriendlyName];
+                let primaryKeyValue: any;
+                if (primaryKeys) {
+                  primaryKeyValue = primaryKeys[deltaItem.rowBeforeIndex - 1];
+                } else {
+                  primaryKeyValue = originalRow[primaryKeyColumnFriendlyName];
+                }
+
+                var isValidEdit = this.isValidEdit(
+                  column,
+                  originalValue,
+                  change,
+                  primaryKeyValue,
+                  deltaItem.rowBeforeIndex - 1,
+                  changeIndex,
+                  errors,
+                  gridColumns
+                );
+                if (isValidEdit) {
+                  let dataChangedInfo: DataChangedInfo = {
+                    OldValue: originalValue,
+                    NewValue: change,
+                    ColumnId: column.ColumnId,
+                    PrimaryKeyValue: primaryKeyValue,
+                  };
+                  dataChangedInfos.push(dataChangedInfo);
+                }
               }
-
-              var isValidEdit = this.isValidEdit(
-                column,
-                originalValue,
-                change,
-                primaryKeyValue,
-                deltaItem.rowBeforeIndex - 1,
-                changeIndex,
-                errors,
-                gridColumns
-              );
-              if (isValidEdit) {
-                let dataChangedInfo: DataChangedInfo = {
-                  OldValue: originalValue,
-                  NewValue: change,
-                  ColumnId: column.ColumnId,
-                  PrimaryKeyValue: primaryKeyValue,
-                };
-                dataChangedInfos.push(dataChangedInfo);
-              }
-            }
-          });
+            });
         } else {
           let msg = '';
           if (deltaItem.action === 'deleted') {
