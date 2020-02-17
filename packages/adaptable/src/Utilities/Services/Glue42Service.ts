@@ -42,6 +42,7 @@ type SheetChangeCallback = (
 export class Glue42Service implements IGlue42Service {
   private glue4ExcelInstance!: any;
   private glueInstance!: any;
+  currentChannelData!: any;
   private ChannelContextName: string = 'Adaptable.glue42Demo.CurrentRow';
   private excelSyncTimeout?: number;
   private sheet?: any; // think this is wrong but lets give it a go
@@ -49,6 +50,7 @@ export class Glue42Service implements IGlue42Service {
     msg: '[Excel] Not checked, changed the addin status 0 times!',
     isResolved: false,
   };
+  sharedContextName = 'instrumentDetails';
 
   constructor(private adaptable: IAdaptable) {
     this.adaptable = adaptable;
@@ -117,6 +119,8 @@ export class Glue42Service implements IGlue42Service {
       }
 
       this.glueInstance = await glue(glue42Config.initialization);
+      //TODO: REMOVE
+      window.glue = this.glueInstance;
       await this.initChannelUpdate();
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
@@ -137,6 +141,25 @@ export class Glue42Service implements IGlue42Service {
     this.adaptable.api.eventApi.on('SelectionChanged', selectionChangedEventArgs => {
       this.handleSelectionChanged(selectionChangedEventArgs.data);
     });
+    if (this.glueInstance.channels) {
+      this.glueInstance.channels.subscribe((data: any) => {
+        this.handleChannelUpdate(data);
+      });
+    }
+    if (this.glueInstance.contexts) {
+      this.glueInstance.contexts.subscribe(
+        this.sharedContextName,
+        this.handleInstrumentDetailsContextChange
+      );
+    }
+  }
+
+  private handleChannelUpdate(data: any) {
+    this.currentChannelData = data;
+  }
+
+  private handleInstrumentDetailsContextChange(context: any, delta: any, removed: any) {
+    console.log('Context instrument details got changed');
   }
 
   handleSelectionChanged(eventData: SelectionChangedEventData[]) {
@@ -160,11 +183,34 @@ export class Glue42Service implements IGlue42Service {
     const channelsObj = this.glueInstance.channels;
     console.log(channelsObj);
     if (channelsObj && channelsObj.current()) {
-      const channelDataObject: any = {};
+      const channelDataObject: any = this.currentChannelData || {};
       const interopObjectPropName = this.ChannelContextName;
       channelDataObject[interopObjectPropName] = row;
+      // HACK: FOR THE DEMO VIDEOS
+      if (row.symbol) {
+        if (!channelDataObject.partyPortfolio) {
+          channelDataObject.partyPortfolio = {};
+        }
+        channelDataObject.partyPortfolio.ric = row.instrument.bbgsymbol;
+      }
       channelsObj.publish(channelDataObject);
+    } else if (this.glueInstance.contexts) {
+      this.glueInstance.contexts.update(this.sharedContextName, {
+        ticker: row.instrument.bbgsymbol,
+      });
     }
+    this.syncSalesforce(row.contact);
+  }
+
+  private syncSalesforce(contact: any) {
+    this.glueInstance.interop.invoke(
+      'T42.CRM.SyncContact',
+      { contact },
+      'all',
+      {},
+      () => {}, //console.log,
+      () => {} // console.warn
+    );
   }
 
   async exportData(data: any[], gridColumns: AdaptableColumn[], primaryKeys: any[]) {

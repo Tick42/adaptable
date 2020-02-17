@@ -324,7 +324,7 @@ export class ExamplesHelper {
     return Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
   }
 
-  protected generateRandomBool(): boolean {
+  public generateRandomBool(): boolean {
     const amount = this.generateRandomInt(0, 1);
     return amount === 0;
   }
@@ -418,7 +418,7 @@ export class ExamplesHelper {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   }
 
-  protected generateRandomDate(minDays: number, maxDays: number): Date {
+  public generateRandomDate(minDays: number, maxDays: number): Date {
     const date = this.generateRandomDateAndTime(minDays, maxDays);
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     // return toDateTimeString(date);
@@ -1809,9 +1809,9 @@ export class ExamplesHelper {
     return adaptableOptions;
   }
 
-  private dateParseragGrid = (params: any) => {
+  public dateParseragGrid = (params: any) => {
     try {
-      return this.stringToDate(params.newValue, 'dd/mm/yyyy', '/');
+      return this.stringToDate(params.newValue, 'mm/dd/yyyy', '/');
     } catch (ex) {
       LoggingHelper.LogAdaptableError(
         `Error parsing the date value: ${params.newValue} and node : `,
@@ -1838,12 +1838,17 @@ export class ExamplesHelper {
     return formatedDate;
   }
 
-  private shortDateFormatter = new Intl.DateTimeFormat('en-GB');
+  private shortDateFormatter = new Intl.DateTimeFormat('en-US');
 
-  private shortDateFormatteragGrid = (params: any) => {
+  public shortDateFormatteragGrid = (params: any) => {
     try {
       if (params.value) {
-        return this.shortDateFormatter.format(params.value);
+        // HACK: Formatter does not work properly with Excel's short regional formatting:
+        let valueAsDate = params.value;
+        if (valueAsDate.length === 19) {
+          valueAsDate = new Date(valueAsDate);
+        }
+        return this.shortDateFormatter.format();
       }
     } catch (ex) {
       LoggingHelper.LogAdaptableError(
@@ -1857,7 +1862,7 @@ export class ExamplesHelper {
   private fourDecimalPlaceFormatter = (params: any) => {
     return params.value ? this.roundTo4Dp(params.value) : null;
   };
-  private twoDecimalPlaceFormatter = (params: any) => {
+  public twoDecimalPlaceFormatter = (params: any) => {
     return params.value ? this.roundTo2Dp(params.value) : null;
   };
 
