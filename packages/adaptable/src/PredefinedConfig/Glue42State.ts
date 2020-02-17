@@ -5,6 +5,8 @@ import { BaseSchedule } from './Common/Schedule';
 export interface Glue42State extends DesignTimeState {
   Username?: string;
   Password?: string;
+  Channels?: boolean;
+  Contexts?: boolean;
   GatewayURL?: string;
   Glue?: any; // this is the glue object
   Glue4Office?: any; // this is the Glue4Office object

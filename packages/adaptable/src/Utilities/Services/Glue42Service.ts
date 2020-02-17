@@ -12,6 +12,7 @@ import ExpressionHelper from '../Helpers/ExpressionHelper';
 import { Glue42State } from '../../PredefinedConfig/Glue42State';
 import { IGlue42Service, Glue42Config } from './Interface/IGlue42Service';
 import StringExtensions from '../Extensions/StringExtensions';
+import { SelectionChangedEventData } from '../../Api/Events/SelectionChanged';
 
 export interface Glue42ExportError {
   row: number;
@@ -41,6 +42,7 @@ type SheetChangeCallback = (
 export class Glue42Service implements IGlue42Service {
   private glue4ExcelInstance!: any;
   private glueInstance!: any;
+  private ChannelContextName: string = 'Adaptable.glue42Demo.CurrentRow';
   private excelSyncTimeout?: number;
   private sheet?: any; // think this is wrong but lets give it a go
   private isExcelStatus: ExcelStatus = {
@@ -60,7 +62,13 @@ export class Glue42Service implements IGlue42Service {
             StringExtensions.IsNotNullOrEmpty(glue42State.Username) &&
             StringExtensions.IsNotNullOrEmpty(glue42State.Password)
           ) {
-            this.login(glue42State.Username, glue42State.Password, glue42State.GatewayURL);
+            this.login(
+              glue42State.Username,
+              glue42State.Password,
+              glue42State.GatewayURL,
+              glue42State.Contexts || false,
+              glue42State.Channels || false
+            );
           }
         } else {
           this.adaptable.api.glue42Api.setGlue42AvailableOff();
@@ -70,7 +78,15 @@ export class Glue42Service implements IGlue42Service {
     });
   }
 
-  async login(username: string, password: string, gatewayURL: string): Promise<void> {
+  // Passing the channels and contexts properties became really ugly here.
+  //   Some kind of a specific type should be figured out.
+  async login(
+    username: string,
+    password: string,
+    gatewayURL: string,
+    contexts: boolean,
+    channels: boolean
+  ): Promise<void> {
     try {
       let ws = StringExtensions.IsNotNullOrEmpty(gatewayURL) ? gatewayURL : 'ws://localhost:8385';
       const glue42Config: any = {
@@ -84,6 +100,8 @@ export class Glue42Service implements IGlue42Service {
             username: username,
             password: password,
           },
+          contexts,
+          channels,
         },
         excelExport: {
           timeoutMs: 30000,
@@ -99,6 +117,7 @@ export class Glue42Service implements IGlue42Service {
       }
 
       this.glueInstance = await glue(glue42Config.initialization);
+      await this.initChannelUpdate();
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
       glue4OfficeConfig.glue = this.glueInstance;
@@ -111,6 +130,40 @@ export class Glue42Service implements IGlue42Service {
       console.log(error);
       LogAdaptableError(error);
       this.adaptable.api.glue42Api.setGlue42RunningOff();
+    }
+  }
+
+  async initChannelUpdate() {
+    this.adaptable.api.eventApi.on('SelectionChanged', selectionChangedEventArgs => {
+      this.handleSelectionChanged(selectionChangedEventArgs.data);
+    });
+  }
+
+  handleSelectionChanged(eventData: SelectionChangedEventData[]) {
+    if (eventData.length === 0) {
+      return;
+    }
+
+    const gridCells = eventData[0].id.selectedCellInfo.GridCells;
+    if (gridCells.length === 0) {
+      return;
+    }
+
+    const primaryKeyValue = gridCells[0].primaryKeyValue;
+    const row = this.adaptable.getRowNodeForPrimaryKey(primaryKeyValue).data;
+
+    if (!row) {
+      console.error('Data row matching the current selection was not discovered');
+      return;
+    }
+
+    const channelsObj = this.glueInstance.channels;
+    console.log(channelsObj);
+    if (channelsObj && channelsObj.current()) {
+      const channelDataObject: any = {};
+      const interopObjectPropName = this.ChannelContextName;
+      channelDataObject[interopObjectPropName] = row;
+      channelsObj.publish(channelDataObject);
     }
   }
 
