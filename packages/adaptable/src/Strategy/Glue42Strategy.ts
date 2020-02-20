@@ -20,7 +20,7 @@ import { ExportDestination } from '../PredefinedConfig/Common/Enums';
 export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Strategy {
   private isSendingData: boolean = false;
 
-  private throttledRecomputeAndSendLiveDataEvent: (() => void) & _.Cancelable;
+  private throttledRecomputeAndSendLiveDataEvent!: (() => void) & _.Cancelable;
 
   constructor(adaptable: IAdaptable) {
     super(StrategyConstants.Glue42StrategyId, adaptable);
@@ -142,7 +142,7 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
         })
         .catch(reason => {
           LoggingHelper.LogAdaptableWarning(
-            'Failed to send data to iGlue42 for [' + currentLiveIGlue42Report.ReportName + ']',
+            'Failed to send data to iGlue42 for [' + currentLiveIGlue42Report!.ReportName + ']',
             reason
           );
           //      this.adaptable.api.glue42Api.stopLiveData();
@@ -203,7 +203,7 @@ export class Glue42Strategy extends AdaptableStrategyBase implements IGlue42Stra
 
   // Converts a Report into an array of array - first array is the column names and subsequent arrays are the values
   // Should probably use same one as Export
-  private ConvertReportToArray(report: Report): any[] {
+  private ConvertReportToArray(report: Report): any {
     let actionReturnObj = this.adaptable.ReportService.ConvertReportToArray(report);
     if (actionReturnObj.Alert) {
       this.adaptable.api.alertApi.displayMessageAlertPopup(actionReturnObj.Alert);

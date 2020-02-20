@@ -58,7 +58,7 @@ let demoConfig: PredefinedConfig = {
   Glue42: {
     Glue: glue42Desktop, // this is the glue object
     Glue4Office: glue42office, // this is the Glue4Office object
-    Username: 'egavalji',
+    Username: 'kparushev',
     Password: 'demopassword', // put in .env file
     Channels: true,
     Contexts: true,
