@@ -13,6 +13,7 @@ import { Glue42State } from '../../PredefinedConfig/Glue42State';
 import { IGlue42Service, Glue42Config } from './Interface/IGlue42Service';
 import StringExtensions from '../Extensions/StringExtensions';
 import { SelectionChangedEventData } from '../../Api/Events/SelectionChanged';
+import { RangeSelectionChangedEvent, SelectionChangedEvent } from '@ag-grid-community/core';
 
 export interface Glue42ExportError {
   row: number;
@@ -42,13 +43,15 @@ type SheetChangeCallback = (
 export class Glue42Service implements IGlue42Service {
   private glue4ExcelInstance!: any;
   private glueInstance!: any;
-  private ChannelContextName: string = 'Adaptable.glue42Demo.CurrentRow';
+  private sheetName = 'exportedSheet';
+  // private ChannelContextName: string = 'Adaptable.glue42Demo.currentRow';
   private excelSyncTimeout?: number;
   private sheet?: any; // think this is wrong but lets give it a go
   private isExcelStatus: ExcelStatus = {
     msg: '[Excel] Not checked, changed the addin status 0 times!',
     isResolved: false,
   };
+  private selectionInProgress = false;
 
   constructor(private adaptable: IAdaptable) {
     this.adaptable = adaptable;
@@ -81,17 +84,16 @@ export class Glue42Service implements IGlue42Service {
   // Passing the channels and contexts properties became really ugly here.
   //   Some kind of a specific type should be figured out.
   async login(
-    username: string,
-    password: string,
-    gatewayURL: string,
-    contexts: boolean,
-    channels: boolean
+    username: string | undefined,
+    password: string | undefined,
+    gatewayURL: string | undefined,
+    contexts: boolean | undefined,
+    channels: boolean | undefined
   ): Promise<void> {
     try {
       let ws = StringExtensions.IsNotNullOrEmpty(gatewayURL) ? gatewayURL : 'ws://localhost:8385';
       const glue42Config: any = {
         initialization: {
-          application: 'Adaptable',
           gateway: {
             protocolVersion: 3,
             ws: ws,
@@ -108,7 +110,7 @@ export class Glue42Service implements IGlue42Service {
         },
       };
 
-      const glue42State: Glue42State = this.adaptable.api.glue42Api.getGlue42State();
+      const glue42State: Glue42State = this.adaptable.api.glue42Api.getGlue42State()!;
       const glue = glue42State.Glue;
       const glue4Office = glue42State.Glue4Office;
 
@@ -117,7 +119,10 @@ export class Glue42Service implements IGlue42Service {
       }
 
       this.glueInstance = await glue(glue42Config.initialization);
-      await this.initChannelUpdate();
+      (window as any).glue = this.glueInstance;
+
+      this.subscribeForSelectionUpdate();
+
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
       glue4OfficeConfig.glue = this.glueInstance;
@@ -133,37 +138,32 @@ export class Glue42Service implements IGlue42Service {
     }
   }
 
-  async initChannelUpdate() {
-    this.adaptable.api.eventApi.on('SelectionChanged', selectionChangedEventArgs => {
-      this.handleSelectionChanged(selectionChangedEventArgs.data);
-    });
+  subscribeForSelectionUpdate() {
+    this.adaptable.adaptableOptions.vendorGrid.api.addEventListener(
+      'selectionChanged',
+      (event: SelectionChangedEvent) => {
+        // if (!this.selectionInProgress) {
+        const ctx = this.handleRowSelection(event);
+        this.updateChannelContext(ctx);
+        // }
+      }
+    );
   }
 
-  handleSelectionChanged(eventData: SelectionChangedEventData[]) {
-    if (eventData.length === 0) {
-      return;
-    }
+  handleRowSelection(event: SelectionChangedEvent) {
+    const ctx: any = {};
+    const rowNodes = event.api.getSelectedNodes().map(node => ({
+      id: node.id,
+      data: node.data,
+    }));
+    ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = rowNodes;
+    return ctx;
+  }
 
-    const gridCells = eventData[0].id.selectedCellInfo.GridCells;
-    if (gridCells.length === 0) {
-      return;
-    }
-
-    const primaryKeyValue = gridCells[0].primaryKeyValue;
-    const row = this.adaptable.getRowNodeForPrimaryKey(primaryKeyValue).data;
-
-    if (!row) {
-      console.error('Data row matching the current selection was not discovered');
-      return;
-    }
-
-    const channelsObj = this.glueInstance.channels;
-    console.log(channelsObj);
-    if (channelsObj && channelsObj.current()) {
-      const channelDataObject: any = {};
-      const interopObjectPropName = this.ChannelContextName;
-      channelDataObject[interopObjectPropName] = row;
-      channelsObj.publish(channelDataObject);
+  updateChannelContext(ctx: any) {
+    const channels = this.glueInstance.channels;
+    if (channels.current()) {
+      channels.publish(ctx);
     }
   }
 
