@@ -121,7 +121,11 @@ export class Glue42Service implements IGlue42Service {
       this.glueInstance = await glue(glue42Config.initialization);
       (window as any).glue = this.glueInstance;
 
-      this.subscribeForSelectionUpdate();
+      this.glueInstance.channels.subscribe((data: any, ctx: any) => {
+        this.updateSelectionOnContextChange(ctx);
+      });
+
+      this.updateContextOnSelectionChange();
 
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
@@ -138,25 +142,45 @@ export class Glue42Service implements IGlue42Service {
     }
   }
 
-  subscribeForSelectionUpdate() {
+  updateContextOnSelectionChange() {
     this.adaptable.adaptableOptions.vendorGrid.api.addEventListener(
       'selectionChanged',
       (event: SelectionChangedEvent) => {
-        // if (!this.selectionInProgress) {
-        const ctx = this.handleRowSelection(event);
-        this.updateChannelContext(ctx);
-        // }
+        const isSingleRow = event.api.getSelectedNodes().length === 1;
+        if (isSingleRow) {
+          const ctx = this.getContextFromSelectedRow(event);
+          this.updateChannelContext(ctx);
+        }
       }
     );
   }
 
-  handleRowSelection(event: SelectionChangedEvent) {
+  updateSelectionOnContextChange(ctx: any) {
+    this.adaptable.adaptableOptions.vendorGrid.api.forEachNode((node: any) => {
+      if (
+        node.data.customer === ctx.data.contact.displayName &&
+        node.data.bbg_symbol === ctx.data.partyPortfolio.ric
+      ) {
+        node.setSelected(true, true);
+      }
+    });
+  }
+
+  getContextFromSelectedRow(event: SelectionChangedEvent) {
     const ctx: any = {};
     const rowNodes = event.api.getSelectedNodes().map(node => ({
       id: node.id,
       data: node.data,
     }));
-    ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = rowNodes;
+    const selectedNode = rowNodes[0];
+    ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = selectedNode;
+    ctx.contact = selectedNode.data.contact;
+    ctx.partyPortfolio = {
+      ric: selectedNode.data.bbg_symbol,
+      description: selectedNode.data.symbol_name,
+      price: selectedNode.data.price,
+      shares: selectedNode.data.quantity,
+    };
     return ctx;
   }
 
@@ -164,6 +188,8 @@ export class Glue42Service implements IGlue42Service {
     const channels = this.glueInstance.channels;
     if (channels.current()) {
       channels.publish(ctx);
+    } else {
+      console.log('Not on a channel');
     }
   }
 

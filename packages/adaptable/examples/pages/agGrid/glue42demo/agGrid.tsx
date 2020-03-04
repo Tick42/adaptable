@@ -11,17 +11,18 @@ import './index.css';
 import { GridOptions } from '@ag-grid-community/all-modules';
 import Adaptable from '../../../../src/agGrid';
 import { AdaptableOptions, PredefinedConfig } from '../../../../src/types';
-import { ExamplesHelper } from '../../ExamplesHelper';
+import { GlueExampleHelper } from '../../GlueExampleHelper';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import glue42Desktop from '@glue42/desktop';
 import glue42office from '@glue42/office';
 import { TickingDataHelper } from '../../TickingDataHelper';
+import { GlueClientsExampleHelper } from '../../GlueClientsExampleHelper';
 
-function InitAdaptableDemo() {
-  const examplesHelper = new ExamplesHelper();
+async function InitAdaptableDemo() {
+  const examplesHelper = new GlueClientsExampleHelper();
   const tradeCount: number = 30;
-  const tradeData: any = examplesHelper.getTrades(tradeCount);
+  const tradeData: any = await examplesHelper.getTrades(0);
   const gridOptions: GridOptions = examplesHelper.getGridOptionsTrade(tradeData);
   const tickingDataHelper = new TickingDataHelper();
   const useTickingData: boolean = false;
