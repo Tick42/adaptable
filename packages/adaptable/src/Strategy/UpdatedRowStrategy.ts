@@ -7,14 +7,11 @@ import { IUpdatedRowStrategy } from './Interface/IUpdatedRowStrategy';
 import { MenuItemShowPopup } from '../Utilities/MenuItem';
 import { AdaptableMenuItem, MenuInfo } from '../PredefinedConfig/Common/Menu';
 import { DataChangedInfo } from '../PredefinedConfig/Common/DataChangedInfo';
-import { AdaptableAlert } from '../Utilities/Interface/IMessage';
 import ArrayExtensions from '../Utilities/Extensions/ArrayExtensions';
 import { UpdatedRowState } from '../PredefinedConfig/UpdatedRowState';
 import { UpdatedRowInfo, ChangeDirection } from '../Utilities/Services/Interface/IDataService';
-import { AdaptableColumn } from '../PredefinedConfig/Common/AdaptableColumn';
 import ColumnHelper from '../Utilities/Helpers/ColumnHelper';
 import { DataType } from '../PredefinedConfig/Common/Enums';
-import { StrategyParams } from '../View/Components/SharedProps/StrategyViewPopupProps';
 
 export abstract class UpdatedRowStrategy extends AdaptableStrategyBase
   implements IUpdatedRowStrategy {
@@ -27,38 +24,46 @@ export abstract class UpdatedRowStrategy extends AdaptableStrategyBase
   }
 
   public addFunctionMenuItem(): AdaptableMenuItem | undefined {
-    return this.createMainMenuItemShowPopup({
-      Label: StrategyConstants.UpdatedRowStrategyFriendlyName,
-      ComponentName: ScreenPopups.UpdatedRowPopup,
-      Icon: StrategyConstants.UpdatedRowGlyph,
-    });
+    if (this.canCreateMenuItem('ReadOnly')) {
+      return this.createMainMenuItemShowPopup({
+        Label: StrategyConstants.UpdatedRowStrategyFriendlyName,
+        ComponentName: ScreenPopups.UpdatedRowPopup,
+        Icon: StrategyConstants.UpdatedRowGlyph,
+      });
+    }
   }
 
-  public addColumnMenuItem(): AdaptableMenuItem | undefined {
-    let currentRowInfos: UpdatedRowInfo[] = this.adaptable.api.internalApi.getUpdatedRowInfos();
-    if (ArrayExtensions.IsNotNullOrEmpty(currentRowInfos)) {
-      return this.createColumnMenuItemReduxAction(
-        'Clear Updated Rows',
-        StrategyConstants.UpdatedRowGlyph,
-        SystemRedux.SystemUpdatedRowDeleteAll(currentRowInfos)
-      );
+  public addColumnMenuItems(): AdaptableMenuItem[] | undefined {
+    if (this.canCreateMenuItem('ReadOnly')) {
+      let currentRowInfos: UpdatedRowInfo[] = this.adaptable.api.internalApi.getUpdatedRowInfos();
+      if (ArrayExtensions.IsNotNullOrEmpty(currentRowInfos)) {
+        return [
+          this.createColumnMenuItemReduxAction(
+            'Clear Updated Rows',
+            StrategyConstants.UpdatedRowGlyph,
+            SystemRedux.SystemUpdatedRowDeleteAll(currentRowInfos)
+          ),
+        ];
+      }
     }
   }
 
   public addContextMenuItem(menuInfo: MenuInfo): AdaptableMenuItem | undefined {
     let menuItemShowPopup: MenuItemShowPopup = undefined;
-    if (menuInfo.Column && menuInfo.RowNode) {
-      let updatedRowInfos: UpdatedRowInfo[] = this.adaptable.api.internalApi.getUpdatedRowInfos();
-      if (ArrayExtensions.IsNotNullOrEmpty(updatedRowInfos)) {
-        let updatedRowInfo: UpdatedRowInfo = updatedRowInfos.find(
-          a => a.primaryKeyValue == menuInfo.PrimaryKeyValue
-        );
-        if (updatedRowInfo) {
-          menuItemShowPopup = this.createColumnMenuItemReduxAction(
-            'Clear Updated Row',
-            StrategyConstants.UpdatedRowGlyph,
-            SystemRedux.SystemUpdatedRowDelete(updatedRowInfo)
+    if (this.canCreateMenuItem('ReadOnly')) {
+      if (menuInfo.Column && menuInfo.RowNode) {
+        let updatedRowInfos: UpdatedRowInfo[] = this.adaptable.api.internalApi.getUpdatedRowInfos();
+        if (ArrayExtensions.IsNotNullOrEmpty(updatedRowInfos)) {
+          let updatedRowInfo: UpdatedRowInfo = updatedRowInfos.find(
+            a => a.primaryKeyValue == menuInfo.PrimaryKeyValue
           );
+          if (updatedRowInfo) {
+            menuItemShowPopup = this.createColumnMenuItemReduxAction(
+              'Clear Updated Row',
+              StrategyConstants.UpdatedRowGlyph,
+              SystemRedux.SystemUpdatedRowDelete(updatedRowInfo)
+            );
+          }
         }
       }
     }

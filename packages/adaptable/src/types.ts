@@ -1,56 +1,19 @@
-// Event Types
-import { EventApi } from './Api/EventApi';
-import {
-  SearchChangedInfo,
-  AdaptableSearchState,
-  SearchChangedEventArgs,
-} from './Api/Events/SearchChanged';
-import { AlertFiredEventArgs, AlertFiredInfo } from './Api/Events/AlertFired';
-import {
-  ColumnStateChangedEventArgs,
-  ColumnStateChangedInfo,
-} from './Api/Events/ColumnStateChanged';
-import { ThemeChangedEventArgs, ThemeChangedInfo } from './Api/Events/ThemeChanged';
-import {
-  ActionColumnClickedEventArgs,
-  ActionColumnClickedInfo,
-} from './Api/Events/ActionColumnClicked';
-import {
-  ToolbarVisibilityChangedEventArgs,
-  ToolbarVisibilityChangedInfo,
-} from './Api/Events/ToolbarVisibilityChanged';
-import {
-  LiveDataChangedEventArgs,
-  LiveDataChangedInfo,
-  LiveReport,
-} from './Api/Events/LiveDataChanged';
-import { SelectionChangedEventArgs, SelectionChangedInfo } from './Api/Events/SelectionChanged';
-import {
-  ToolbarButtonClickedEventArgs,
-  ToolbarButtonClickedInfo,
-} from './Api/Events/ToolbarButtonClicked';
-import { AdaptableReadyInfo } from './Api/Events/AdaptableReady';
-import {
-  AuditLogEventArgs,
-  StateChangedDetails,
-  StatePropertyChangedDetails,
-  StateObjectChangedDetails,
-  FunctionAppliedDetails,
-  DataChangedDetails,
-} from './Api/Events/AuditEvents';
-
 // Base Types
 export {
   IAdaptableNoCodeWizard,
-  IAdaptableNoCodeWizardOptions,
-} from './AdaptableInterfaces/IAdaptableNoCodeWizard';
-
+  AdaptableNoCodeWizardOptions,
+} from './AdaptableInterfaces/AdaptableNoCodeWizard';
 export { IAdaptable } from './AdaptableInterfaces/IAdaptable';
 export { IAdaptableStore } from './Redux/Store/Interface/IAdaptableStore';
 export { AdaptableApi } from './Api/AdaptableApi';
 export { AdaptablePlugin } from './AdaptableOptions/AdaptablePlugin';
 
+// Types we use
+export { AdaptableFunctionName } from './PredefinedConfig/Common/Types';
+
 // Adaptable Objects
+export { RowStyle } from './PredefinedConfig/UserInterfaceState';
+export { AccessLevel, Entitlement } from './PredefinedConfig/EntitlementState';
 
 // Predefined Config and Predefined Config Common Objects
 export { PredefinedConfig } from './PredefinedConfig/PredefinedConfig';
@@ -62,9 +25,6 @@ export { SelectedCellInfo } from './PredefinedConfig/Selection/SelectedCellInfo'
 export { SelectedRowInfo } from './PredefinedConfig/Selection/SelectedRowInfo';
 export { GridCell } from './PredefinedConfig/Selection/GridCell';
 export { GridRow } from './PredefinedConfig/Selection/GridRow';
-
-// State Objects
-export { RowStyle } from './PredefinedConfig/UserInterfaceState';
 
 // Adaptable Options Objects
 export { AdaptableOptions } from './AdaptableOptions/AdaptableOptions';
@@ -88,33 +48,38 @@ export { IServerColumnValues } from './AdaptableOptions/QueryOptions';
 export { ValidationResult } from './AdaptableOptions/EditOptions';
 
 // Events
+export { EventApi } from './Api/EventApi';
 export {
-  EventApi,
-  AdaptableReadyInfo,
-  AdaptableSearchState,
   SearchChangedInfo,
+  AdaptableSearchState,
   SearchChangedEventArgs,
-  ActionColumnClickedInfo,
-  ActionColumnClickedEventArgs,
-  AlertFiredInfo,
-  AlertFiredEventArgs,
-  ToolbarButtonClickedInfo,
-  ToolbarButtonClickedEventArgs,
-  ColumnStateChangedInfo,
+} from './Api/Events/SearchChanged';
+export { AlertFiredEventArgs, AlertFiredInfo } from './Api/Events/AlertFired';
+export {
   ColumnStateChangedEventArgs,
-  LiveReport,
-  LiveDataChangedInfo,
-  LiveDataChangedEventArgs,
-  SelectionChangedInfo,
-  SelectionChangedEventArgs,
-  ThemeChangedInfo,
-  ThemeChangedEventArgs,
-  ToolbarVisibilityChangedInfo,
+  ColumnStateChangedInfo,
+} from './Api/Events/ColumnStateChanged';
+export { ThemeChangedEventArgs, ThemeChangedInfo } from './Api/Events/ThemeChanged';
+export {
+  ActionColumnClickedEventArgs,
+  ActionColumnClickedInfo,
+} from './Api/Events/ActionColumnClicked';
+export {
   ToolbarVisibilityChangedEventArgs,
-  AuditLogEventArgs,
-  StateChangedDetails,
-  StatePropertyChangedDetails,
-  StateObjectChangedDetails,
-  FunctionAppliedDetails,
-  DataChangedDetails,
-};
+  ToolbarVisibilityChangedInfo,
+} from './Api/Events/ToolbarVisibilityChanged';
+export {
+  LiveDataChangedEventArgs,
+  LiveDataChangedInfo,
+  LiveReport,
+} from './Api/Events/LiveDataChanged';
+export { SelectionChangedEventArgs, SelectionChangedInfo } from './Api/Events/SelectionChanged';
+export {
+  ToolbarButtonClickedEventArgs,
+  ToolbarButtonClickedInfo,
+} from './Api/Events/ToolbarButtonClicked';
+export { AdaptableReadyInfo } from './Api/Events/AdaptableReady';
+
+// Audit Events
+export { AuditEventApi, AuditEventName } from './Api/AuditEventApi';
+export * from './Api/Events/AuditEvents';

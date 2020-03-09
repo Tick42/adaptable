@@ -12,6 +12,8 @@ AdapTable supports a number of underlying vendor grid components, and new vendor
 
 AdapTable is fully data agnostic and can work with any data set you provide it with. It is suitable for all data, all asset classes, all grid types, all locations and all use cases.
 
+AdapTable is written in TypeScript.  All the necessary definition files are included in the package to enable easy design-time access to all internal classes.
+
 
 ![AdapTable image](./images/adaptable.png)
 
@@ -106,6 +108,18 @@ For the ag-Grid Angular Wrapper it will be:
 npm i @adaptabletools/adaptable-angular-aggrid
 ```
 
+7.  Install any Adaptable Plugins as required (see section below for more details).
+
+e.g. to install the charts plugin it will be:
+
+```
+npm install @adaptabletools/adaptable-plugin-charts
+```
+
+>  This downloaded contains everything required to run AdapTable and no other downloads are necessary.
+>  AdapTable, once running, **does not make any external internet calls nor store any of your data**.
+>  Adaptable Tools has no knowledge, or visibility, of anything that you are doing when you use AdapTable.
+
 ## Plugins
 AdapTable since version 6 includes plugins to reduce the download size of the 'core' project and to allow you to select only the functionality you want.  
 
@@ -118,6 +132,8 @@ There are currently two plugins:
 - **Finance** (`@adaptabletools/adaptable-plugin-finance`)
 
 > Adds additional functionality of benefit to advanced financial users (currently very empty but will be added to over time)
+
+Further information is availalbe in the [Plugins ReadMe](./packages/plugins/README.md)
 
 
 ## Licences
@@ -140,7 +156,7 @@ We have added a few example projects to Github to help you to understand how to 
 These include:
 * [Angular Wrapper Example](https://github.com/AdaptableTools/example-adaptable-angular-aggrid)
  
-* [React Wrapper Example](https://github.com/AdaptableTools/example-adaptable-angular-aggrid)
+* [React Wrapper Example](https://github.com/AdaptableTools/example-adaptable-react-aggrid)
   
 * [Building Minifed File (with parcel.js) Example](https://github.com/AdaptableTools/example-adaptable-with-parceljs)
    
@@ -149,7 +165,7 @@ These include:
  
 ## Help
 
-Further information about AdapTable is available at our [Website](www.adaptabletools.com) and our [Help Site](https://adaptabletools.zendesk.com/hc/en-us)
+Further information about AdapTable is available at our [Website](http://www.adaptabletools.com) and our [Help Site](https://adaptabletools.zendesk.com/hc/en-us)
 
 Developers can learn how to access AdapTable programmatically at [AdapTable Developer Documentation](https://api.adaptabletools.com) 
 
@@ -157,7 +173,7 @@ Developers can learn how to access AdapTable programmatically at [AdapTable Deve
 
 Other Read Me docs that will be of interest are:
 
- - [Version 6 Upgrade Guide](./packages/adaptable/upgrade-guide.md)
+ - [Version 6 Upgrade Guide](./packages/adaptable/readme/upgrade-guide.md)
 
  - [Adaptable Core](./packages/adaptable/README.md)
 
@@ -165,7 +181,11 @@ Other Read Me docs that will be of interest are:
   
  - [Angular Wrapper](./packages/adaptable-ng-aggrid/README.md)
  
- - [Adaptable Theming and Styling Guide](./packages/adaptable/adaptable-theming-guide.md)
+ - [Adaptable Theming and Styling Guide](./packages/adaptable/readme/adaptable-theming-guide.md)
+ 
+ - [Plugins](./packages/plugins/README.md)
+ 
+ Read the [full list of the AdapTable ReadMe docs](./packages/adaptable/readme/readme-list.md).
 
 ## Support
 

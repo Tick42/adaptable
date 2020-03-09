@@ -1,3 +1,57 @@
+## 6.0.17
+
+Fix bug where default layout was still showing columns which had been marked as hidden in GridOptions
+
+Fix bug where Shortucts were not being applied when a numeric cell was directly edited
+
+## 6.0.16
+
+Fix bug that caused data updates to not work correctly when having multiple AdapTable instances in one page
+
+## 6.0.15
+
+Try to improve loading times for layouts
+
+## 6.0.14
+
+Fix version displayed in the info popup & update some readme docs
+
+## 6.0.13
+
+Trying to fix grouping layouts
+
+## 6.0.12
+
+Sorting out AutoSize layouts 
+
+## 6.0.11
+
+Fixing grouping bug
+
+## 6.0.10
+
+Pivot Sort improvements
+
+## 6.0.9
+
+Fixing alert bug in Object Factory
+
+## 6.0.8
+
+Doing a proper merge of recent changes in Dev
+
+## 6.0.7
+
+More Audit Log related types exported
+
+## 6.0.6
+
+Update to Audit Log so user can specify name of server to run audit log
+
+## 6.0.5
+
+Fix OpenFinHelper so it doesn't break tsc build
+
 ## 6.0.4
 
 Fix bug in state management preventing changes to Application Data Entries at run-time

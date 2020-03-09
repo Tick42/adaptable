@@ -3,8 +3,6 @@ import { Action } from 'redux';
 import { DataType } from '../PredefinedConfig/Common/Enums';
 import { StringExtensions } from '../Utilities/Extensions/StringExtensions';
 import { AdaptableColumn } from '../PredefinedConfig/Common/AdaptableColumn';
-
-import { Entitlement } from '../PredefinedConfig/EntitlementState';
 import { StrategyParams } from '../View/Components/SharedProps/StrategyViewPopupProps';
 import {
   MenuItemShowPopup,
@@ -14,6 +12,7 @@ import {
 import { AdaptableMenuItem, MenuInfo } from '../PredefinedConfig/Common/Menu';
 import { IAdaptable } from '../AdaptableInterfaces/IAdaptable';
 import { AdaptableFunctionName } from '../PredefinedConfig/Common/Types';
+import { AccessLevel } from '../PredefinedConfig/EntitlementState';
 
 /**
  * Base class for all strategies and does most of the work of creating menus
@@ -25,8 +24,7 @@ export abstract class AdaptableStrategyBase implements IStrategy {
     this.adaptable = adaptable;
   }
 
-  private isVisible: boolean;
-  private isReadOnly: boolean;
+  public AccessLevel: AccessLevel;
 
   public initializeWithRedux() {
     this.InitState();
@@ -34,8 +32,9 @@ export abstract class AdaptableStrategyBase implements IStrategy {
   }
 
   public setStrategyEntitlement(): void {
-    this.isVisible = this.isVisibleStrategy();
-    this.isReadOnly = this.isReadOnlyStrategy();
+    this.AccessLevel = this.adaptable.api.entitlementsApi.getEntitlementAccessLevelByAdaptableFunctionName(
+      this.Id
+    );
   }
 
   protected InitState(): void {
@@ -55,7 +54,7 @@ export abstract class AdaptableStrategyBase implements IStrategy {
     return undefined;
   }
 
-  public addColumnMenuItem(column: AdaptableColumn): AdaptableMenuItem | undefined {
+  public addColumnMenuItems(column: AdaptableColumn): AdaptableMenuItem[] | undefined {
     // base class implementation which is empty
     return undefined;
   }
@@ -63,28 +62,6 @@ export abstract class AdaptableStrategyBase implements IStrategy {
   public addContextMenuItem(menuInfo: MenuInfo): AdaptableMenuItem | undefined {
     // base class implementation which is empty
     return undefined;
-  }
-
-  private getStrategyEntitlement(): Entitlement {
-    let functionEntitlements: Entitlement[] = this.adaptable.api.entitlementsApi.getEntitlementsState()
-      .FunctionEntitlements;
-    return functionEntitlements.find(x => x.FunctionName == this.Id);
-  }
-
-  private isVisibleStrategy(): boolean {
-    let entitlement: Entitlement = this.getStrategyEntitlement();
-    if (entitlement) {
-      return entitlement.AccessLevel != 'Hidden';
-    }
-    return true;
-  }
-
-  private isReadOnlyStrategy(): boolean {
-    let entitlement: Entitlement = this.getStrategyEntitlement();
-    if (entitlement) {
-      return entitlement.AccessLevel == 'ReadOnly';
-    }
-    return false;
   }
 
   // creates the menu items in the main dropdown
@@ -104,37 +81,25 @@ export abstract class AdaptableStrategyBase implements IStrategy {
         source: 'FunctionMenu',
       };
     }
-    if (this.isVisible && !this.isReadOnly) {
-      return new MenuItemShowPopup(
-        Label,
-        this.Id,
-        ComponentName,
-        Icon,
-        this.isVisible,
-        PopupParams
-      );
-    }
+    return new MenuItemShowPopup(Label, this.Id, ComponentName, Icon, true, PopupParams);
   }
 
-  // direct actions called by the column menu - invisible if strategy is hidden or readonly
+  // creates a menu item for the column menu to perform a function
   createColumnMenuItemClickFunction(
     Label: string,
     Icon: string,
     ClickFunction: () => void
   ): MenuItemDoClickFunction {
-    if (this.isVisible && !this.isReadOnly) {
-      return new MenuItemDoClickFunction(Label, this.Id, ClickFunction, Icon, true);
-    }
+    return new MenuItemDoClickFunction(Label, this.Id, ClickFunction, Icon, true);
   }
 
+  // creates a menu item for the column menu to enact a Redux action
   createColumnMenuItemReduxAction(
     Label: string,
     Icon: string,
     Action: Action
   ): MenuItemDoReduxAction {
-    if (this.isVisible && !this.isReadOnly) {
-      return new MenuItemDoReduxAction(Label, this.Id, Action, Icon, true);
-    }
+    return new MenuItemDoReduxAction(Label, this.Id, Action, Icon, true);
   }
 
   // popups called by the column menu - invisible if strategy is hidden or readonly
@@ -144,14 +109,23 @@ export abstract class AdaptableStrategyBase implements IStrategy {
     Icon: string,
     PopupParams?: StrategyParams
   ): MenuItemShowPopup {
-    if (this.isVisible && !this.isReadOnly) {
-      return new MenuItemShowPopup(Label, this.Id, ComponentName, Icon, true, PopupParams);
+    return new MenuItemShowPopup(Label, this.Id, ComponentName, Icon, true, PopupParams);
+  }
+
+  canCreateMenuItem(minimumAccessLevel: AccessLevel): boolean {
+    if (minimumAccessLevel == 'Full' && this.AccessLevel != 'Full') {
+      return false;
     }
+    if (minimumAccessLevel == 'ReadOnly' && this.AccessLevel == 'Hidden') {
+      return false;
+    }
+    return true;
   }
 
   canCreateColumnMenuItem(
     column: AdaptableColumn,
     adaptable: IAdaptable,
+    minimumAccessLevel: AccessLevel,
     functionType?:
       | 'sort'
       | 'editable'
@@ -161,7 +135,10 @@ export abstract class AdaptableStrategyBase implements IStrategy {
       | 'quickfilter'
       | 'numeric'
   ): boolean {
-    if (this.isReadOnly) {
+    if (!this.canCreateMenuItem(minimumAccessLevel)) {
+      return false;
+    }
+    if (!column) {
       return false;
     }
     if (StringExtensions.IsNotNullOrEmpty(functionType)) {

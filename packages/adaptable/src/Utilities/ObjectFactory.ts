@@ -188,7 +188,7 @@ export function CreateInternalAlertDefinitionForMessages(
     Expression: null,
     MessageType: messageType,
     AlertProperties: {
-      ShowPopup: showPopup ? showPopup : ALERT_DEFAULT_SHOW_POPUP,
+      ShowPopup: showPopup != null && showPopup != undefined ? showPopup : ALERT_DEFAULT_SHOW_POPUP,
     },
   };
 }
@@ -443,6 +443,7 @@ export function CreateEmptyConditionalStyle(): ConditionalStyle {
     ColumnCategoryId: undefined,
     Style: CreateEmptyStyle(),
     ConditionalStyleScope: 'Row',
+    ExcludeGroupedRows: false,
     Expression: ExpressionHelper.CreateEmptyExpression(),
   };
 }
@@ -477,22 +478,23 @@ export function CreateEmptyLayout(): Layout {
   };
 }
 
-export function CreateLayout(
+export function CreateDefaultLayout(
   columns: AdaptableColumn[],
   columnSorts: ColumnSort[],
   vendorGridInfo: VendorGridInfo,
   name: string
 ): Layout {
+  let columnIds: string[] = columns ? columns.filter(x => x.Visible).map(x => x.ColumnId) : [];
   return {
     Uuid: createUuid(),
-    Columns: columns ? columns.map(x => x.ColumnId) : [],
+    Columns: columnIds,
     ColumnSorts: columnSorts,
     GroupedColumns: null,
     PivotDetails: null,
     Name: name,
     VendorGridInfo: vendorGridInfo,
     AdaptableGridInfo: {
-      CurrentColumns: columns ? columns.map(x => x.ColumnId) : [],
+      CurrentColumns: columnIds,
       CurrentColumnSorts: columnSorts,
     },
   };
@@ -527,10 +529,10 @@ export function CreateUserFilterFromColumnFilter(
 
 export function CreateRange(
   operator: LeafExpressionOperator,
-  operand1: any,
-  operand2: any,
-  rangeOperandType: RangeOperandType,
-  rangeOperandType2: RangeOperandType
+  operand1?: any,
+  operand2?: any,
+  rangeOperandType?: RangeOperandType,
+  rangeOperandType2?: RangeOperandType
 ): QueryRange {
   return {
     Operator: operator,
@@ -676,7 +678,7 @@ export const ObjectFactory = {
   CreateEmptyFormatColumn,
   CreateEmptyFreeTextColumn,
   CreateEmptyLayout,
-  CreateLayout,
+  CreateDefaultLayout,
   CreateEmptyPivotDetails,
   CreateColumnFilter,
   CreateUserFilterFromColumnFilter,

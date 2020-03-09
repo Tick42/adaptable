@@ -19,6 +19,7 @@ interface FileDroppableProps extends FlexProps {
   icon?: React.ReactNode;
   helpText?: React.ReactNode;
   defaultText?: React.ReactNode;
+  loadingText?: React.ReactNode;
   dragOverText?: React.ReactNode;
   message?: React.ReactNode;
   toJSON?: (str: string) => Promise<any> | any;
@@ -62,7 +63,7 @@ const FileDroppable = (props: FileDroppableProps) => {
     onDropSuccess,
     message,
     fileAccept = '.json',
-    helpText = 'Adaptable No Code Version',
+    helpText = 'AdapTable No Code Version',
     defaultText = 'Click here to select a JSON file to load or drag it here',
     dragOverText = 'Drop file here to start Adaptable Wizard',
     icon = <Icon name="attach-file" size={48} />,
@@ -115,7 +116,11 @@ const FileDroppable = (props: FileDroppableProps) => {
         dispatch({
           type: ActionTypes.DROP_SUCCES,
           payload: {
-            message: <Box>{'Initializing adaptable...'}</Box>,
+            message: (
+              <Box>
+                {props.loadingText === undefined ? 'Initializing adaptable...' : props.loadingText}
+              </Box>
+            ),
           },
         });
         requestAnimationFrame(() => {
@@ -140,7 +145,7 @@ const FileDroppable = (props: FileDroppableProps) => {
 
   let form = (
     <form onSubmit={stop}>
-      <SimpleButton style={{ cursor: 'pointer' }} variant="text">
+      <SimpleButton style={{ cursor: 'pointer' }} variant="outlined">
         <div>{state.dragOver ? dragOverText : defaultText}</div>
         <input
           type="file"
@@ -149,6 +154,7 @@ const FileDroppable = (props: FileDroppableProps) => {
           style={{
             opacity: 0,
             position: 'absolute',
+            cursor: 'pointer',
             fontSize: 0,
             lineHeight: 0,
             top: 0,
@@ -187,7 +193,9 @@ const FileDroppable = (props: FileDroppableProps) => {
         <Flex flexDirection="column">
           {helpText ? (
             <Flex flexDirection="column" alignItems="center" margin={2}>
-              <HelpBlock>{helpText}</HelpBlock>
+              <HelpBlock>
+                <b>{helpText}</b>
+              </HelpBlock>
             </Flex>
           ) : null}
           {icon ? (

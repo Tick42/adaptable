@@ -69,6 +69,12 @@ export interface InternalApi {
 
   isGridInPivotMode(): boolean;
 
+  setTreeModeOn(): void;
+
+  setTreeModeOff(): void;
+
+  isGridInTreeMode(): boolean;
+
   addAdaptableColumn(AdaptableColumn: AdaptableColumn): void;
 
   setColumnSorts(columnSorts: ColumnSort[]): void;
@@ -86,6 +92,10 @@ export interface InternalApi {
   setGridCells(gridCells: GridCell[], internalUpdate: boolean, validateChange: boolean): void;
 
   setGridCell(gridCell: GridCell, internalUpdate: boolean, validateChange: boolean): void;
+
+  setToolbarTitle(): string;
+
+  setLastAppliedShortCut(gridCell: GridCell | undefined): void;
 
   // for general store accessibilty - not sure that this is right but...
   dispatchReduxAction(action: Action): void;

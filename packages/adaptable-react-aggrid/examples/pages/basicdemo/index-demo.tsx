@@ -28,9 +28,11 @@ export default () => (
   <AdaptableReactAggrid
     style={{ height: '100vh' }}
     modules={[SideBarModule, MenuModule, RangeSelectionModule]}
-    onAdaptableReady={(api, gridOptions) => {
+    onAdaptableReady={({ adaptableApi: api, vendorGrid: gridOptions }) => {
       console.log('Adaptable ready', api, gridOptions);
 
+      (global as any).api = api;
+      (global as any).gridOptions = gridOptions;
       api.eventApi.on('SearchChanged', (...args: any[]) => {
         LoggingHelper.LogAdaptableWarning('search changed', args);
       });

@@ -24,11 +24,13 @@ export class ShortcutStrategy extends AdaptableStrategyBase implements IShortcut
   }
 
   public addFunctionMenuItem(): AdaptableMenuItem | undefined {
-    return this.createMainMenuItemShowPopup({
-      Label: StrategyConstants.ShortcutStrategyFriendlyName,
-      ComponentName: ScreenPopups.ShortcutPopup,
-      Icon: StrategyConstants.ShortcutGlyph,
-    });
+    if (this.canCreateMenuItem('Full')) {
+      return this.createMainMenuItemShowPopup({
+        Label: StrategyConstants.ShortcutStrategyFriendlyName,
+        ComponentName: ScreenPopups.ShortcutPopup,
+        Icon: StrategyConstants.ShortcutGlyph,
+      });
+    }
   }
 
   private handleKeyDown(keyEvent: KeyboardEvent | any) {
@@ -59,14 +61,14 @@ export class ShortcutStrategy extends AdaptableStrategyBase implements IShortcut
             // Another complication is that the cell might have been edited or not, so we need to work out which method to use...
             if (this.adaptable.gridHasCurrentEditValue()) {
               currentCellValue = this.adaptable.getCurrentCellEditValue();
-              valueToReplace = this.CalculateShortcut(
+              valueToReplace = this.calculateShortcut(
                 currentCellValue,
                 activeShortcut.ShortcutResult,
                 activeShortcut.ShortcutOperation as MathOperation
               );
             } else {
               currentCellValue = activeCell.rawValue;
-              valueToReplace = this.CalculateShortcut(
+              valueToReplace = this.calculateShortcut(
                 currentCellValue,
                 activeShortcut.ShortcutResult,
                 activeShortcut.ShortcutOperation as MathOperation
@@ -97,13 +99,25 @@ export class ShortcutStrategy extends AdaptableStrategyBase implements IShortcut
         //We cancel the edit before doing anything so there is no issue when showing a popup or performing the shortcut
         this.adaptable.cancelEdit();
 
-        this.applyShortcut(activeShortcut, activeCell, valueToReplace, keyEventString);
+        let newGridCell: GridCell = {
+          columnId: activeCell.columnId,
+          rawValue: valueToReplace,
+          displayValue: valueToReplace,
+          primaryKeyValue: activeCell.primaryKeyValue,
+        };
+
+        this.adaptable.api.internalApi.setLastAppliedShortCut(newGridCell);
+
+        this.applyShortcut(activeShortcut, newGridCell, valueToReplace, keyEventString);
         keyEvent.preventDefault();
+        setTimeout(() => {
+          this.adaptable.api.internalApi.setLastAppliedShortCut(undefined);
+        }, 500);
       }
     }
   }
 
-  private CalculateShortcut(first: any, second: any, shortcutOperation: MathOperation): number {
+  private calculateShortcut(first: any, second: any, shortcutOperation: MathOperation): number {
     let firstNumber: number = Number(first);
     let secondNumber: number = Number(second);
 
@@ -123,17 +137,10 @@ export class ShortcutStrategy extends AdaptableStrategyBase implements IShortcut
 
   private applyShortcut(
     activeShortcut: Shortcut,
-    activeCell: GridCell,
+    newGridCell: GridCell,
     newValue: any,
     keyEventString: string
   ): void {
-    let newGridCell: GridCell = {
-      columnId: activeCell.columnId,
-      rawValue: newValue,
-      displayValue: newValue,
-      primaryKeyValue: activeCell.primaryKeyValue,
-    };
-
     this.adaptable.api.internalApi.setGridCell(newGridCell, true, true);
 
     let functionAppliedDetails: FunctionAppliedDetails = {
@@ -142,8 +149,8 @@ export class ShortcutStrategy extends AdaptableStrategyBase implements IShortcut
       info: 'KeyPressed:' + keyEventString,
       data: {
         Shortcut: activeShortcut,
-        PrimaryKey: activeCell.primaryKeyValue,
-        ColumnId: activeCell.columnId,
+        PrimaryKey: newGridCell.primaryKeyValue,
+        ColumnId: newGridCell.columnId,
         NewValue: newValue,
       },
     };

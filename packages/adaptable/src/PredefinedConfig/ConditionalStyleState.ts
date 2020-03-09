@@ -16,7 +16,7 @@ import { AdaptableStyle } from './Common/AdaptableStyle';
  *
  * [Conditional Style Demo](https://demo.adaptabletools.com/style/aggridconditionalstyledemo/)
  *
- * [Conditional Style API](_api_conditionalstyleapi_.conditionalstyleapi.html)
+ * [Conditional Style API](_src_api_conditionalstyleapi_.conditionalstyleapi.html)
  *
  * [Conditional Style FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029742932-Conditional-Styles-FAQ)
  *
@@ -89,6 +89,7 @@ import { AdaptableStyle } from './Common/AdaptableStyle';
  **/
 export interface ConditionalStyleState extends RunTimeState {
   ConditionalStyles?: ConditionalStyle[];
+  ExcludeGroupedRows?: boolean;
 }
 
 /**
@@ -118,9 +119,18 @@ export interface ConditionalStyle extends AdaptableObject {
   /**
    * The Style to apply when the rule is matched.
    *
-   * The Style object defines fore and back colours, font size and other basic style properties.  See [Style](_predefinedconfig_common_istyle_.istyle.html) for more details.
+   * The Style object defines fore and back colours, font size and other basic style properties.  See [Style](_src_predefinedconfig_common_istyle_.istyle.html) for more details.
    */
   Style?: AdaptableStyle;
+
+  /**
+   * Whether to show the Style for Grouped Rows
+   *
+   * Only applies where the `ConditionalStyleScope` is Row.
+   *
+   * If unset, will default to false.
+   */
+  ExcludeGroupedRows?: boolean;
 
   //  DataType?: 'String' | 'Number' | 'Boolean' | 'Date';
 }

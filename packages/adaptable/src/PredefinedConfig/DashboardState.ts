@@ -14,7 +14,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  *  **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/dashboard/aggriddashboardtoolbarsdemo/) | [API](_api_dashboardapi_.dashboardapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029743092-Dashboard-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360030944511-Dashboard-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002755177-Styling-Functions)
+ * [Demo Site](https://demo.adaptabletools.com/dashboard/aggriddashboardtoolbarsdemo/) | [API](_src_api_dashboardapi_.dashboardapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029743092-Dashboard-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360030944511-Dashboard-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002755177-Styling-Functions)
  *
  * **Dashboard Predefined Config Example**
  *
@@ -54,14 +54,14 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  * - a div which will **display any buttons that you provide** via the *ToolbarButtons* property of the Application state (see below).
  *
- * See [Custom Toolbar](_predefinedconfig_dashboardstate_.customtoolbar.html) for full documentation and code examples.
+ * See [Custom Toolbar](_src_predefinedconfig_dashboardstate_.customtoolbar.html) for full documentation and code examples.
  *
  */
 export interface DashboardState extends RunTimeState {
   /**
    * Which toolbars should be available for the user to select to see.
    *
-   * Only those toolbars listed here will be selectable
+   * Only those toolbars listed here will be selectable at run-time
    *
    * If you don't provide any value for this property, then ALL Adaptable toolbars will be available.
    *
@@ -83,7 +83,7 @@ export interface DashboardState extends RunTimeState {
    *
    * Each button is connected to a Function in Adaptable and opens the relevant popup screen.
    *
-   * **Default Value**:  'Dashboard', 'SmartEdit', 'ColumnChooser', 'ConditionalStyle', ''
+   * **Default Value**: 'SystemStatus', 'GridInfo', 'Dashboard', 'ColumnChooser', 'ConditionalStyle'
    */
   VisibleButtons?: AdaptableFunctionButtons;
 
@@ -97,20 +97,6 @@ export interface DashboardState extends RunTimeState {
    * **Default Value**: 'Visible'
    */
   DashboardVisibility?: 'Minimised' | 'Visible' | 'Hidden';
-
-  /**
-   * This is now deprecated and no longer used
-   *
-   * Instead please make sure that 'SystemStatus' is included in the Visible Buttons collection
-   */
-  ShowSystemStatusButton?: boolean;
-
-  /**
-   * This is now deprecated and no longer used
-   *
-   * Instead please make sure that 'GridInfo' is included in Visible Buttons collection
-   */
-  ShowGridInfoButton?: boolean;
 
   /**
    * Whether to show the Functions dropdown in the Home Toolbar.
@@ -175,6 +161,20 @@ export interface DashboardState extends RunTimeState {
    * It can optionally also contain a Glyph and an array of `ToolbarButton`.
    */
   CustomToolbars?: CustomToolbar[];
+
+  /**
+   * This is now deprecated and no longer used
+   *
+   * Instead please make sure that 'SystemStatus' is included in the Visible Buttons collection
+   */
+  ShowSystemStatusButton?: boolean;
+
+  /**
+   * This is now deprecated and no longer used
+   *
+   * Instead please make sure that 'GridInfo' is included in Visible Buttons collection
+   */
+  ShowGridInfoButton?: boolean;
 }
 
 /**
@@ -189,7 +189,7 @@ export interface DashboardState extends RunTimeState {
  *
  * **Rendering Bespoke Content**
  *
- * Adaptable provides the [dashboardAPI](_api_dashboardapi_.dasbhoardapi.html) **getCustomToolbarContentsDiv** method that returns the Div in which you should render the contents.
+ * Adaptable provides the [dashboardAPI](_src_api_dashboardapi_.dasbhoardapi.html) **getCustomToolbarContentsDiv** method that returns the Div in which you should render the contents.
  *
  * You can listen to the **ToolbarVisibilityChanged** event published by Adaptable which provides the name of relevant toolbar and its new visibility.
  *
@@ -314,9 +314,23 @@ export interface DashboardState extends RunTimeState {
  * ```
  */
 export interface CustomToolbar extends AdaptableObject {
+  /**
+   * The name of the Toolbar
+   *
+   * This is how it will be referred to in the Dashboard Popup when managing toolbars
+   */
   Name: string;
+
+  /**
+   * The title which will appear in the Toolbar when its displayed
+   */
   Title: string;
+
+  /**
+   * An (optional) Glyph to display in the Custom Toolbar
+   */
   Glyph?: string;
+
   /**
    * An array of Toolbar Buttons - each of which is rendered as a button in a Custom Toolbar.
    *

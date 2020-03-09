@@ -1,15 +1,23 @@
 /**
  * Options for managing the AdapTable Audit Log.
  *
- * ​​**Note: AdapTable has no knowledge of the messages Audit Log sends, nor where they are sent.**
+ * Every single action in AdapTable can, optionally, be fully audited for internal review purposes: each keystroke, menu click, configuration change, data edit and ticking data change.
+ *
+ * This provides you with complete oversight over everything that ever happens in AdapTable.
+ *
+ * For instance you can set up an alert to be informed whenever a value changes in a particular column, or if the new value exceeds set limits; or you can run reports showing a particular user's activity, or how data has changed over any time period.
+ *
+ *  > **Note: AdapTable has no knowledge of the messages Audit Log sends, nor where they are sent.  Information sent to Audit Log lives entirely within your systems at a destination specified by you.**
  *
  * Likewise, AdapTable has no ability to access Audit Log messages: they are only visible to, and accessible by, our users.​​
  *
- * Each Audit message is essentially a combination of an `AuditMessage, an `AuditTrigger` and an `AuditDestination`, packaged as a simple JSON object.
+ * Each Audit Log message is essentially a combination of an `AuditMessage`, an `AuditTrigger` and an `AuditDestination`, packaged as a simple JSON object and sent to destination(s) you specify.
  *
  * There are 5 AuditTriggers and 4 AuditDestinations.
  *
  * You can set as many AuditTriggers as you want, and for each `AuditTrigger`, select as many AuditDestinations as you require.
+ *
+ * It no AuditTriggers are set, then AuditLog will be turned off.
  *
  * The 5 Audit Triggers are:
  *
@@ -21,17 +29,17 @@
  *
  * - **UserStateChange**: whenever a change is made to the User's state (e.g. selected a new layout)
  *
- * - **InternalStateChange**: whenever a change is made to AdapTable's internal state (e.g. new cells selected, a popup displayed)
+ * - **InternalStateChange**: whenever a change is made to AdapTable's internal state (e.g. new cells selected, a popup displayed). Note that this can be quite verbose.
  *
  * The 4 available Audit Destinations are:
  *
- * - **Http Channel**: If you choose this then you need to set up the channel, on which you can subsequently listen to Audit messages using your own internal reporting software (e.g. the Elastic Stack).  You can also, otpionally, set the name of the Http Channel (or use the default of '/auditlog').
+ * - **Http Channel**: If you choose this then you need to set up the channel, on which you can subsequently listen to Audit messages using your own internal reporting software (e.g. the Elastic Stack).  You can also, optionally, set the name of the Http Channel (or use the default of '/auditlog').
  *
  * - **Console**: Audits messages to the console - useful for testing, support and debug purposes
  *
  * - **Alert**: If you set this option for any Trigger, then you can should also choose the Type (e.g. 'Success', 'Info' etc) and whether to show it as a Popup.
  *
- * - **Event**: If selected, you will be able to listen to the the `Audit Event` using the [Audit Event API](_api_auditeventapi_.auditeventapi.html)
+ * - **Event**: If selected, you will be able to listen to the the `Audit Event` using the [Audit Event API](_src_api_auditeventapi_.auditeventapi.html)
  *
  * **The default for each option for each Audit Type is false** - meaning that audit is **only triggered** if you set at least one destination for one trigger to `true`.
  *
@@ -67,7 +75,7 @@
  *
  * We have selected different Audit Destinations for each type (sometimes choosing more than one destination).
  *
- * We have also changed the default values so that, when using the Http Channel, Audit Log will ping to test the connection every 2 minutes, will send messages every 3 seconds, and provided our own channel name.
+ * We have also changed the default values so that Audit Log will send messages every 3 seconds, and - when using the Http Channel - will ping to test the connection every 2 minutes, using the the channel name that we provided.
  *
  */
 export interface AuditOptions {
@@ -169,16 +177,16 @@ export interface AuditOptions {
  */
 export interface AuditDestinationOptions {
   /**
-   * Sends the Audit Messages to an (internal) HTTP channel for you to listen to.
+   * Sends the Audit Log Message to an (internal) HTTP channel for you to listen to.
    *
-   * This is the most popular option though requires you to use your internal, listening software (like the Elastic stack) to wire it up.
+   * This is the most popular option, though it requires you to use your internal, listening software (like the Elastic stack) to wire it up.
    *
    * **Default Value: false**
    */
   auditToHttpChannel?: boolean;
 
   /**
-   * Sends the Audit Message to the Console.
+   * Sends the Audit Log Message to the Console.
    *
    * Primarily used by developers as a useful design-time or debugging tool when building the application.
    *
@@ -189,7 +197,7 @@ export interface AuditDestinationOptions {
   auditToConsole?: boolean;
 
   /**
-   * Fires the Audit Message as an Audit Log (AuditLogEventArgs) event.
+   * Fires the Audit Log Message as an Audit Log (AuditLogEventArgs) event.
    *
    * You listen to this Event the same way that you do all other Adaptable events.
    *
@@ -198,7 +206,7 @@ export interface AuditDestinationOptions {
   auditAsEvent?: boolean;
 
   /**
-   * Fires the Audit Message as an Alert.
+   * Fires the Audit Log Message as an Alert.
    *
    * This Alert will appear in the Alert toolbar and, optionally, also as a popup (based on the value of the *alertShowAsPopup* property).
    *

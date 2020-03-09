@@ -27,7 +27,7 @@ var api: AdaptableApi;
 
 function InitAdaptableDemo() {
   const examplesHelper = new ExamplesHelper();
-  const tradeCount: number = 5;
+  const tradeCount: number = 50;
   const tradeData: any = examplesHelper.getTrades(tradeCount);
   const gridOptions: GridOptions = examplesHelper.getGridOptionsTrade(tradeData);
 
@@ -99,22 +99,31 @@ let demoConfig: PredefinedConfig = {
           ForeColor: '#000000',
         },
         ConditionalStyleScope: 'Row',
+        // ExcludeGroupedRows: false,
         Expression: {
           RangeExpressions: [
             {
               ColumnId: 'notional',
               Ranges: [
                 {
-                  Operand1: '50',
+                  Operand1: '1400',
                   Operand1Type: 'Value',
-                  Operand2: '',
-                  Operand2Type: 'Value',
                   Operator: 'GreaterThan',
                 },
               ],
             },
           ],
         },
+      },
+    ],
+  },
+  Layout: {
+    CurrentLayout: 'Grouping Layout',
+    Layouts: [
+      {
+        GroupedColumns: ['country'],
+        Columns: ['notional', 'country', 'currency', 'tradeId', 'counterparty'],
+        Name: 'Grouping Layout',
       },
     ],
   },
