@@ -1017,6 +1017,7 @@ export class Adaptable implements IAdaptable {
           primaryKeyValue: this.getPrimaryKeyValueFromRowNode(node),
           rowData: node.data,
           rowInfo,
+          rowNode: node,
         };
         selectedRows.push(gridRow);
       });

@@ -14,6 +14,7 @@ import { IGlue42Service, Glue42Config } from './Interface/IGlue42Service';
 import StringExtensions from '../Extensions/StringExtensions';
 import { SelectionChangedEventData } from '../../Api/Events/SelectionChanged';
 import { RangeSelectionChangedEvent, SelectionChangedEvent } from '@ag-grid-community/core';
+import { GridRow } from '../../PredefinedConfig/Selection/GridRow';
 
 export interface Glue42ExportError {
   row: number;
@@ -127,6 +128,8 @@ export class Glue42Service implements IGlue42Service {
 
       this.updateContextOnSelectionChange();
 
+      this.addGlueItemsToContextMenu();
+
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
       glue4OfficeConfig.glue = this.glueInstance;
@@ -143,20 +146,18 @@ export class Glue42Service implements IGlue42Service {
   }
 
   updateContextOnSelectionChange() {
-    this.adaptable.adaptableOptions.vendorGrid.api.addEventListener(
-      'selectionChanged',
-      (event: SelectionChangedEvent) => {
-        const isSingleRow = event.api.getSelectedNodes().length === 1;
-        if (isSingleRow) {
-          const ctx = this.getContextFromSelectedRow(event);
-          this.updateChannelContext(ctx);
-        }
+    this.adaptable._on('RowsSelected', () => {
+      const selectedRows = this.adaptable.api.gridApi.getSelectedRowInfo().GridRows;
+      const isSingleRow = selectedRows.length === 1;
+      if (isSingleRow) {
+        const ctx = this.getContextFromSelectedRow(selectedRows[0]);
+        this.updateChannelContext(ctx);
       }
-    );
+    });
   }
 
   updateSelectionOnContextChange(ctx: any) {
-    this.adaptable.adaptableOptions.vendorGrid.api.forEachNode((node: any) => {
+    this.adaptable.forAllRowNodesDo(node => {
       if (
         node.data.customer === ctx.data.contact.displayName &&
         node.data.bbg_symbol === ctx.data.partyPortfolio.ric
@@ -166,13 +167,12 @@ export class Glue42Service implements IGlue42Service {
     });
   }
 
-  getContextFromSelectedRow(event: SelectionChangedEvent) {
+  getContextFromSelectedRow(row: GridRow) {
     const ctx: any = {};
-    const rowNodes = event.api.getSelectedNodes().map(node => ({
-      id: node.id,
-      data: node.data,
-    }));
-    const selectedNode = rowNodes[0];
+    const selectedNode = {
+      id: row.rowNode.id,
+      data: row.rowData,
+    };
     ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = selectedNode;
     ctx.contact = selectedNode.data.contact;
     ctx.partyPortfolio = {
@@ -191,6 +191,45 @@ export class Glue42Service implements IGlue42Service {
     } else {
       console.log('Not on a channel');
     }
+  }
+
+  addGlueItemsToContextMenu() {
+    let existingMenuItems: any = this.adaptable.adaptableOptions.vendorGrid.getContextMenuItems;
+    this.adaptable.adaptableOptions.vendorGrid.getContextMenuItems = (params: any) => {
+      return [
+        ...this.generateItems(params.node.data.interopSymbols),
+        'separator',
+        ...existingMenuItems(params),
+      ];
+    };
+  }
+
+  generateItems(symbols: any[]): any[] {
+    const values: any[] = [];
+
+    symbols.forEach(symbol => {
+      switch (symbol.symbol) {
+        case 'Client':
+          values.push(this.generateMenuItem(`${symbol.displayValue} details`, symbol));
+          break;
+        case 'Trade':
+          values.push(this.generateMenuItem(`Trade ${symbol.displayValue}`, symbol));
+          break;
+        default:
+          break;
+      }
+    });
+
+    return values;
+  }
+
+  generateMenuItem(name: string, symbol: any) {
+    return {
+      name,
+      action: () => {
+        console.log(symbol);
+      },
+    };
   }
 
   async exportData(data: any[], gridColumns: AdaptableColumn[], primaryKeys: any[]) {

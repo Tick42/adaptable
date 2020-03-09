@@ -6,6 +6,7 @@ export interface IGlueDemoTrade {
   tradeId: number;
   customer: string;
   contact: any;
+  interopSymbols: any;
   tradeDate: Date;
   buySell: string;
   instrument: any;
@@ -62,6 +63,19 @@ export class GlueClientsExampleHelper {
     // fees
     const fees = (this.examplesHelper.generateRandomInt(1, 2) * price) / 100;
 
+    const interopSymbols = [
+      {
+        symbol: 'Client',
+        value: contact._id,
+        displayValue: contact.displayName,
+      },
+      {
+        symbol: 'Trade',
+        value: instrument.bbgsymbol,
+        displayValue: instrument.name,
+      },
+    ];
+
     const trade = {
       tradeId: i + 1,
       customer: contact.displayName,
@@ -78,6 +92,7 @@ export class GlueClientsExampleHelper {
       totalAmount,
       commission,
       fees,
+      interopSymbols,
     };
     return trade;
   }
@@ -256,6 +271,7 @@ export class GlueClientsExampleHelper {
       enableRowGroup: true,
       type: 'abColDefString',
       resizable: true,
+      objectType: 'Client',
     });
     schema.push({
       headerName: 'Buy/Sell',
@@ -286,6 +302,7 @@ export class GlueClientsExampleHelper {
       enableRowGroup: true,
       type: 'abColDefString',
       resizable: true,
+      objectType: 'Symbol',
     });
     schema.push({
       headerName: 'Security Description',
