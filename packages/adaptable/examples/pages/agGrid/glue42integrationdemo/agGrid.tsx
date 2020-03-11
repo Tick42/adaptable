@@ -10,17 +10,23 @@ import './index.css';
 
 import { GridOptions } from '@ag-grid-community/all-modules';
 import Adaptable from '../../../../src/agGrid';
-import { AdaptableOptions, PredefinedConfig } from '../../../../src/types';
+import {
+  AdaptableOptions,
+  PredefinedConfig,
+  MenuInfo,
+  AdaptableMenuItem,
+} from '../../../../src/types';
 import { GlueExampleHelper } from '../../GlueExampleHelper';
 import { MenuModule } from '@ag-grid-enterprise/menu';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import glue42Desktop from '@glue42/desktop';
 import glue42office from '@glue42/office';
 import { TickingDataHelper } from '../../TickingDataHelper';
-import { GlueClientsExampleHelper } from '../../GlueClientsExampleHelper';
+import { GlueIntegrationExampleHelper } from '../../GlueIntegrationExampleHelper';
+import { UserMenuItem } from '../../../../src/PredefinedConfig/UserInterfaceState';
 
 async function InitAdaptableDemo() {
-  const examplesHelper = new GlueClientsExampleHelper();
+  const examplesHelper = new GlueIntegrationExampleHelper();
   const tradeCount: number = 30;
   const tradeData: any = await examplesHelper.getTrades(0);
   const gridOptions: GridOptions = examplesHelper.getGridOptionsTrade(tradeData);
@@ -52,6 +58,34 @@ async function InitAdaptableDemo() {
   }
 }
 
+const generateMenuItem = (name: string, symbol: any) => {
+  return {
+    Label: name,
+    UserMenuItemClickedFunction: () => {
+      console.log(symbol);
+    },
+  };
+};
+
+const generateItems = (symbols: any[]): any[] => {
+  const values: any[] = [];
+
+  symbols.forEach(symbol => {
+    switch (symbol.symbol) {
+      case 'Client':
+        values.push(generateMenuItem(`${symbol.displayValue} details`, symbol));
+        break;
+      case 'Trade':
+        values.push(generateMenuItem(`Trade ${symbol.displayValue}`, symbol));
+        break;
+      default:
+        break;
+    }
+  });
+
+  return values;
+};
+
 let demoConfig: PredefinedConfig = {
   Dashboard: {
     VisibleToolbars: ['Glue42'],
@@ -63,6 +97,11 @@ let demoConfig: PredefinedConfig = {
     Password: 'demopassword', // put in .env file
     Channels: true,
     Contexts: true,
+  },
+  UserInterface: {
+    ContextMenuItems: (menuinfo: MenuInfo) => {
+      return generateItems(menuinfo.RowNode.data.interopSymbols);
+    },
   },
   FlashingCell: {
     FlashingCells: [

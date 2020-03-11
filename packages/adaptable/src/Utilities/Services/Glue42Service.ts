@@ -128,8 +128,6 @@ export class Glue42Service implements IGlue42Service {
 
       this.updateContextOnSelectionChange();
 
-      this.addGlueItemsToContextMenu();
-
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
       glue4OfficeConfig.glue = this.glueInstance;
@@ -157,30 +155,53 @@ export class Glue42Service implements IGlue42Service {
 
   updateSelectionOnContextChange(ctx: any) {
     this.adaptable.forAllRowNodesDo(node => {
-      if (
-        node.data.customer === ctx.data.contact.displayName &&
-        node.data.bbg_symbol === ctx.data.partyPortfolio.ric
-      ) {
+      if (this.matchesContextPair(node.data, node.data.incomingContextChangePairs, ctx.data)) {
         node.setSelected(true, true);
       }
     });
   }
 
+  matchesContextPair(nodeData: any, pairsToMatch: any, context: any): boolean {
+    for (const key in pairsToMatch) {
+      const valueOfCurrentKey = pairsToMatch[key];
+      if (typeof valueOfCurrentKey === 'string') {
+        if (nodeData[valueOfCurrentKey] !== context[key]) {
+          return false;
+        }
+      } else {
+        if (!this.matchesContextPair(nodeData, pairsToMatch[key], context[key])) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   getContextFromSelectedRow(row: GridRow) {
-    const ctx: any = {};
+    let ctx: any = {};
     const selectedNode = {
       id: row.rowNode.id,
       data: row.rowData,
     };
     ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = selectedNode;
-    ctx.contact = selectedNode.data.contact;
-    ctx.partyPortfolio = {
-      ric: selectedNode.data.bbg_symbol,
-      description: selectedNode.data.symbol_name,
-      price: selectedNode.data.price,
-      shares: selectedNode.data.quantity,
+
+    ctx = {
+      ...ctx,
+      ...this.generateContextPairs(selectedNode.data.contextPairs, selectedNode.data),
     };
+
     return ctx;
+  }
+
+  generateContextPairs(contextPairs: any, nodeData: any): any {
+    return Object.keys(contextPairs).reduce((acc, cur) => {
+      if (typeof contextPairs[cur] === 'string') {
+        acc[cur] = nodeData[contextPairs[cur]];
+      } else {
+        acc[cur] = this.generateContextPairs(contextPairs[cur], nodeData);
+      }
+      return acc;
+    }, {} as any);
   }
 
   updateChannelContext(ctx: any) {
@@ -190,45 +211,6 @@ export class Glue42Service implements IGlue42Service {
     } else {
       console.log('Not on a channel');
     }
-  }
-
-  addGlueItemsToContextMenu() {
-    let existingMenuItems: any = this.adaptable.adaptableOptions.vendorGrid.getContextMenuItems;
-    this.adaptable.adaptableOptions.vendorGrid.getContextMenuItems = (params: any) => {
-      return [
-        ...this.generateItems(params.node.data.interopSymbols),
-        'separator',
-        ...existingMenuItems(params),
-      ];
-    };
-  }
-
-  generateItems(symbols: any[]): any[] {
-    const values: any[] = [];
-
-    symbols.forEach(symbol => {
-      switch (symbol.symbol) {
-        case 'Client':
-          values.push(this.generateMenuItem(`${symbol.displayValue} details`, symbol));
-          break;
-        case 'Trade':
-          values.push(this.generateMenuItem(`Trade ${symbol.displayValue}`, symbol));
-          break;
-        default:
-          break;
-      }
-    });
-
-    return values;
-  }
-
-  generateMenuItem(name: string, symbol: any) {
-    return {
-      name,
-      action: () => {
-        console.log(symbol);
-      },
-    };
   }
 
   async exportData(data: any[], gridColumns: AdaptableColumn[], primaryKeys: any[]) {

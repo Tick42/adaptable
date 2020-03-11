@@ -19,9 +19,10 @@ export interface IGlueDemoTrade {
   totalAmount: number;
   commission: number;
   fees: number;
+  contextPairs: any;
 }
 
-export class GlueClientsExampleHelper {
+export class GlueIntegrationExampleHelper {
   examplesHelper: ExamplesHelper = new ExamplesHelper();
 
   public async getTrades(count: number) {
@@ -76,6 +77,25 @@ export class GlueClientsExampleHelper {
       },
     ];
 
+    const contextPairs = {
+      contact: 'contact',
+      partyPortfolio: {
+        ric: 'bbg_symbol',
+        description: 'symbol_name',
+        price: 'price',
+        shares: 'quantity',
+      },
+    };
+
+    const incomingContextChangePairs = {
+      contact: {
+        displayName: 'customer',
+      },
+      partyPortfolio: {
+        ric: 'bbg_symbol',
+      },
+    };
+
     const trade = {
       tradeId: i + 1,
       customer: contact.displayName,
@@ -93,6 +113,8 @@ export class GlueClientsExampleHelper {
       commission,
       fees,
       interopSymbols,
+      contextPairs,
+      incomingContextChangePairs,
     };
     return trade;
   }
