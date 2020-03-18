@@ -58,31 +58,41 @@ async function InitAdaptableDemo() {
   }
 }
 
-const generateMenuItem = (name: string, symbol: any) => {
+const generateMenuItem = (symbol: any) => {
+  let name;
+  let action = () => {};
+  switch (symbol.symbol) {
+    case 'Client':
+      {
+        name = `${symbol.displayValue} details`;
+        action = () => {
+          return () => {
+            console.log(symbol);
+          };
+        };
+      }
+      break;
+    case 'Trade':
+      {
+        name = `Trade ${symbol.displayValue}`;
+        action = () => {
+          return () => {
+            console.log(symbol);
+          };
+        };
+      }
+      break;
+    default:
+      break;
+  }
   return {
     Label: name,
-    UserMenuItemClickedFunction: () => {
-      console.log(symbol);
-    },
+    UserMenuItemClickedFunction: action(),
   };
 };
 
 const generateItems = (symbols: any[]): any[] => {
-  const values: any[] = [];
-
-  symbols.forEach(symbol => {
-    switch (symbol.symbol) {
-      case 'Client':
-        values.push(generateMenuItem(`${symbol.displayValue} details`, symbol));
-        break;
-      case 'Trade':
-        values.push(generateMenuItem(`Trade ${symbol.displayValue}`, symbol));
-        break;
-      default:
-        break;
-    }
-  });
-
+  const values = symbols.map(symbol => generateMenuItem(symbol));
   return values;
 };
 
