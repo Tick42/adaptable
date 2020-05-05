@@ -1,4 +1,4 @@
-import { RunTimeState } from './/RunTimeState';
+import { ConfigState } from './/ConfigState';
 import { Expression } from './Common/Expression';
 import { AdaptableObject } from './Common/AdaptableObject';
 
@@ -11,7 +11,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  *  **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/search/aggridadvancedsearchdemo/) | [Advanced Search API](_src_api_advancedsearchapi_.advancedsearchapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029895971-Advanced-Search-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360028637652-Advanced-Search-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002755137-Search-Functions)
+ * [Demo Site](https://demo.adaptabletools.com/search/aggridadvancedsearchdemo/) | [Advanced Search API](_src_api_advancedsearchapi_.advancedsearchapi.html) | [Advanced Search Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/advanced-search-function.md)
  *
  * **Advanced Search Predefined Config Example**
  *
@@ -74,7 +74,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  * - 'Big Dollar Notionals' (which uses both ColumnValues and **Ranges**) and is also set to be the Current Advanced Search.
  */
-export interface AdvancedSearchState extends RunTimeState {
+export interface AdvancedSearchState extends ConfigState {
   /**
    * A collection of AdvancedSearch objects - which will appear in the Advanced Search toolbar dropdown.
    *

@@ -8,6 +8,7 @@ import { SelectedRowInfo } from '../../PredefinedConfig/Selection/SelectedRowInf
 import { GridCell } from '../../PredefinedConfig/Selection/GridCell';
 import { AdaptableOptions } from '../../types';
 import { ColumnSort } from '../../PredefinedConfig/Common/ColumnSort';
+import * as GridRedux from '../../Redux/ActionsReducers/GridRedux';
 
 export class GridApiImpl extends ApiBase implements GridApi {
   public getGridState(): GridState {
@@ -16,6 +17,10 @@ export class GridApiImpl extends ApiBase implements GridApi {
 
   public setGridData(dataSource: any): void {
     this.adaptable.setDataSource(dataSource);
+  }
+
+  public loadGridData(dataSource: any): void {
+    this.adaptable.loadDataSource(dataSource);
   }
 
   public updateGridData(
@@ -120,8 +125,12 @@ export class GridApiImpl extends ApiBase implements GridApi {
     this.adaptable.clearGridFiltering();
   }
 
+  public setColumnSorts(columnSorts: ColumnSort[]): void {
+    this.dispatchAction(GridRedux.GridSetSort(columnSorts));
+  }
+
   public getColumnSorts(): ColumnSort[] {
-    return this.getGridState().ColumnSorts;
+    return this.getAdaptableState().Grid.ColumnSorts;
   }
 
   public getVendorGrid(): any {
@@ -134,7 +143,7 @@ export class GridApiImpl extends ApiBase implements GridApi {
 
   public sortAdaptable(columnSorts: ColumnSort[]): void {
     this.adaptable.setColumnSort(columnSorts);
-    this.adaptable.api.internalApi.setColumnSorts(columnSorts);
+    this.setColumnSorts(columnSorts);
   }
 
   public selectNodes(rowNodes: any[]): void {
@@ -162,5 +171,21 @@ export class GridApiImpl extends ApiBase implements GridApi {
   }
   public getRowNodeForPrimaryKey(primaryKeyValue: any): any {
     return this.adaptable.getRowNodeForPrimaryKey(primaryKeyValue);
+  }
+
+  public expandAllRowGroups(): void {
+    this.adaptable.expandAllRowGroups();
+  }
+
+  public closeAllRowGroups(): void {
+    this.adaptable.closeAllRowGroups();
+  }
+
+  public getExpandRowGroupsKeys(): any[] {
+    return this.adaptable.getExpandRowGroupsKeys();
+  }
+
+  public expandRowGroupsForValues(columnValues: any[]): void {
+    this.adaptable.expandRowGroupsForValues(columnValues);
   }
 }

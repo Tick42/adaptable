@@ -1,0 +1,117 @@
+.ab-Dashboard {
+  z-index: 1000;
+  user-select: none;
+  background: var(--ab-dashboard__background);
+  color: var(--ab-dashboard__color);
+
+  &--inline:not(&--collapsed) {
+    display: flex;
+  }
+
+  &__header {
+    display: flex;
+    align-items: stretch;
+    background: var(--ab-dashboard-header__background);
+    color: var(--ab-dashboard-header__color);
+    height: 40px;
+    padding: 0 var(--ab-space-2);
+  }
+
+  &__header-left,
+  &__header-right {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  &__header-left {
+    justify-content: flex-start;
+  }
+
+  &__header-right {
+    justify-content: flex-end;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--ab-space-3);
+    font-weight: bold;
+    font-size: var(--ab-font-size-4);
+  }
+
+  &__tabs {
+    align-self: flex-end;
+    margin-left: var(--ab-space-2);
+  }
+
+  &__tab {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: var(--ab-font-size-3);
+    border-radius: var(--ab__border-radius) var(--ab__border-radius) 0 0;
+    padding: 8px 12px 12px 12px;
+    color: var(--ab-dashboard-header__color);
+    background: var(--ab-dashboard-header__background);
+    &--active {
+      color: var(--ab-dashboard__color);
+    background: var(--ab-dashboard__background);
+    }
+  }
+
+  &__content {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  &__container {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  &__content-buttons {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    padding: var(--ab-space-2);
+    border-left: 1px solid var(--ab-dashboard__border);
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid var(--ab-dashboard__border);
+  }
+
+  &__toolbar-content {
+    padding: var(--ab-space-2) var(--ab-space-2) var(--ab-space-1) var(--ab-space-2);
+    display: flex;
+  }
+
+  &__toolbar-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--ab-font-size-2);
+    padding: 0 var(--ab-space-1) 2px var(--ab-space-2);
+    opacity: 0.7;
+  }
+
+  &__toolbar.ab-Dashboard__home-toolbar {
+
+    color: var(--ab-dashboard-header__color);
+    background: var(--ab-dashboard-header__background);
+
+    .ab-Dashboard__toolbar-title {
+      opacity: 1;
+    }
+  }
+
+  .ab-Input {
+    border: none;
+  }
+}

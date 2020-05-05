@@ -24,7 +24,10 @@ interface ColumnFilterPopupProps extends StrategyViewPopupProps<ColumnFilterPopu
   ColumnFilters: ColumnFilter[];
   onClearColumnFilter: (columnFilter: ColumnFilter) => ColumnFilterRedux.ColumnFilterClearAction;
   onShowPrompt: (prompt: IUIPrompt) => PopupRedux.PopupShowPromptAction;
-  onShare: (entity: AdaptableObject) => TeamSharingRedux.TeamSharingShareAction;
+  onShare: (
+    entity: AdaptableObject,
+    description: string
+  ) => TeamSharingRedux.TeamSharingShareAction;
 }
 
 class ColumnFilterPopupComponent extends React.Component<ColumnFilterPopupProps, {}> {
@@ -106,19 +109,27 @@ class ColumnFilterPopupComponent extends React.Component<ColumnFilterPopupProps,
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(state: AdaptableState, ownProps: any): Partial<ColumnFilterPopupProps> {
   return {
     ColumnFilters: state.ColumnFilter.ColumnFilters,
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<ColumnFilterPopupProps> {
   return {
     onClearColumnFilter: (columnFilter: ColumnFilter) =>
       dispatch(ColumnFilterRedux.ColumnFilterClear(columnFilter)),
     onShowPrompt: (prompt: IUIPrompt) => dispatch(PopupRedux.PopupShowPrompt(prompt)),
-    onShare: (entity: AdaptableObject) =>
-      dispatch(TeamSharingRedux.TeamSharingShare(entity, StrategyConstants.ColumnFilterStrategyId)),
+    onShare: (entity: AdaptableObject, description: string) =>
+      dispatch(
+        TeamSharingRedux.TeamSharingShare(
+          entity,
+          StrategyConstants.ColumnFilterStrategyId,
+          description
+        )
+      ),
   };
 }
 

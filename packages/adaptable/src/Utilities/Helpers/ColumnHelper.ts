@@ -5,11 +5,12 @@ import { DataType } from '../../PredefinedConfig/Common/Enums';
 import { ArrayExtensions } from '../Extensions/ArrayExtensions';
 import { StringExtensions } from '../Extensions/StringExtensions';
 import { ColumnCategory } from '../../PredefinedConfig/ColumnCategoryState';
+import { AG_GRID_GROUPED_COLUMN } from '../../Utilities/Constants/GeneralConstants';
 
 // Single place for all column mapping functions so can be dealt with consistetly re error handling
 
 export function isSpecialColumn(columnId: string): boolean {
-  return columnId == 'ag-Grid-AutoColumn';
+  return columnId == AG_GRID_GROUPED_COLUMN;
 }
 
 export function isNumericColumn(column: AdaptableColumn): boolean {
@@ -94,6 +95,19 @@ export function getColumnsFromFriendlyNames(
 ): AdaptableColumn[] {
   // not sure if this is right as might ignore bad cols
   return friendlyNames.map(friendlyName => columns.find(x => x.FriendlyName == friendlyName));
+}
+
+export function getColumnsFromIds(
+  columnIds: string[],
+  columns: AdaptableColumn[],
+  logWarning = true
+): AdaptableColumn[] {
+  let returnCols: AdaptableColumn[] = [];
+  columnIds.forEach(c => {
+    returnCols.push(getColumnFromId(c, columns, logWarning));
+  });
+
+  return returnCols;
 }
 
 export function getColumnFromId(
@@ -223,6 +237,7 @@ export const ColumnHelper = {
   getFriendlyNamesFromColumnIds,
   getColumnsFromFriendlyNames,
   getColumnFromId,
+  getColumnsFromIds,
   getColumnFromFriendlyName,
   getColumnsOfType,
   getNumericColumns,

@@ -74,11 +74,11 @@ export class CustomSortSummaryComponent extends React.Component<
         <StrategyDetail
           key={StrategyConstants.CustomSortStrategyFriendlyName}
           Item1={<StrategyProfile FunctionName={StrategyConstants.CustomSortStrategyId} />}
-          Item2={customSort.SortedValues.join(', ')}
+          Item2={this.getCustomSortedValues(customSort)}
           ConfigEnity={customSort}
           EntityType={StrategyConstants.CustomSortStrategyFriendlyName}
           onEdit={() => this.onEdit(customSort)}
-          onShare={() => this.props.onShare(customSort)}
+          onShare={description => this.props.onShare(customSort, description)}
           showShare={this.props.TeamSharingActivated}
           onDelete={CustomSortRedux.CustomSortDelete(customSort)}
           showBold={true}
@@ -158,6 +158,14 @@ export class CustomSortSummaryComponent extends React.Component<
       ArrayExtensions.IsNotNullOrEmpty(customSort.SortedValues)
     );
   }
+
+  private getCustomSortedValues(customSort: CustomSort): any {
+    if (ArrayExtensions.IsNotNullOrEmpty(customSort.SortedValues)) {
+      return customSort.SortedValues.join(', ');
+    } else {
+      return 'Custom Sort uses a bespoke function';
+    }
+  }
 }
 
 function mapStateToProps(state: AdaptableState, ownProps: any) {
@@ -173,8 +181,14 @@ function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState
       dispatch(CustomSortRedux.CustomSortAdd(customSort)),
     onEditCustomSort: (customSort: CustomSort) =>
       dispatch(CustomSortRedux.CustomSortEdit(customSort)),
-    onShare: (entity: AdaptableObject) =>
-      dispatch(TeamSharingRedux.TeamSharingShare(entity, StrategyConstants.CustomSortStrategyId)),
+    onShare: (entity: AdaptableObject, description: string) =>
+      dispatch(
+        TeamSharingRedux.TeamSharingShare(
+          entity,
+          StrategyConstants.CustomSortStrategyId,
+          description
+        )
+      ),
   };
 }
 

@@ -1,4 +1,4 @@
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
 import { Expression, QueryRange } from './Common/Expression';
 
@@ -13,7 +13,7 @@ import { Expression, QueryRange } from './Common/Expression';
  *
  * **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/alertsmessages/aggridalertdemo/) | [API](_src_api_alertapi_.alertapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029895931-Alert-Functions-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360029895731-Alerts-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002755197-Grid-Functions)
+ * [Demo Site](https://demo.adaptabletools.com/alertsmessages/aggridalertdemo/) | [API](_src_api_alertapi_.alertapi.html) | [Alert Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/alert-function.md)
  *
  * **Alert Predefined Config Example**
  *
@@ -60,7 +60,7 @@ import { Expression, QueryRange } from './Common/Expression';
  *
  * - On the *ItemCount* column which will show **info** alert (but not show a popup) if the new value is more than double (i.e. has percent change > 100).
  */
-export interface AlertState extends RunTimeState {
+export interface AlertState extends ConfigState {
   /**
    * A collection of Alert Definitions - which will trigger Alerts when their condition is met
    *

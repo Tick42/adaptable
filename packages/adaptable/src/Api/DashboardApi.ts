@@ -1,17 +1,21 @@
 import { DashboardState, CustomToolbar } from '../PredefinedConfig/DashboardState';
-import {
-  AdaptableDashboardToolbars,
-  AdaptableDashboardToolbar,
-  AdaptableFunctionButtons,
-} from '../PredefinedConfig/Common/Types';
+import { AdaptableFunctionButtons } from '../PredefinedConfig/Common/Types';
 import { ToolbarButton } from '../PredefinedConfig/Common/ToolbarButton';
 
 /**
- * Provides access to the Dashboard state
+ * Functions relating to the AdapTable Dashboard.
+ *
+ * The Dashboard is the area above the grid which contains buttons, tabs, toolbars and Quick Search.
+ *
+ * **Note**: In v.6.1 (March 2020) the Dashboard has been signficantly updated and improved with some previous properties now deprecated.
+ *
+ * --------------
  *
  *  **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/dashboard/aggriddashboardtoolbarsdemo/) | [State](_src_predefinedconfig_dashboardstate_.dashboardstate.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029743092-Dashboard-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360030944511-Dashboard-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002755177-Styling-Functions)
+ * [Demo Site](https://demo.adaptabletools.com/dashboard) | [State](_src_predefinedconfig_dashboardstate_.dashboardstate.html)  | [ReadMe](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/Functions/dashboard_function.md)
+ *
+ *  --------------
  *
  */
 export interface DashboardApi {
@@ -26,33 +30,6 @@ export interface DashboardApi {
   getCustomToolbars(): CustomToolbar[] | undefined;
 
   /**
-   * Sets which toolbars should be available in Adaptable
-   *
-   * @param availableToolbars toolbars to make available
-   */
-  setAvailableToolbars(availableToolbars: AdaptableDashboardToolbars): void;
-  /**
-   * Sets which toolbars should be visibile in Adaptable
-   *
-   * @param visibleToolbars toolbars to show
-   */
-  setVisibleToolbars(visibleToolbars: AdaptableDashboardToolbars): void;
-
-  /**
-   * Makes the given toolbar visible
-   *
-   * @param visibleToolbar toolbar to show
-   */
-  showToolbar(visibleToolbar: AdaptableDashboardToolbar): void;
-
-  /**
-   * Hides the given toolbar
-   *
-   * @param visibleToolbar toolbar to hide
-   */
-  hideToolbar(visibleToolbar: AdaptableDashboardToolbar): void;
-
-  /**
    * Sets which Function Buttons are visible
    *
    * @param functionButtons buttons to show
@@ -60,73 +37,11 @@ export interface DashboardApi {
   setVisibleButtons(functionButtons: AdaptableFunctionButtons): void;
 
   /**
-   * Sets whether the Dashboard is Visible, Hiden or Minimised
+   * Sets the title of the Dashboard Header
    *
-   * @param dashboardVisibility visibility option to set
-   */
-  setVisibility(dashboardVisibility: 'Minimised' | 'Visible' | 'Hidden'): void;
-
-  /**
-   * Shows the Dashboard (ie. sets Visibility to 'Visible')
-   */
-  show(): void;
-
-  /**
-   * Hides the Dashboard (ie. sets Visibility to 'Hidden')
-   */
-  hide(): void;
-
-  /**
-   * Minimises the Dashboard (ie. sets Visibility to 'Minimised' so that only a button is visibile)
-   */
-  minimise(): void;
-
-  /**
-   * Shows the Functions Dropdown.
+   * Note: This is the bit which can be double-clicked to put the Dashboard into floating mode
    *
-   * The Functions dropdown appears on the left of the Home Toolbar and lists all the functions available to the user.
-   */
-  showFunctionsDropdown(): void;
-
-  /**
-   * Hides the Functions Dropdown.
-   *
-   * The Functions dropdown appears on the left of the Home Toolbar and lists all the functions available to the user.
-   */
-  hideFunctionsDropdown(): void;
-
-  /**
-   * Shows the Columns Dropdown.
-   *
-   * The Columns dropdown appears on the right of the Home Toolbar and lists all the columns in the grid.
-   */
-  showColumnsDropdown(): void;
-
-  /**
-   * Hides the Columns Dropdown.
-   *
-   * The Columns dropdown appears on the right of the Home Toolbar and lists all the columns in the grid.
-   */
-  hideColumnsDropdown(): void;
-
-  /**
-   * Shows the Toolbars Dropdown.
-   *
-   * The Toolbars dropdown appears on the right of the Home Toolbar and lists all the available Toolbars.
-   */
-  showToolbarsDropdown(): void;
-
-  /**
-   * Hides the Toolbars Dropdown.
-   *
-   * The Toolbars dropdown appears on the right of the Home Toolbar and lists all the available Toolbars.
-   */
-  hideToolbarsDropdown(): void;
-
-  /**
-   * Sets the title of the Home Toolbar - the one on the left of the Dashboard
-   *
-   * If no value is set, the title of the Home Toolbar will be AdaptableId property in AdaptableOptions
+   * If no value is set this property, the Dashboard will display the value of the `AdaptableId` property in AdaptableOptions
    */
   setHomeToolbarTitle(title: string): void;
 
@@ -161,6 +76,38 @@ export interface DashboardApi {
    * @param customToolbarName the name of the Custom Toolbar
    */
   clearCustomToolbarButtons(customToolbarName: string): void;
+
+  /***
+   * Collapses the Dashboard so only the Dashboard Header is visible - and not the contents of any Toolbars
+   */
+  collapseDashboard(): void;
+
+  /***
+   * Expands the Dashboard so that Toolbars in the Active Tab are fully visible
+   */
+  expandDashboard(): void;
+
+  /***
+   * Floats the Dashboard so only the Dashboard Header is visible (in reduced size) - and it can be dragged to a new location
+   */
+  floatDashboard(): void;
+
+  /***
+   * Docks the Dashboard so that it 'snaps back' into its customary position above the grid.
+   */
+  dockDashboard(): void;
+
+  /**
+   * Returns the current Active Tab (if there is one)
+   */
+  getActiveTab(): number | undefined;
+
+  /**
+   * Sets the Active Tab in the Dashboard Header
+   *
+   * @param tabIndex the tab index to set
+   */
+  setActiveTab(tabIndex: number): void;
 
   /**
    * Opens the Dashboard popup screen

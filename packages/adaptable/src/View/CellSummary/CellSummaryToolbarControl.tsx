@@ -130,7 +130,6 @@ class CellSummaryToolbarControlComponent extends React.Component<
         className="ab-DashboardToolbar__CellSummary"
         headerText={StrategyConstants.CellSummaryStrategyFriendlyName}
         glyphicon={StrategyConstants.CellSummaryGlyph}
-        onClose={() => this.props.onClose(StrategyConstants.CellSummaryStrategyId)}
         onConfigure={() => this.props.onConfigure()}
       >
         {content}
@@ -166,7 +165,10 @@ class CellSummaryToolbarControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<CellSummaryToolbarControlComponentProps> {
   return {
     SelectedCellInfo: state.Grid.SelectedCellInfo,
     CellSummaryOperation: state.CellSummary.SummaryOperation,
@@ -175,13 +177,13 @@ function mapStateToProps(state: AdaptableState, ownProps: any) {
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<CellSummaryToolbarControlComponentProps> {
   return {
     onCellSummaryOperationChange: (summaryOperation: CellSummaryOperation | string) =>
       dispatch(SelectedCellsRedux.CellSummaryChangeOperation(summaryOperation)),
     onCreateCellSummary: () => dispatch(GridRedux.GridCreateCellSummary()),
-    onClose: (toolbar: AdaptableDashboardToolbar) =>
-      dispatch(DashboardRedux.DashboardHideToolbar(toolbar)),
     onConfigure: () =>
       dispatch(
         PopupRedux.PopupShowScreen(

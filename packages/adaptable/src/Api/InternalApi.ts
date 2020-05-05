@@ -77,8 +77,6 @@ export interface InternalApi {
 
   addAdaptableColumn(AdaptableColumn: AdaptableColumn): void;
 
-  setColumnSorts(columnSorts: ColumnSort[]): void;
-
   getUpdatedRowInfos(): any[];
 
   isRowInUpdatedRowInfo(primaryKeyValue: any, changeDirection: ChangeDirection): boolean;
@@ -96,6 +94,10 @@ export interface InternalApi {
   setToolbarTitle(): string;
 
   setLastAppliedShortCut(gridCell: GridCell | undefined): void;
+
+  setDefaultDashboardTab(): void;
+
+  displayActionColumns(): void;
 
   // for general store accessibilty - not sure that this is right but...
   dispatchReduxAction(action: Action): void;

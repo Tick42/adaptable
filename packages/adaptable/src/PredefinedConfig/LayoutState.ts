@@ -1,4 +1,4 @@
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
 import { ColumnSort } from './Common/ColumnSort';
 
@@ -11,7 +11,7 @@ import { ColumnSort } from './Common/ColumnSort';
  *
  *  **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/gridmanagement/aggridlayoutdemo/) | [API](_src_api_layoutapi_.layoutapi.html) | [Options](_src_adaptableoptions_layoutoptions_.layoutoptions.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360002170317-Layouts-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360029743312-Layout-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002755197-Grid-Functions)
+ * [Demo Site](https://demo.adaptabletools.com/gridmanagement/aggridlayoutdemo/) | [API](_src_api_layoutapi_.layoutapi.html) | [Options](_src_adaptableoptions_layoutoptions_.layoutoptions.html) | [Layout Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/layout-function.md)
  *
  * **Layout Predefined Config Example**
  *
@@ -66,7 +66,7 @@ import { ColumnSort } from './Common/ColumnSort';
  *
  * - *Pivoted Layout* - a Layout that includes Pivot details (so that the grid will be pivoted when the Layout is selected)
  */
-export interface LayoutState extends RunTimeState {
+export interface LayoutState extends ConfigState {
   /**
    * The name of the Layout which will be loaded AdapTable starts.
    *
@@ -112,7 +112,7 @@ export interface Layout extends AdaptableObject {
   ColumnSorts?: ColumnSort[];
 
   /**
-   * Which columns should be grouped when the Layout is applied.
+   * Which columns should be row-grouped when the Layout is applied.
    *
    * Make sure that the column names supplied are groupable according to the vendor grid you are using (e.g. `enableRowGroup` in ag-Grid)
    */
@@ -167,6 +167,7 @@ export interface VendorGridInfo {
 export interface AdaptableGridInfo {
   CurrentColumns?: string[];
   CurrentColumnSorts?: ColumnSort[];
+  ExpandedRowGroupKeys?: any[];
 }
 
 /**

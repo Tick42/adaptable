@@ -7,6 +7,7 @@ import { ThemeState, AdaptableTheme } from '../PredefinedConfig/ThemeState';
 import { AdaptableMenuItem } from '../PredefinedConfig/Common/Menu';
 import AdaptableHelper from '../Utilities/Helpers/AdaptableHelper';
 import { ThemeChangedEventArgs, ThemeChangedInfo } from '../Api/Events/ThemeChanged';
+import * as ThemeRedux from '../Redux/ActionsReducers/ThemeRedux';
 
 export class ThemeStrategy extends AdaptableStrategyBase implements IThemeStrategy {
   private ThemeState: ThemeState;
@@ -30,6 +31,7 @@ export class ThemeStrategy extends AdaptableStrategyBase implements IThemeStrate
 
     let themeChangedInfo: ThemeChangedInfo = {
       themeName: themeState.CurrentTheme,
+      adaptableApi: this.adaptable.api,
     };
     const themeChangedEventArgs: ThemeChangedEventArgs = AdaptableHelper.createFDC3Message(
       'Theme Changed Args',

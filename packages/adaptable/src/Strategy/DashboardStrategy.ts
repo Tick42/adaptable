@@ -3,74 +3,49 @@ import * as StrategyConstants from '../Utilities/Constants/StrategyConstants';
 import * as ScreenPopups from '../Utilities/Constants/ScreenPopups';
 import { IAdaptable } from '../AdaptableInterfaces/IAdaptable';
 import { IDashboardStrategy } from './Interface/IDashboardStrategy';
-import { Visibility } from '../PredefinedConfig/Common/Enums';
 import * as DashboardRedux from '../Redux/ActionsReducers/DashboardRedux';
 import { AdaptableMenuItem } from '../PredefinedConfig/Common/Menu';
-import { arrayToKeyMap } from '../Utilities/Helpers/Helper';
 import AdaptableHelper from '../Utilities/Helpers/AdaptableHelper';
 import {
   ToolbarVisibilityChangedEventArgs,
   ToolbarVisibilityChangedInfo,
 } from '../Api/Events/ToolbarVisibilityChanged';
-import { AdaptableDashboardToolbar } from '../PredefinedConfig/Common/Types';
+import { DashboardTab } from '../PredefinedConfig/DashboardState';
+import ArrayExtensions from '../Utilities/Extensions/ArrayExtensions';
 
 export class DashboardStrategy extends AdaptableStrategyBase implements IDashboardStrategy {
-  private visibleToolbars: AdaptableDashboardToolbar[] | string[] | undefined;
-  private dashboardVisibility: Visibility;
-
   constructor(adaptable: IAdaptable) {
     super(StrategyConstants.DashboardStrategyId, adaptable);
+
+    this.adaptable.api.eventApi.on('AdaptableReady', () => {
+      // create the default Dashboard tab - this is for jump from 6 to 6.1
+      this.adaptable.api.internalApi.setDefaultDashboardTab();
+      this.prepareToolbarVisibilityChangedEvent();
+    });
+
+    adaptable.AdaptableStore.onAny((eventName: string) => {
+      if (
+        eventName == DashboardRedux.DASHBOARD_SET_ACTIVE_TAB ||
+        eventName == DashboardRedux.DASHBOARD_SET_IS_COLLAPSED ||
+        eventName == DashboardRedux.DASHBOARD_SET_IS_FLOATING ||
+        eventName == DashboardRedux.DASHBOARD_SET_TABS
+      ) {
+        this.prepareToolbarVisibilityChangedEvent();
+      }
+    });
   }
 
-  protected InitState() {
-    if (
-      this.visibleToolbars != this.adaptable.api.dashboardApi.getDashboardState().VisibleToolbars
-    ) {
-      const oldVisibleToolbars = arrayToKeyMap(this.visibleToolbars);
-      const newVisibleToolbars = arrayToKeyMap(
-        this.adaptable.api.dashboardApi.getDashboardState().VisibleToolbars
-      );
-
-      [...(this.adaptable.api.dashboardApi.getDashboardState().VisibleToolbars || [])].forEach(
-        (toolbar: string) => {
-          if (!oldVisibleToolbars[toolbar]) {
-            if (
-              this.adaptable.api.dashboardApi.getDashboardState().DashboardVisibility ==
-              Visibility.Visible
-            ) {
-              this.fireToolbarVisibilityChangedEvent(toolbar, 'Visible');
-            }
-          }
+  private prepareToolbarVisibilityChangedEvent(): void {
+    let currentTabs: DashboardTab[] = this.adaptable.api.dashboardApi.getDashboardState().Tabs;
+    if (ArrayExtensions.IsNotNullOrEmpty(currentTabs)) {
+      let activeTab = this.adaptable.api.dashboardApi.getDashboardState().ActiveTab;
+      if (activeTab > -1) {
+        let tab: DashboardTab = this.adaptable.api.dashboardApi.getDashboardState().Tabs[activeTab];
+        if (tab) {
+          tab.Toolbars.forEach(toolbar => {
+            this.fireToolbarVisibilityChangedEvent(tab, toolbar);
+          });
         }
-      );
-
-      [...(this.visibleToolbars || [])].forEach((toolbar: AdaptableDashboardToolbar | string) => {
-        if (!newVisibleToolbars[toolbar]) {
-          this.fireToolbarVisibilityChangedEvent(toolbar, 'Hidden');
-        }
-      });
-
-      this.visibleToolbars = this.adaptable.api.dashboardApi.getDashboardState().VisibleToolbars;
-    }
-
-    if (
-      this.dashboardVisibility !=
-      this.adaptable.api.dashboardApi.getDashboardState().DashboardVisibility
-    ) {
-      this.dashboardVisibility = this.adaptable.api.dashboardApi.getDashboardState()
-        .DashboardVisibility as Visibility;
-
-      if (this.dashboardVisibility == Visibility.Visible) {
-        [...(this.adaptable.api.dashboardApi.getDashboardState().VisibleToolbars || [])].forEach(
-          (toolbar: string) => {
-            if (
-              this.adaptable.api.dashboardApi.getDashboardState().DashboardVisibility ==
-              Visibility.Visible
-            ) {
-              this.fireToolbarVisibilityChangedEvent(toolbar, 'Visible');
-            }
-          }
-        );
       }
     }
   }
@@ -88,35 +63,52 @@ export class DashboardStrategy extends AdaptableStrategyBase implements IDashboa
   public addColumnMenuItems(): AdaptableMenuItem[] | undefined {
     // for now just show / hide = lets worry about minimise later..
     if (this.canCreateMenuItem('ReadOnly')) {
-      if (
-        this.adaptable.api.dashboardApi.getDashboardState().DashboardVisibility == Visibility.Hidden
-      ) {
-        return [
+      let menuItems: AdaptableMenuItem[] = [];
+      if (this.adaptable.api.dashboardApi.getDashboardState().IsCollapsed) {
+        menuItems.push(
           this.createColumnMenuItemReduxAction(
-            'Show Dashboard',
-            StrategyConstants.DashboardGlyph,
-            DashboardRedux.DashboardSetVisibility(Visibility.Visible)
-          ),
-        ];
+            'Expand Dashboard',
+            'expand',
+            DashboardRedux.DashboardSetIsCollapsed(false)
+          )
+        );
       } else {
-        return [
+        menuItems.push(
           this.createColumnMenuItemReduxAction(
-            'Hide Dashboard',
-            StrategyConstants.DashboardGlyph,
-            DashboardRedux.DashboardSetVisibility(Visibility.Hidden)
-          ),
-        ];
+            'Collapse Dashboard',
+            'collapse',
+            DashboardRedux.DashboardSetIsCollapsed(true)
+          )
+        );
       }
+      if (this.adaptable.api.dashboardApi.getDashboardState().IsFloating) {
+        menuItems.push(
+          this.createColumnMenuItemReduxAction(
+            'Dock Dashboard',
+            'dock',
+            DashboardRedux.DashboardSetIsFloating(false)
+          )
+        );
+      } else {
+        menuItems.push(
+          this.createColumnMenuItemReduxAction(
+            'Float Dashboard',
+            'dock',
+            DashboardRedux.DashboardSetIsFloating(true)
+          )
+        );
+      }
+
+      return menuItems;
     }
   }
 
-  private fireToolbarVisibilityChangedEvent(
-    toolbar: string,
-    visibility: 'Visible' | 'Hidden'
-  ): void {
+  private fireToolbarVisibilityChangedEvent(tab: DashboardTab, toolbar: string): void {
     let toolbarVisibilityChangedInfo: ToolbarVisibilityChangedInfo = {
+      tab: tab,
       toolbar: toolbar,
-      visibility: visibility,
+      visibility: 'Visible',
+      adaptableApi: this.adaptable.api,
     };
     const toolbarVisibilityChangedEventArgs: ToolbarVisibilityChangedEventArgs = AdaptableHelper.createFDC3Message(
       'Toolbar Visibility Changed Args',

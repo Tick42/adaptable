@@ -28,7 +28,7 @@ import { BulkUpdateValidationResult } from '../../Strategy/Interface/IBulkUpdate
 
 interface BulkUpdateToolPanelControlComponentProps
   extends ToolPanelStrategyViewPopupProps<BulkUpdateToolPanelControlComponent> {
-  BulkUpdateValue: string;
+  BulkUpdateValue: string | undefined;
   BulkUpdateValidationResult: BulkUpdateValidationResult;
   PreviewInfo: IPreviewInfo;
 
@@ -67,7 +67,7 @@ class BulkUpdateToolPanelControlComponent extends React.Component<
   render() {
     let statusColour: StatusColour = this.getStatusColour();
 
-    let selectedColumn: AdaptableColumn = this.props.BulkUpdateValidationResult.Column;
+    let selectedColumn: AdaptableColumn | undefined = this.props.BulkUpdateValidationResult.Column;
 
     let previewPanel = (
       <PreviewResultsPanel
@@ -224,7 +224,10 @@ class BulkUpdateToolPanelControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<BulkUpdateToolPanelControlComponentProps> {
   return {
     BulkUpdateValue: state.BulkUpdate.BulkUpdateValue,
     BulkUpdateValidationResult: state.System.BulkUpdateValidationResult,
@@ -232,7 +235,9 @@ function mapStateToProps(state: AdaptableState, ownProps: any) {
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<BulkUpdateToolPanelControlComponentProps> {
   return {
     onBulkUpdateValueChange: (value: string) =>
       dispatch(BulkUpdateRedux.BulkUpdateChangeValue(value)),

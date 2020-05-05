@@ -22,11 +22,12 @@ import { GridCell } from '../../PredefinedConfig/Selection/GridCell';
 import AdaptableHelper from '../Helpers/AdaptableHelper';
 import { LiveDataChangedInfo } from '../../Api/Events/LiveDataChanged';
 import { LiveDataChangedEventArgs } from '../../types';
-
-export const ALL_DATA_REPORT = 'All Data';
-export const VISIBLE_DATA_REPORT = 'Visible Data';
-export const SELECTED_CELLS_REPORT = 'Selected Cells';
-export const SELECTED_ROWS_REPORT = 'Selected Rows';
+import {
+  ALL_DATA_REPORT,
+  VISIBLE_DATA_REPORT,
+  SELECTED_CELLS_REPORT,
+  SELECTED_ROWS_REPORT,
+} from '../Constants/GeneralConstants';
 
 export class ReportService implements IReportService {
   constructor(private adaptable: IAdaptable) {
@@ -90,6 +91,7 @@ export class ReportService implements IReportService {
 
   public IsReportDestinationActive(exportDestination: ExportDestination): boolean {
     switch (exportDestination) {
+      case ExportDestination.Excel:
       case ExportDestination.CSV:
       case ExportDestination.Clipboard:
       case ExportDestination.JSON:
@@ -152,7 +154,7 @@ export class ReportService implements IReportService {
     switch (report.ReportRowScope) {
       case ReportRowScope.AllRows:
         this.adaptable.forAllRowNodesDo(row => {
-          let newRow = this.getRowValues(row, reportColumns, report);
+          let newRow: any[] = this.getRowValues(row, reportColumns, report);
           dataToExport.push(newRow);
         });
         break;
@@ -318,6 +320,8 @@ export class ReportService implements IReportService {
       if (exportColumnRawValue) {
         useRawValue = exportColumnRawValue(col, report);
       }
+
+      //  useRawValue = true;
       if (useRawValue) {
         columnValue = this.adaptable.getRawValueFromRowNode(rowNode, col.ColumnId);
       } else {
@@ -355,6 +359,7 @@ export class ReportService implements IReportService {
       ReportDestination: reportDestination,
       LiveDataTrigger: liveDataTrigger,
       LiveReport: liveReport,
+      adaptableApi: this.adaptable.api,
     };
     const liveDataChangedEventArgs: LiveDataChangedEventArgs = AdaptableHelper.createFDC3Message(
       'Live Data Changed Args',

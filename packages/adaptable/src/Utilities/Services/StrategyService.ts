@@ -10,12 +10,28 @@ import { IAdaptable } from '../../AdaptableInterfaces/IAdaptable';
 import { AlertDefinition } from '../../PredefinedConfig/AlertState';
 import ExpressionHelper from '../Helpers/ExpressionHelper';
 import StringExtensions from '../Extensions/StringExtensions';
+import { AdaptableFunctionName, AdaptableMenuItem } from '../../types';
+import { IStrategyCollection, IStrategy } from '../../Strategy/Interface/IStrategy';
+import Helper from '../Helpers/Helper';
+import { TeamSharingImportInfo, SharedEntity } from '../../PredefinedConfig/TeamSharingState';
+import { AdaptableObject } from '../../PredefinedConfig/Common/AdaptableObject';
 
 export interface IStrategyService {
   createAlertDescription(alertDefinition: AlertDefinition, columns: AdaptableColumn[]): string;
 
   getDistinctColumnValues(columnId: string): number[];
+
+  isStrategyAvailable(adaptableFunctionName: AdaptableFunctionName): boolean;
+
+  setStrategiesEntitlements(): void;
+
+  createStrategyFunctionMenu(): void;
+
+  getTeamSharingAction(
+    adaptableFunctionName: AdaptableFunctionName
+  ): TeamSharingImportInfo<AdaptableObject> | undefined;
 }
+
 export class StrategyService implements IStrategyService {
   constructor(private adaptable: IAdaptable) {
     this.adaptable = adaptable;
@@ -81,5 +97,43 @@ export class StrategyService implements IStrategyService {
       valueDescription = valueDescription + operand2Text;
     }
     return valueDescription;
+  }
+
+  public setStrategiesEntitlements(): void {
+    this.adaptable.strategies.forEach((strat: IStrategy) => {
+      strat.setStrategyEntitlement();
+    });
+  }
+
+  public createStrategyFunctionMenu(): void {
+    const menuItems: AdaptableMenuItem[] = [];
+    this.adaptable.strategies.forEach((strat: IStrategy) => {
+      const menuItem: AdaptableMenuItem | undefined = strat.addFunctionMenuItem();
+      if (Helper.objectExists(menuItem)) {
+        if (menuItems.findIndex(m => m.FunctionName == menuItem.FunctionName) == -1) {
+          menuItems.push(menuItem);
+        }
+      }
+    });
+    // store the main menu as we will re-use (and it never changes)
+    this.adaptable.api.internalApi.setMainMenuItems(menuItems);
+  }
+
+  public isStrategyAvailable(adaptableFunctionName: AdaptableFunctionName): boolean {
+    let strategy: IStrategy | undefined = this.adaptable.strategies.get(adaptableFunctionName);
+    if (!strategy) {
+      return false;
+    }
+    return strategy.isStrategyAvailable();
+  }
+
+  public getTeamSharingAction(
+    adaptableFunctionName: AdaptableFunctionName
+  ): TeamSharingImportInfo<AdaptableObject> | undefined {
+    let strategy: IStrategy | undefined = this.adaptable.strategies.get(adaptableFunctionName);
+    if (!strategy) {
+      return undefined;
+    }
+    return strategy.getTeamSharingAction();
   }
 }

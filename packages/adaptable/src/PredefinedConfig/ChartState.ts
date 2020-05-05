@@ -1,4 +1,4 @@
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
 import {
   ChartType,
@@ -16,7 +16,7 @@ import {
 } from './Common/ChartEnums';
 import { Expression } from './Common/Expression';
 
-export interface ChartState extends RunTimeState {
+export interface ChartState extends ConfigState {
   ChartDefinitions?: ChartDefinition[];
   CurrentChartName?: string;
   RefreshRate?: number;
@@ -45,6 +45,30 @@ export interface PieChartDefinition extends ChartDefinition {
   SecondaryColumnId?: string;
   SecondaryColumnOperation: 'Sum' | 'Count';
   PrimaryKeyValues?: any[];
+}
+
+export interface FinancialChartDataSource {
+  Name: string;
+  XAxisDateColumnId: string;
+
+  YAxisNumericOpenColumnId: string;
+  YAxisNumericCloseColumnId: string;
+  YAxisNumericHighColumnId: string;
+  YAxisNumericLowColumnId: string;
+  YAxisNumericVolumeColumnId?: string;
+}
+
+export interface FinancialChartDataItem {
+  time: Date;
+  open?: number;
+  high?: number;
+  low?: number;
+  close?: number;
+  volume?: number;
+}
+
+export interface FinancialChartDefinition extends ChartDefinition {
+  DataSources: FinancialChartDataSource[];
 }
 
 export interface SparklinesChartDefinition extends ChartDefinition {

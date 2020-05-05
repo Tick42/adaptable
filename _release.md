@@ -1,3 +1,120 @@
+## 6.2.1-canary5
+
+No code and ipushpull small updates.
+
+## 6.2.1-canary4
+
+Calculated Column settings
+
+## 6.2.1-canary3
+
+Fix Percent Bars bug
+
+## 6.2.1-canary2
+
+Fix to Formatting to allow for nulls (e.g. for grouped rows)
+
+## 6.2.1-canary1
+
+Small updates to Format Column function (2 extra date presets)
+
+## 6.2.1-canary0
+
+Canary release testing changes to formatting and team sharing
+
+## 6.2.0
+
+Minor release with improvements to Layouts and export to Excel
+
+## 6.1.6
+
+updating layout docs
+
+## 6.1.5
+
+new layout api methods
+
+## 6.1.4
+
+css dashboard issue fixed when multiple tabs
+
+## 6.1.3
+
+Inline dashboard minor fix
+Fixes for AdapTable unmount
+
+## 6.1.2
+
+Fixing some issues in inline view and adding icons. Also fix throttled and debounced methods to check for existing api object
+
+## 6.1.1
+
+Adding 'IsInline' option to Dashboard State to offer an alternative expanded view
+
+## 6.1.0
+
+Minor release with No Code version, Dashboard Tabs and improvements to State Management 
+
+## 6.0.32
+
+Updating style for Tabs in Dark theme
+
+## 6.0.31
+
+Adding a ShowQuickSearchInHeader property to Dashboard state
+
+## 6.0.30
+
+Adding some dashboard api methods
+
+## 6.0.29
+
+Adding default Visible toolbars
+
+## 6.0.28
+
+Fix mismatching React imports
+
+## 6.0.27
+
+Creating a default Dasbhoard Tab
+
+## 6.0.26
+
+Introduction of Dasbhoard Tabs
+
+## 6.0.25
+
+UserFunctions refactoring
+
+## 6.0.24
+
+FilterForm tidy up
+
+## 6.0.23
+
+ToolPanel update
+
+## 6.0.22
+
+More boolean filter updates
+
+## 6.0.21
+
+Adding boolean column support in filter dropdown
+
+## 6.0.20
+
+Fixing bug with custom sort functions in predefined config
+
+## 6.0.19
+
+Prevent layouts in Tree Grid View from having Grouped or Pivoted columns 
+
+## 6.0.18
+
+Fix nocode plugin imports failures
+
 ## 6.0.17
 
 Fix bug where default layout was still showing columns which had been marked as hidden in GridOptions

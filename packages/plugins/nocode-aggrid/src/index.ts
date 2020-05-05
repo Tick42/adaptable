@@ -41,13 +41,17 @@ export const readExcelFile = (file: File): Promise<any> => {
 
   return new Promise((resolve, reject) => {
     reader.onload = (e: any) => {
-      const wb = XLSXRead(e.target.result, { type: asBinary ? 'binary' : 'array' });
+      const wb = XLSXRead(e.target.result, {
+        type: asBinary ? 'binary' : 'array',
+        cellDates: true,
+      });
       // Get first worksheet
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       // Convert array of arrays
       const data = XLSXUtils.sheet_to_json(ws, { header: 1 });
 
+      console.log(data);
       resolve(data);
     };
     reader.onerror = reject;
@@ -102,7 +106,7 @@ class NoCodePlugin extends AdaptablePlugin {
         helpText: this.options.headerMessage,
         defaultActionMessage:
           this.options.actionMessage ||
-          'Click here to select an Excel or JSON file to load — or drag it here',
+          'Click to select an Excel or JSON file to load — or drag it here',
         dragOverActionMessage: this.options.dropActionMessage,
         loadingMessage: this.options.loadingMessage,
         readFile: (file: File): Promise<any> => {

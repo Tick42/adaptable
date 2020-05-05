@@ -8,16 +8,20 @@ import { Helper } from '../Utilities/Helpers/Helper';
 import { OpenfinHelper } from '../Utilities/Helpers/OpenfinHelper';
 import * as _ from 'lodash';
 import { Report } from '../PredefinedConfig/ExportState';
+import * as ExportRedux from '../Redux/ActionsReducers/ExportRedux';
+import { TeamSharingImportInfo } from '../PredefinedConfig/TeamSharingState';
 import { LoggingHelper } from '../Utilities/Helpers/LoggingHelper';
 import { ArrayExtensions } from '../Utilities/Extensions/ArrayExtensions';
 import { AdaptableColumn } from '../PredefinedConfig/Common/AdaptableColumn';
 import {
   SELECTED_CELLS_REPORT,
   DEFAULT_LIVE_REPORT_THROTTLE_TIME,
+  VISIBLE_DATA_REPORT,
 } from '../Utilities/Constants/GeneralConstants';
 import { AdaptableMenuItem } from '../PredefinedConfig/Common/Menu';
 import { LiveReport } from '../Api/Events/LiveDataChanged';
 import { DataChangedInfo } from '../PredefinedConfig/Common/DataChangedInfo';
+import ColumnHelper from '../Utilities/Helpers/ColumnHelper';
 
 export class ExportStrategy extends AdaptableStrategyBase implements IExportStrategy {
   private isSendingData: boolean = false;
@@ -200,12 +204,33 @@ export class ExportStrategy extends AdaptableStrategyBase implements IExportStra
   }
 
   public export(report: Report, exportDestination: ExportDestination): void {
+    if (report.Name === VISIBLE_DATA_REPORT) {
+      switch (exportDestination) {
+        case ExportDestination.Clipboard:
+          this.adaptable.exportVisibleToClipboard(report);
+          break;
+        case ExportDestination.CSV:
+          this.adaptable.exportVisibleToCsv(report);
+          break;
+        case ExportDestination.Excel:
+          this.adaptable.exportVisibleToExcel(report);
+          break;
+        case ExportDestination.JSON:
+          this.convertReportToJSON(report);
+          break;
+      }
+      return;
+    }
+
     switch (exportDestination) {
       case ExportDestination.Clipboard:
         this.copyToClipboard(report);
         break;
       case ExportDestination.CSV:
         this.convertReportToCsv(report);
+        break;
+      case ExportDestination.Excel:
+        this.convertReportToExcel(report);
         break;
       case ExportDestination.JSON:
         this.convertReportToJSON(report);
@@ -243,6 +268,19 @@ export class ExportStrategy extends AdaptableStrategyBase implements IExportStra
       let csvFileName: string = report.Name + '.csv';
       Helper.createDownloadedFile(csvContent, csvFileName, 'text/csv;encoding:utf-8');
     }
+  }
+
+  private convertReportToExcel(report: Report): void {
+    let reportAsArray: any[] = this.ConvertReportToArray(report);
+
+    let reportCols = reportAsArray.shift();
+
+    let cols: AdaptableColumn[] = ColumnHelper.getColumnsFromFriendlyNames(
+      reportCols,
+      this.adaptable.api.gridApi.getColumns()
+    );
+
+    this.adaptable.exportToExcel(report, cols, reportAsArray);
   }
 
   private copyToClipboard(report: Report) {
@@ -292,5 +330,13 @@ export class ExportStrategy extends AdaptableStrategyBase implements IExportStra
       return this.adaptable.api.internalApi.getLiveReports()[0];
     }
     return undefined;
+  }
+
+  public getTeamSharingAction(): TeamSharingImportInfo<Report> {
+    return {
+      FunctionEntities: this.adaptable.api.exportApi.getAllReports(),
+      AddAction: ExportRedux.ReportAdd,
+      EditAction: ExportRedux.ReportEdit,
+    };
   }
 }

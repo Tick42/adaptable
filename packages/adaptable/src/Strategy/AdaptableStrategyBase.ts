@@ -13,6 +13,8 @@ import { AdaptableMenuItem, MenuInfo } from '../PredefinedConfig/Common/Menu';
 import { IAdaptable } from '../AdaptableInterfaces/IAdaptable';
 import { AdaptableFunctionName } from '../PredefinedConfig/Common/Types';
 import { AccessLevel } from '../PredefinedConfig/EntitlementState';
+import { TeamSharingImportInfo } from '../PredefinedConfig/TeamSharingState';
+import { AdaptableObject } from '../PredefinedConfig/Common/AdaptableObject';
 
 /**
  * Base class for all strategies and does most of the work of creating menus
@@ -35,6 +37,10 @@ export abstract class AdaptableStrategyBase implements IStrategy {
     this.AccessLevel = this.adaptable.api.entitlementsApi.getEntitlementAccessLevelByAdaptableFunctionName(
       this.Id
     );
+  }
+
+  public isStrategyAvailable(): boolean {
+    return !this.adaptable.api.entitlementsApi.isFunctionHiddenEntitlement(this.Id);
   }
 
   protected InitState(): void {
@@ -159,5 +165,9 @@ export abstract class AdaptableStrategyBase implements IStrategy {
       }
     }
     return true;
+  }
+
+  public getTeamSharingAction(): TeamSharingImportInfo<AdaptableObject> | undefined {
+    return undefined;
   }
 }

@@ -10,6 +10,11 @@ import { createUuid, TypeUuid } from '../Uuid';
  * - Filters: can be a mix of *Column Filters* (created by the user at run-time), *System Filters* (filters which are shipped by Adaptable) and *User Filters* (special filters which the user creates and names and can then re-use as required).
  *
  * - Ranges: an evaluation (e.g. 'GreaterThan 15', 'LessThan [Bid]' etc.)
+ *
+ * **Further AdapTable Help Resources**
+ *
+ * [Expression Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/guides/adaptable-expression-guide.md) | [Filtering Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/guides/adaptable-filtering-guide.md)
+ *
  */
 export class Expression {
   /**
@@ -52,11 +57,11 @@ export interface ColumnValueExpression {
  *
  * There are 3 types of Filter that can be included here:
  *
- * [User Filters](../interfaces/_predefinedconfig_runtimestate_userfilterstate_.userfilterstate.html) - created by the User at RunTime and saved for re-use
+ * [User Filters](../interfaces/_predefinedconfig_configstate_userfilterstate_.userfilterstate.html) - created by the User at RunTime and saved for re-use
  *
- * [System Filters](../interfaces/_predefinedconfig_designtimestate_systemfilterstate_.systemfilterstate.htm) - provided by Adaptable (e.g. 'Today', 'Positive', 'Blanks' etc.)
+ * [System Filters](../interfaces/_predefinedconfig_configstate_systemfilterstate_.systemfilterstate.htm) - provided by Adaptable (e.g. 'Today', 'Positive', 'Blanks' etc.)
  *
- * [Named Filters](../interfaces/_predefinedconfig_runtimestate_namedfilterstate_.namedfilterstate.html) - created by developers at Design Time (who provide in Adavnced Options the function that will be applied).
+ * [Named Filters](../interfaces/_predefinedconfig_configstate_namedfilterstate_.namedfilterstate.html) - created by developers at Design Time (who provide in Adavnced Options the function that will be applied).
  */
 export interface FilterExpression {
   /**

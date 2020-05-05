@@ -31,7 +31,10 @@ export interface CellValidationSummaryProps
   onEditCellValidation: (
     cellValidationRule: CellValidationRule
   ) => CellValidationRedux.CellValidationEditAction;
-  onShare: (entity: AdaptableObject) => TeamSharingRedux.TeamSharingShareAction;
+  onShare: (
+    entity: AdaptableObject,
+    description: string
+  ) => TeamSharingRedux.TeamSharingShareAction;
 }
 
 export class CellValidationSummaryComponent extends React.Component<
@@ -79,7 +82,7 @@ export class CellValidationSummaryComponent extends React.Component<
             EntityType={StrategyConstants.CellValidationStrategyFriendlyName}
             showShare={this.props.TeamSharingActivated}
             onEdit={() => this.onEdit(item)}
-            onShare={() => this.props.onShare(item)}
+            onShare={description => this.props.onShare(item, description)}
             onDelete={CellValidationRedux.CellValidationDelete(item)}
           />
         );
@@ -160,7 +163,10 @@ export class CellValidationSummaryComponent extends React.Component<
     return true;
   }
 }
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<CellValidationSummaryProps> {
   return {
     Columns: state.Grid.Columns,
     CellValidations: state.CellValidation.CellValidations,
@@ -170,15 +176,21 @@ function mapStateToProps(state: AdaptableState, ownProps: any) {
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<CellValidationSummaryProps> {
   return {
     onAddCellValidation: (cellValidationRule: CellValidationRule) =>
       dispatch(CellValidationRedux.CellValidationAdd(cellValidationRule)),
     onEditCellValidation: (cellValidationRule: CellValidationRule) =>
       dispatch(CellValidationRedux.CellValidationEdit(cellValidationRule)),
-    onShare: (entity: AdaptableObject) =>
+    onShare: (entity: AdaptableObject, description: string) =>
       dispatch(
-        TeamSharingRedux.TeamSharingShare(entity, StrategyConstants.CellValidationStrategyId)
+        TeamSharingRedux.TeamSharingShare(
+          entity,
+          StrategyConstants.CellValidationStrategyId,
+          description
+        )
       ),
   };
 }

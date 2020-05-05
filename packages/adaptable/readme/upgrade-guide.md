@@ -1,4 +1,4 @@
-# AdapTable Upgrade Guide
+# AdapTable Version 6 Upgrade Guide
 
 Version 6 of AdapTable includes many new features, improvements and ways of working that will allow you to do more with the tool than ever before. 
 
@@ -216,23 +216,23 @@ Find out more - and see the full list of AdapTable events at [Event API Document
 
 ## New Features
 
-We have added a lot of new functionality to AdapTable in version 6.  This includes many more options (and option groups) to [Adaptable Options](https://api.adaptabletools.com/interfaces/_adaptableoptions_adaptableoptions_.adaptableoptions) (the object you create at design time and provide to the AdapTable constructor), more [API methods](https://api.adaptabletools.com/interfaces/_src_api_adaptableapi_.adaptableapi)  and more [Predefined Config](https://api.adaptabletools.com/interfaces/_predefinedconfig_predefinedconfig_.predefinedconfig.html) properties. 
+We have added a lot of new functionality to AdapTable in version 6.  This includes many more options (and option groups) to [Adaptable Options](https://api.adaptabletools.com/interfaces/_adaptableoptions_adaptableoptions_.adaptableoptions) (the object you create at design time and provide to the AdapTable constructor), more [API methods](https://api.adaptabletools.com/interfaces/_src_api_adaptableapi_.adaptableapi)  and more [Predefined Config](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_predefinedconfig_.predefinedconfig.html) properties. 
 
 The result is to give you more complete control over how your instance of AdapTable looks and works. 
 
 There are far too many new features to list here but some of the headlines are:
 
-* [Options to manage state hydration/dehydration](https://api.adaptabletools.com/interfaces/_adaptableoptions_stateoptions_.stateoptions.html)
-* [Application Data Entries to store custom state](https://api.adaptabletools.com/interfaces/_predefinedconfig_applicationstate_.applicationstate.html)
-* [Adaptable Tool Panel](https://api.adaptabletools.com/interfaces/_predefinedconfig_toolpanelstate_.toolpanelstate.html)
-* [Server Validation](https://api.adaptabletools.com/interfaces/_adaptableoptions_editoptions_.editoptions.html)  
-* [Updated Rows](https://api.adaptabletools.com/interfaces/_predefinedconfig_updatedrowstate_.updatedrowstate.html)
-* [Saveable Pivot and Grouped Layouts](https://api.adaptabletools.com/interfaces/_predefinedconfig_layoutstate_.pivotdetails.html)   
-* [Custom Dashboard Toolbars](https://api.adaptabletools.com/interfaces/_predefinedconfig_dashboardstate_.customtoolbar.html)
-* [Column Menu bespoke items](https://api.adaptabletools.com/interfaces/_predefinedconfig_userinterfacestate_.userinterfacestate.html#columnmenuitems)
-* [Context Menu bespoke items](https://api.adaptabletools.com/interfaces/_predefinedconfig_userinterfacestate_.userinterfacestate.html#contextmenuitems)
-* [Quick Search exclude columns](https://api.adaptabletools.com/interfaces/_adaptableoptions_searchoptions_.searchoptions.html#excludecolumnfromquicksearch)
-* [ipushpull improvements](https://api.adaptabletools.com/interfaces/_predefinedconfig_ipushpullstate_.ipushpullstate.html)
+* [Options to manage state hydration/dehydration](https://api.adaptabletools.com/interfaces/_src_adaptableoptions_stateoptions_.stateoptions.html)
+* [Application Data Entries to store custom state](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_applicationstate_.applicationdataentry.html)
+* [Adaptable Tool Panel](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_toolpanelstate_.toolpanelstate.html)
+* [Server Validation](https://api.adaptabletools.com/interfaces/_src_adaptableoptions_editoptions_.editoptions.html)  
+* [Updated Rows](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_updatedrowstate_.updatedrowstate.html)
+* [Saveable Pivot and Grouped Layouts](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_layoutstate_.pivotdetails.html)   
+* [Custom Dashboard Toolbars](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_dashboardstate_.dashboardstate.html#customtoolbars)
+* [Column Menu bespoke items](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_userinterfacestate_.userinterfacestate.html#columnmenuitems)
+* [Context Menu bespoke items](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_userinterfacestate_.userinterfacestate.html#contextmenuitems)
+* [Quick Search exclude columns](https://api.adaptabletools.com/interfaces/_src_adaptableoptions_searchoptions_.searchoptions.html#excludecolumnfromquicksearch)
+* [ipushpull improvements](https://api.adaptabletools.com/interfaces/_src_predefinedconfig_ipushpullstate_.ipushpullstate.html)
 
 
 ## Basic Installation Example
@@ -316,10 +316,16 @@ To see AdapTable in action visit our [Demo Site](https://demo.adaptabletools.com
 
 ## Help
 
-Further information about AdapTable is available at our [Website](https://www.adaptabletools.com) and our [Help Site](https://adaptabletools.zendesk.com/hc/en-us)
-
 Developers can learn how to access AdapTable programmatically at [AdapTable Developer Documentation](https://api.adaptabletools.com) 
+
+The other source for Help is our collection of 'Read Me' Docs ([full list here](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/readme-list.md)).
+
+> Previously the main source of AdapTable Help was our [Zendesk Pages](https://adaptabletools.zendesk.com/hc/en-us/articles/360007083017-Help-) but these have been replaced by these 'Read Me' docs and the Developer Documentation that is automatically produced and therefore always up to date.
+
+## More Information
+
+General information about Adaptable Tools is available at our [Website](http://www.adaptabletools.com) 
 
 ## Support
 
-For all support enquiries please email [`support@adaptabletools.com`](mailto:support@adaptabletools.com) or [raise a ticket](https://adaptabletools.zendesk.com/hc/en-us/requests/new).
+For all support enquiries please email [`support@adaptabletools.com`](mailto:support@adaptabletools.com) or [raise a Support Ticket](https://adaptabletools.zendesk.com/hc/en-us/requests/new).

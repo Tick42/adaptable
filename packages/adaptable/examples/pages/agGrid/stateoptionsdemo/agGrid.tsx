@@ -11,7 +11,7 @@ import { GridOptions } from '@ag-grid-community/all-modules';
 import Adaptable from '../../../../src/agGrid';
 import { AdaptableOptions, PredefinedConfig, AdaptableApi } from '../../../../src/types';
 import { ExamplesHelper } from '../../ExamplesHelper';
-
+import { AllEnterpriseModules } from '@ag-grid-enterprise/all-modules';
 var adaptableApi: AdaptableApi;
 
 function InitAdaptableDemo() {
@@ -24,28 +24,35 @@ function InitAdaptableDemo() {
     primaryKey: 'tradeId',
     userName: 'Demo User',
     adaptableId: 'Basic Demo',
-    vendorGrid: gridOptions,
+    vendorGrid: {
+      ...gridOptions,
+      modules: AllEnterpriseModules,
+    },
     predefinedConfig: demoConfig,
     stateOptions: {
       saveState: state => {
-        console.log('in save state');
         return {
           ...state,
           name: 'Jonny',
         };
       },
+
       applyState: state => {
         const { name, ...rest } = state;
-        console.log('in apply state name is:', name);
+
         return rest;
       },
       loadState: () => {
-        let state = localStorage.getItem('TestingState');
-        if (state != null) {
-          state = JSON.parse(state);
-        }
-        console.log('in load state:', state);
-        return Promise.resolve(state);
+        return new Promise(resolve => {
+          setTimeout(() => {
+            let state = localStorage.getItem('TestingState');
+            if (state != null) {
+              state = JSON.parse(state);
+            }
+            console.log('in load state:', state);
+            resolve(state);
+          }, 1000);
+        });
       },
       persistState: state => {
         localStorage.setItem('TestingState', JSON.stringify(state));

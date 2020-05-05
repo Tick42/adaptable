@@ -1,30 +1,29 @@
 import { useEffect } from 'react';
-
 import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
 import '@ag-grid-community/all-modules/dist/styles/ag-theme-balham.css';
 import '@ag-grid-community/all-modules/dist/styles/ag-theme-balham-dark.css';
 import '../../../../src/index.scss';
 import '../../../../src/themes/dark.scss';
 import './index.css';
-
-import { GridOptions } from '@ag-grid-community/all-modules';
+import { GridOptions, Column } from '@ag-grid-community/all-modules';
 import {
   AdaptableOptions,
-  PredefinedConfig,
   AdaptableApi,
+  AdaptableReadyInfo,
   SearchChangedEventArgs,
-  MenuInfo,
+  ToolbarButtonClickedInfo,
 } from '../../../../src/types';
 import { ExamplesHelper } from '../../ExamplesHelper';
 import { AllEnterpriseModules } from '@ag-grid-enterprise/all-modules';
 import Adaptable from '../../../../agGrid';
-import { AdaptableReadyInfo } from '../../../../src/Api/Events/AdaptableReady';
-import { ColumnSort } from '../../../../src/PredefinedConfig/Common/ColumnSort';
-
+import { TickingDataHelper } from '../../TickingDataHelper';
+import { Layout } from '../../../../src/PredefinedConfig/LayoutState';
+import { ToolbarButton } from '../../../../src/PredefinedConfig/Common/ToolbarButton';
 var api: AdaptableApi;
 
 function InitAdaptableDemo() {
   const examplesHelper = new ExamplesHelper();
+  const tickingDataHelper = new TickingDataHelper();
   const tradeCount: number = 100;
   const tradeData: any = examplesHelper.getTrades(tradeCount);
   const gridOptions: GridOptions = examplesHelper.getGridOptionsTrade(tradeData);
@@ -32,39 +31,126 @@ function InitAdaptableDemo() {
   const adaptableOptions: AdaptableOptions = {
     primaryKey: 'tradeId',
     userName: 'Demo User',
-    adaptableId: 'Basic Demo',
-
+    adaptableId: 'Basic Demo New',
+    userInterfaceOptions: {
+      showAdaptableToolPanel: true,
+      useCustomMacLikeScrollbars: true,
+    },
     vendorGrid: {
       ...gridOptions,
       modules: AllEnterpriseModules,
     },
-    predefinedConfig: demoConfig,
-  };
-
-  adaptableOptions.layoutOptions = {
-    //   autoSizeColumnsInLayout: true,
-  };
-  adaptableOptions.userInterfaceOptions = {
-    showAdaptableToolPanel: true,
-  };
-  adaptableOptions.filterOptions = {
-    clearFiltersOnStartUp: true,
-  };
-  adaptableOptions.searchOptions = {
-    clearSearchesOnStartUp: true,
+    predefinedConfig: {
+      Dashboard: {
+        Tabs: [
+          {
+            Name: 'General',
+            Toolbars: ['Toolbar1', 'SmartEdit', 'CellSummary', 'Layout'],
+          },
+        ],
+        VisibleButtons: ['CellSummary', 'ColumnChooser'],
+        CustomToolbars: [
+          {
+            Name: 'Toolbar1',
+            Title: 'Demo Toolbar',
+            Glyph: 'advanced-search',
+            ToolbarButtons: [
+              {
+                Name: 'btnNewLayout',
+                Caption: 'New Layout',
+              },
+              {
+                Name: 'btnCopyLayout',
+                Caption: 'Copy Layout',
+              },
+            ],
+          },
+        ],
+        ShowFunctionsDropdown: true,
+        //  HomeToolbarTitle: 'Hello world',
+        ShowQuickSearchInHeader: true,
+        IsInline: true, // making it false in Redux so we dont forget but true here for testing purposes
+      },
+      SystemStatus: {
+        Revision: 13,
+        DefaultStatusMessage: 'System Running Fine',
+        DefaultStatusType: 'Error',
+      },
+      AdvancedSearch: {
+        Revision: 4,
+        AdvancedSearches: [],
+      },
+      FormatColumn: {
+        FormatColumns: [
+          {
+            ColumnId: 'notional',
+            CellAlignment: 'Right',
+          },
+        ],
+      },
+      QuickSearch: {
+        Revision: 11,
+        QuickSearchText: 'b',
+      },
+      Entitlements: {
+        Revision: 3,
+        DefaultAccessLevel: 'Full',
+        FunctionEntitlements: [
+          {
+            FunctionName: 'Layout',
+            AccessLevel: 'Full',
+          },
+          {
+            FunctionName: 'Dashboard',
+            AccessLevel: 'Full',
+          },
+        ],
+      },
+    },
   };
 
   api = Adaptable.init(adaptableOptions);
 
-  (globalThis as any).api = api;
+  api.eventApi.on('ToolbarButtonClicked', toolbarButtonClickedEventArgs => {
+    let eventInfo: ToolbarButtonClickedInfo = toolbarButtonClickedEventArgs.data[0].id;
+    let toolbarButton = eventInfo.toolbarButton;
+
+    if (toolbarButton.Name == 'btnNewLayout') {
+      let newLayout: Layout = {
+        Name: 'test',
+        Columns: ['bid', 'currency', 'counterparty'],
+        GroupedColumns: ['country'],
+      };
+      api.layoutApi.createAndSetLayout(newLayout);
+    } else if (toolbarButton.Name == 'btnCopyLayout') {
+      //   let currentLayout = api.layoutApi.getCurrentLayout();
+      //  let testLayout: Layout = api.layoutApi.getLayoutByName('test');
+
+      //  api.layoutApi.cloneAndSetLayout(currentLayout, 'Hello World');
+      console.log('here');
+      api.formatColumnApi.setCellAlignment('amount', 'Right');
+      api.formatColumnApi.setCellAlignment('notional', 'Center');
+    }
+  });
+
+  // tickingDataHelper.useTickingDataagGrid(adaptableOptions.vendorGrid, api, 200, tradeCount);
 
   api.eventApi.on('AdaptableReady', (info: AdaptableReadyInfo) => {
+    // info.adaptableApi.layoutApi.setLayout(newLayout.Name);
+    /*
     setTimeout(() => {
-      let firstNode: any = api.gridApi.getFirstRowNode();
-      api.gridApi.selectNode(firstNode);
-      let pkNode: any = api.gridApi.getRowNodeForPrimaryKey(21);
-      api.gridApi.selectNode(pkNode);
-    }, 500);
+      api.dashboardApi.floatDashboard();
+    }, 2000);
+    setTimeout(() => {
+      api.dashboardApi.unFloatDashboard();
+    }, 4000);
+    setTimeout(() => {
+      api.dashboardApi.collapseDashboard();
+    }, 6000);
+    setTimeout(() => {
+      api.dashboardApi.unCollapseDashboard();
+    }, 8000); */
+    //  info.adaptableApi.flashingCellApi.showFlashingCellPopup();
   });
 
   api.eventApi.on('SearchChanged', (searchChangedArgs: SearchChangedEventArgs) => {
@@ -72,191 +158,6 @@ function InitAdaptableDemo() {
     //  console.log(searchChangedArgs.data[0].id);
   });
 }
-
-let demoConfig: PredefinedConfig = {
-  Dashboard: {
-    VisibleToolbars: ['QuickSearch', 'Layout', 'SystemStatus'],
-    MinimisedHomeToolbarButtonStyle: {
-      Variant: 'text',
-      Tone: 'success',
-    }, //
-  },
-
-  Layout: {
-    // CurrentLayout: 'Layout Two',
-    Layouts: [
-      {
-        Columns: ['country', 'currency'],
-        Name: 'Layout One',
-      },
-      {
-        Columns: ['lastUpdated', 'tradeId'],
-        Name: 'Layout Three',
-      },
-      {
-        Columns: [
-          'lastUpdated',
-          'bid',
-          'ask',
-          'notional',
-          'tradeId',
-          'currency',
-          'counterparty',
-          'country',
-        ],
-        Name: 'Layout Two',
-      },
-    ],
-  },
-
-  Entitlements: {
-    DefaultAccessLevel: 'Full',
-    FunctionEntitlements: [
-      {
-        FunctionName: 'ColumnCategory',
-        AccessLevel: 'Hidden',
-      },
-      {
-        FunctionName: 'ColumnChooser',
-        AccessLevel: 'Full',
-      },
-      {
-        FunctionName: 'Export',
-        AccessLevel: 'Hidden',
-      },
-      {
-        FunctionName: 'Layout',
-        AccessLevel: 'Full',
-      },
-      {
-        FunctionName: 'CustomSort',
-        AccessLevel: 'Hidden',
-      },
-    ],
-  },
-  Shortcut: {
-    Shortcuts: [
-      {
-        ColumnType: 'Number',
-        IsDynamic: false,
-        ShortcutKey: 'K',
-        ShortcutOperation: 'Multiply',
-        ShortcutResult: '1000',
-      },
-      {
-        ColumnType: 'Date',
-        IsDynamic: true,
-        ShortcutKey: 'N',
-        ShortcutOperation: 'Replace',
-        ShortcutResult: 'Next Work Day',
-      },
-    ],
-  },
-  PercentBar: {
-    PercentBars: [
-      {
-        ColumnId: 'notional',
-        PositiveValue: 1496,
-        PositiveColor: '#006400',
-        ShowValue: false,
-        ShowToolTip: true,
-      },
-    ],
-  },
-  NamedFilter: {
-    NamedFilters: [
-      {
-        Name: '$ Trades',
-        Scope: {
-          DataType: 'Number',
-          ColumnIds: ['currency'],
-        },
-        FilterPredicate: (_record, _columnId, cellValue) => {
-          return cellValue === 'USD';
-        },
-      },
-      {
-        Name: 'High',
-        Scope: {
-          DataType: 'Number',
-        },
-        FilterPredicate: (_record, _columnId, cellValue) => {
-          let currency: string = _record.data.currency;
-          if (currency === 'USD') {
-            return cellValue > 1000;
-          } else if (currency === 'EUR') {
-            return cellValue > 30;
-          } else {
-            return cellValue > 10;
-          }
-        },
-      },
-      {
-        Name: 'Biz Year',
-        Scope: {
-          DataType: 'Date',
-        },
-        FilterPredicate: (_record, _columnId, cellValue) => {
-          let dateToTest = cellValue as Date;
-          let startBusinesssYear = new Date('2019-04-05');
-          return dateToTest > startBusinesssYear;
-        },
-      },
-    ],
-  },
-  UserInterface: {
-    ColumnMenuItems: (menuinfo: MenuInfo) => {
-      console.log('in the function');
-      console.log(menuinfo);
-      return [];
-    },
-    ContextMenuItems: (menuinfo: MenuInfo) => {
-      //  console.log('in the function');
-      //   console.log(menuinfo);
-      return [
-        {
-          Label: 'Sort Column',
-          Icon:
-            '<img width="15" height="15" src="https://img.icons8.com/ios-glyphs/30/000000/sort.png">',
-          UserMenuItemClickedFunction: () => {
-            let customSort: ColumnSort = {
-              Column: menuinfo.Column.ColumnId,
-              SortOrder: 'Ascending',
-            };
-            //      adaptableApi.gridApi.sortAdaptable([customSort]);
-          },
-        },
-      ];
-    },
-  },
-  ToolPanel: {
-    VisibleToolPanels: ['Export', 'Layout', 'SystemStatus', 'ColumnFilter'],
-  },
-
-  SystemStatus: {
-    // ShowAlert: false,
-    DefaultStatusMessage: 'This is default message and its quite long',
-    DefaultStatusType: 'Success',
-    StatusMessage: 'overriding with this',
-    StatusType: 'Error',
-  },
-
-  ConditionalStyle: {
-    ConditionalStyles: [
-      {
-        ConditionalStyleScope: 'Column', // 'DataType',
-        ColumnId: 'moodysRating',
-        // DataType: 'Number',
-        Style: {
-          BackColor: '#32cd32',
-        },
-        Expression: {
-          FilterExpressions: [{ ColumnId: 'notional', Filters: ['Positive', 'Negative'] }],
-        },
-      },
-    ],
-  },
-};
 
 export default () => {
   useEffect(() => {

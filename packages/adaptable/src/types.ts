@@ -25,6 +25,32 @@ export { SelectedCellInfo } from './PredefinedConfig/Selection/SelectedCellInfo'
 export { SelectedRowInfo } from './PredefinedConfig/Selection/SelectedRowInfo';
 export { GridCell } from './PredefinedConfig/Selection/GridCell';
 export { GridRow } from './PredefinedConfig/Selection/GridRow';
+export {
+  AdaptableFormat,
+  NumberFormatterOptions,
+  DateFormatterOptions,
+} from './PredefinedConfig/Common/AdaptableFormat';
+
+// Action Column State
+export {
+  ActionColumn,
+  ActionColumnShouldRenderPredicate,
+  ActionColumnState,
+  ActionColumnRenderParams,
+  ActionColumnRenderFunction,
+} from './PredefinedConfig/ActionColumnState';
+
+// Advanced Search State
+export { AdvancedSearchState, AdvancedSearch } from './PredefinedConfig/AdvancedSearchState';
+
+// Advanced Search State
+export { AlertState, AlertDefinition, AlertProperties } from './PredefinedConfig/AlertState';
+
+// Application State
+export { ApplicationState, ApplicationDataEntry } from './PredefinedConfig/ApplicationState';
+
+// Bulk Update State
+export { BulkUpdateState } from './PredefinedConfig/BulkUpdateState';
 
 // Adaptable Options Objects
 export { AdaptableOptions } from './AdaptableOptions/AdaptableOptions';
@@ -40,6 +66,7 @@ export { LayoutOptions } from './AdaptableOptions/LayoutOptions';
 export { QueryOptions } from './AdaptableOptions/QueryOptions';
 export { SearchOptions } from './AdaptableOptions/SearchOptions';
 export { StateOptions } from './AdaptableOptions/StateOptions';
+export { TeamSharingOptions } from './AdaptableOptions/TeamSharingOptions';
 export { UserInterfaceOptions } from './AdaptableOptions/UserInterfaceOptions';
 
 export { AdaptablePersistStateFunction } from './AdaptableOptions/StateOptions';
@@ -52,6 +79,7 @@ export { EventApi } from './Api/EventApi';
 export {
   SearchChangedInfo,
   AdaptableSearchState,
+  AdaptableSortState,
   SearchChangedEventArgs,
 } from './Api/Events/SearchChanged';
 export { AlertFiredEventArgs, AlertFiredInfo } from './Api/Events/AlertFired';
@@ -64,6 +92,7 @@ export {
   ActionColumnClickedEventArgs,
   ActionColumnClickedInfo,
 } from './Api/Events/ActionColumnClicked';
+
 export {
   ToolbarVisibilityChangedEventArgs,
   ToolbarVisibilityChangedInfo,
@@ -83,3 +112,19 @@ export { AdaptableReadyInfo } from './Api/Events/AdaptableReady';
 // Audit Events
 export { AuditEventApi, AuditEventName } from './Api/AuditEventApi';
 export * from './Api/Events/AuditEvents';
+
+// Chart related objects
+export {
+  ChartDefinition,
+  CategoryChartDefinition,
+  PieChartDefinition,
+  FinancialChartDefinition,
+  SparklinesChartDefinition,
+  FinancialChartDataSource,
+  FinancialChartDataItem,
+  ChartProperties,
+  CategoryChartProperties,
+  PieChartProperties,
+  SparklineChartProperties,
+  PieChartDataItem,
+} from './PredefinedConfig/ChartState';

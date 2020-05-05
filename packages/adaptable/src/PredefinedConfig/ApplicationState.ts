@@ -1,5 +1,4 @@
-import { DesignTimeState } from './DesignTimeState';
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 
 /**
  * The Predefined Configuration for the Application function
@@ -10,7 +9,7 @@ import { RunTimeState } from './RunTimeState';
  *
  *  **Further AdapTable Help Resources**
  *
- * [API](_src_api_applicationapi_.applicationapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360008819192-Adaptable-Blotter-State-FAQ)
+ * [API](_src_api_applicationapi_.applicationapi.html) | [AdapTable State Guide](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/guides/adaptable-state-guide.md)
  *
  * **Application Data Entries**
  *
@@ -46,7 +45,7 @@ import { RunTimeState } from './RunTimeState';
  * ```
  *
  **/
-export interface ApplicationState extends RunTimeState {
+export interface ApplicationState extends ConfigState {
   /**
    * An array of Application Data Entries (essentially Key / Value pairs) enabling you to provide Adaptable with your own data.
    *

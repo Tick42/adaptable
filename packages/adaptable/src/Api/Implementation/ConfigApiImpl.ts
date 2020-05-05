@@ -9,7 +9,7 @@ import { LayoutState } from '../../PredefinedConfig/LayoutState';
 import { FormatColumnState } from '../../PredefinedConfig/FormatColumnState';
 import { FlashingCellState } from '../../PredefinedConfig/FlashingCellState';
 import { ExportState } from '../../PredefinedConfig/ExportState';
-import { DataSourceState } from '../../PredefinedConfig/DataSourceState';
+import { DataSourceState, DataSource } from '../../PredefinedConfig/DataSourceState';
 import { DashboardState } from '../../PredefinedConfig/DashboardState';
 import { CustomSortState } from '../../PredefinedConfig/CustomSortState';
 import { ConditionalStyleState } from '../../PredefinedConfig/ConditionalStyleState';
@@ -20,8 +20,8 @@ import { CalendarState } from '../../PredefinedConfig/CalendarState';
 import { CalculatedColumnState } from '../../PredefinedConfig/CalculatedColumnState';
 import { BulkUpdateState } from '../../PredefinedConfig/BulkUpdateState';
 import { AlertState } from '../../PredefinedConfig/AlertState';
-import { AdvancedSearchState } from '../../PredefinedConfig/AdvancedSearchState';
-import { RunTimeState } from '../../PredefinedConfig/RunTimeState';
+import { AdvancedSearchState, AdvancedSearch } from '../../PredefinedConfig/AdvancedSearchState';
+import { ConfigState } from '../../PredefinedConfig/ConfigState';
 import { AdaptableState } from '../../PredefinedConfig/AdaptableState';
 import { ResetUserData, LoadState, InitState } from '../../Redux/Store/AdaptableStore';
 import { ApiBase } from './ApiBase';
@@ -44,6 +44,8 @@ import { ConfigApi } from '../ConfigApi';
 import { AdaptableStateKey } from '../../PredefinedConfig/Common/Types';
 import { IPushPullState } from '../../PredefinedConfig/IPushPullState';
 import { Glue42State } from '../../PredefinedConfig/Glue42State';
+import { AdaptableSearchState } from '../../types';
+import { AdaptableSortState } from '../Events/SearchChanged';
 
 export class ConfigApiImpl extends ApiBase implements ConfigApi {
   public configInit(): void {
@@ -82,42 +84,56 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
   // im sure we can do this better
   private getUserStateKeys() {
     return [
+      'ActionColumn',
       'AdvancedSearch',
       'Alert',
+      'Application',
       'BulkUpdate',
       'CalculatedColumn',
       'Calendar',
+      'CellSummary',
       'CellValidation',
       'Chart',
+      'ColumnCategory',
       'ColumnFilter',
       'ConditionalStyle',
       'CustomSort',
       'Dashboard',
       'DataSource',
+      'Entitlement',
       'Export',
       'FlashingCell',
       'FormatColumn',
-      'Layout',
-      'PlusMinus',
-      'IPushPull',
+      'FreeTextColumn',
       'Glue42',
+      'GradientColumn',
+      'IPushPull',
+      'Layout',
+      'NamedFilter',
+      'PercentBar',
+      'PlusMinus',
       'QuickSearch',
-      'SelectedCells',
+      'Reminder',
       'Shortcut',
       'SmartEdit',
       'SparklineColumn',
+      'SystemFilter',
+      'SystemStatus',
       'Theme',
+      'ToolPanel',
+      'UpdatedRow',
       'UserFilter',
+      'UserInterface',
     ];
   }
 
-  public configGetAllUserState(): RunTimeState[] {
+  public configGetAllUserState(): ConfigState[] {
     const userStateKeys = this.getUserStateKeys();
     const allState = this.configGetAllState();
     return userStateKeys.map(k => allState[k]);
   }
 
-  public configloadUserState(state: { [s: string]: RunTimeState }): void {
+  public configloadUserState(state: { [s: string]: ConfigState }): void {
     const userStateKeys = this.getUserStateKeys();
     const userState = Object.keys(state).reduce(
       (xs, x) => (userStateKeys.indexOf(x) !== -1 ? { ...xs, [x]: state[x] } : xs),
@@ -129,7 +145,7 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
   public configGetUserStateByStateKey(
     stateKey: AdaptableStateKey,
     returnJson: boolean = false
-  ): RunTimeState {
+  ): ConfigState | string {
     switch (stateKey) {
       case 'ActionColumn':
         return returnJson
@@ -159,6 +175,10 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().Calendar)
           : this.getAdaptableState().Calendar;
+      case 'CellSummary':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().SelectedCells)
+          : this.getAdaptableState().CellSummary;
       case 'CellValidation':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().CellValidation)
@@ -167,10 +187,15 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().Chart)
           : this.getAdaptableState().Chart;
+      case 'ColumnCategory':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().ColumnCategory)
+          : this.getAdaptableState().ColumnCategory;
       case 'ColumnFilter':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().ColumnFilter)
           : this.getAdaptableState().ColumnFilter;
+
       case 'ConditionalStyle':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().ConditionalStyle)
@@ -187,6 +212,10 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().DataSource)
           : this.getAdaptableState().DataSource;
+      case 'Entitlement':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().Entitlements)
+          : this.getAdaptableState().Entitlements;
       case 'Export':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().Export)
@@ -199,18 +228,35 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().FormatColumn)
           : this.getAdaptableState().FormatColumn;
-      case 'Layout':
+      case 'FreeTextColumn':
         return returnJson
-          ? JSON.stringify(this.getAdaptableState().Layout)
-          : this.getAdaptableState().Layout;
-      case 'IPushPull':
-        return returnJson
-          ? JSON.stringify(this.getAdaptableState().IPushPull)
-          : this.getAdaptableState().IPushPull;
+          ? JSON.stringify(this.getAdaptableState().FreeTextColumn)
+          : this.getAdaptableState().FreeTextColumn;
       case 'Glue42':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().Glue42)
           : this.getAdaptableState().Glue42;
+      case 'GradientColumn':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().GradientColumn)
+          : this.getAdaptableState().GradientColumn;
+      case 'IPushPull':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().IPushPull)
+          : this.getAdaptableState().IPushPull;
+      case 'Layout':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().Layout)
+          : this.getAdaptableState().Layout;
+      case 'NamedFilter':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().NamedFilter)
+          : this.getAdaptableState().NamedFilter;
+      case 'PercentBar':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().PercentBar)
+          : this.getAdaptableState().PercentBar;
+
       case 'PlusMinus':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().PlusMinus)
@@ -219,10 +265,11 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().QuickSearch)
           : this.getAdaptableState().QuickSearch;
-      case 'CellSummary':
+      case 'Reminder':
         return returnJson
-          ? JSON.stringify(this.getAdaptableState().SelectedCells)
-          : this.getAdaptableState().CellSummary;
+          ? JSON.stringify(this.getAdaptableState().Reminder)
+          : this.getAdaptableState().Reminder;
+
       case 'Shortcut':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().Shortcut)
@@ -235,10 +282,22 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().SparklineColumn)
           : this.getAdaptableState().SparklineColumn;
+      case 'SystemFilter':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().SystemFilter)
+          : this.getAdaptableState().SystemFilter;
+      case 'SystemStatus':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().SystemStatus)
+          : this.getAdaptableState().SystemStatus;
       case 'Theme':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().Theme)
           : this.getAdaptableState().Theme;
+      case 'ToolPanel':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().ToolPanel)
+          : this.getAdaptableState().ToolPanel;
       case 'UpdatedRow':
         return returnJson
           ? JSON.stringify(this.getAdaptableState().UpdatedRow)
@@ -247,6 +306,10 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
         return returnJson
           ? JSON.stringify(this.getAdaptableState().UserFilter)
           : this.getAdaptableState().UserFilter;
+      case 'UserInterface':
+        return returnJson
+          ? JSON.stringify(this.getAdaptableState().UserInterface)
+          : this.getAdaptableState().UserInterface;
     }
   }
 
@@ -374,5 +437,31 @@ export class ConfigApiImpl extends ApiBase implements ConfigApi {
   }
   public configGetUserInterfaceState(returnJson: boolean = false): UserInterfaceState {
     return this.configGetUserStateByStateKey('UserInterface', returnJson) as UserInterfaceState;
+  }
+
+  public configGetAdaptableSearchState(): AdaptableSearchState {
+    const currentDataSource: DataSource = this.adaptable.api.dataSourceApi.getCurrentDataSource();
+    const currentAdvancedSearch:
+      | AdvancedSearch
+      | undefined = this.adaptable.api.advancedSearchApi.getCurrentAdvancedSearch();
+
+    // lets get the searchstate
+    const adaptableSearchState: AdaptableSearchState = {
+      dataSource: currentDataSource == null ? undefined : currentDataSource,
+      advancedSearch: currentAdvancedSearch == null ? undefined : currentAdvancedSearch,
+      quickSearch: this.adaptable.api.quickSearchApi.getQuickSearchValue(),
+      columnFilters: this.adaptable.api.columnFilterApi.getAllColumnFilter(),
+      userFilters: this.adaptable.api.userFilterApi.getAllUserFilter(),
+      namedFilters: this.adaptable.api.namedFilterApi.getAllNamedFilter(),
+    };
+    return adaptableSearchState;
+  }
+
+  public configGetAdaptableSortState(): AdaptableSortState {
+    const adaptableSortState: AdaptableSortState = {
+      columnSorts: this.adaptable.api.gridApi.getColumnSorts(),
+      customSorts: this.adaptable.api.customSortApi.getAllCustomSort(),
+    };
+    return adaptableSortState;
   }
 }

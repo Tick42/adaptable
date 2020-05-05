@@ -1,7 +1,11 @@
 import { ActionColumnState, ActionColumn } from '../PredefinedConfig/ActionColumnState';
 
 /**
- * Provides full and comprehensive run-time access to the Action Column function and associated state.
+ * Provides run-time access to the Action Column function and associated state.
+ *
+ * The Action Column Function enables the creation of special columns that contain buttons together with a function that is called when the button is clicked by the user.
+ *
+ * --------------
  *
  *  **Further AdapTable Help Resources**
  *
@@ -9,11 +13,11 @@ import { ActionColumnState, ActionColumn } from '../PredefinedConfig/ActionColum
  *
  * - [Action Column State](_src_predefinedconfig_actioncolumnstate_.actioncolumnstate.html)
  *
- * - [Action Column FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360002209498-Action-Column-FAQ)
+ * - [Action Column Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/action-column-function.md)
  *
- * - [Action Column Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360002204277-Action-Column-Videos)
+ * - [Action Column Video](https://youtu.be/y0cDvtdmSKM)
  *
- * - [Adaptable User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360003213038-Special-Column-Functions)
+ * --------------
  *
  */
 export interface ActionColumnApi {

@@ -1,7 +1,7 @@
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableToolPanels, AdaptableFunctionButtons } from './Common/Types';
 
-export interface ToolPanelState extends RunTimeState {
+export interface ToolPanelState extends ConfigState {
   /**
    * Which of the ToolPanels should be available to the User to choose to select.
    *
@@ -48,7 +48,7 @@ export interface ToolPanelState extends RunTimeState {
   VisibleButtons?: AdaptableFunctionButtons;
 
   /**
-   * Whether to show the Functions dropdown in the Adaptable ToolPanel.
+   * Whether to show the Home dropdown in the Adaptable ToolPanel.
    *
    * If 'true' then the dropdown will be visible as the first item (with a 'house' icon).
    *

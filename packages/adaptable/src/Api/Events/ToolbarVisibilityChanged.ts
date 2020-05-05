@@ -1,4 +1,5 @@
-import { AdaptableEventArgs, AdaptableEventData } from './AdaptableEvents';
+import { AdaptableEventArgs, AdaptableEventData, AdaptableEventInfo } from './AdaptableEvents';
+import { DashboardTab } from '../../PredefinedConfig/DashboardState';
 
 /**
  * Event Args used as part of the **on('ToolbarVisibilityChanged)** event.
@@ -13,7 +14,19 @@ export interface ToolbarVisibilityChangedEventData extends AdaptableEventData {
   id: ToolbarVisibilityChangedInfo;
 }
 
-export interface ToolbarVisibilityChangedInfo {
+export interface ToolbarVisibilityChangedInfo extends AdaptableEventInfo {
+  /***
+   * The Dashboard Tab which 'hosts' the Toolbar that has become visible
+   */
+  tab: DashboardTab;
+
+  /**
+   * The name of the Toolbar which has become visible
+   */
   toolbar: string;
-  visibility: 'Visible' | 'Hidden';
+
+  /**
+   * This property is now deprecated as the event only fires when a toolbar becomes visible
+   */
+  visibility?: 'Visible' | 'Hidden';
 }

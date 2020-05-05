@@ -1,5 +1,6 @@
-import { DesignTimeState } from './DesignTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableFunctionName } from './Common/Types';
+import { BaseUserFunction } from '../AdaptableOptions/UserFunctions';
 
 /**
  *
@@ -27,7 +28,11 @@ import { AdaptableFunctionName } from './Common/Types';
  *
  * 1. a 'hard-coded' list provided via the `FunctionEntitlements` property
  *
- * 2. a function which will be called each time an Entitlement is checked, provided via the `EntitlementLookUpFunction` property
+ * 2. via a function which you reference in Predefined Config and provide the implementation in userOptions section of Adaptable Options.
+ *
+ * This funtion will be called each time an Entitlement is checked, provided via the `EntitlementLookUpFunction` property
+ *
+ *  --------------
  *
  * **Entitlements Predefined Config Example using `FunctionEntitlements` property**
  *
@@ -59,32 +64,48 @@ import { AdaptableFunctionName } from './Common/Types';
  *
  * - **2 ReadOnly Entitlements**: Export and Layout.  This means that users can access any existing layouts and reports but cannot add / edit / delete their own.
  *
- * - **2 Hidden Entitlements**: Column Category and Advanced Search.  This means that these AdaptableFunctions wont be available in any menus, and nor will any associcated toolbars and tool panel elements.
+ * - **2 Hidden Entitlements**: Column Category and Advanced Search.  This means that these AdaptableFunctions wont be available in any menus, and nor will any associated toolbars and tool panel elements.
+ *
+ * --------------
  *
  * **Entitlements Predefined Config Example using `EntitlementLookUpFunction` property**
  *
  * ```ts
+ * // Predefined Config
  * export default {
- * Entitlements: {
- *   EntitlementLookUpFunction: (funcName: AdaptableFunctionName, userName: string, adaptableId, string) => {
- *      switch (funcName) {
- *        case 'BulkUpdate':
- *        case 'CellValidation':
- *        case 'PlusMinus':
- *        case 'SmartEdit':
- *        case 'Shortcut':
- *          return 'Hidden';
- *
- *      case 'AdvancedSearch':
- *        case 'ColumnFilter':
- *        case 'UserFilter':
- *        case 'DataSource':
- *        case 'QuickSearch':
- *          return getPermissionServerResult(funcName, userName, adaptableId);
- *      }
+ *  Entitlements: {
+ *    DefaultAccessLevel: 'Full',
+ *    EntitlementLookUpFunction: 'serverLookUp',
  *   },
  *  },
  * } as PredefinedConfig;
+ *
+ *
+ * // Adaptable Options
+ * const adaptableOptions: AdaptableOptions = {
+ * ......
+ *  userFunctions: [
+ *     {
+ *        name: 'EntitlementLookUpFunction',
+ *        type: 'serverLookUp',
+ *        handler(functionName: AdaptableFunctionName, userName: string, adaptableId: string) {
+ *          switch (funcName) {
+ *              case 'BulkUpdate':
+ *              case 'CellValidation':
+ *              case 'PlusMinus':
+ *              case 'SmartEdit':
+ *              case 'Shortcut':
+ *                return 'Hidden';
+ *
+ *              case 'AdvancedSearch':
+ *              case 'ColumnFilter':
+ *              case 'UserFilter':
+ *              case 'DataSource':
+ *              case 'QuickSearch':
+ *                return getPermissionServerResult(funcName, userName, adaptableId);
+ *          }
+ *      },
+ *    ],
  * ```
  * In this example we have set:
  *
@@ -93,8 +114,10 @@ import { AdaptableFunctionName } from './Common/Types';
  * - The Searching-related AdaptableFunctions to be permissioned based on the results from an Entitlements Server we call.
  *
  * - All other AdaptableFunctions to be 'Full' (as we have not set the `DefaultAccessLevel` property)
+ *
+ * --------------
  */
-export interface EntitlementState extends DesignTimeState {
+export interface EntitlementState extends ConfigState {
   /**
    * A collection of `Entitlement` objects.
    */
@@ -105,11 +128,7 @@ export interface EntitlementState extends DesignTimeState {
    *
    * Allows you to call a Permission Service externally
    */
-  EntitlementLookUpFunction?: (
-    functionName: AdaptableFunctionName,
-    userName: string,
-    adaptableId: string
-  ) => AccessLevel | undefined;
+  EntitlementLookUpFunction?: string;
 
   /**
    * The AccessLevel to use for any Entitlement when its not explicitly set.
@@ -158,3 +177,13 @@ export interface Entitlement {
  * - 'ReadOnly' : the AdaptableFunction is visible but only those objects provided in PredefinedConfig can be used (and are not editable)
  */
 export type AccessLevel = 'ReadOnly' | 'Hidden' | 'Full';
+
+export interface EntitlementLookUpFunction extends BaseUserFunction {
+  type: 'EntitlementLookUpFunction';
+  name: string;
+  handler: (
+    functionName: AdaptableFunctionName,
+    userName: string,
+    adaptableId: string
+  ) => AccessLevel | undefined;
+}

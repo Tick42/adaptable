@@ -51,7 +51,7 @@ export class CalculatedColumnSummaryComponent extends React.Component<
             showShare={this.props.TeamSharingActivated}
             EntityType={StrategyConstants.CalculatedColumnStrategyFriendlyName}
             onEdit={() => this.onEdit(item)}
-            onShare={() => this.props.onShare(item)}
+            onShare={description => this.props.onShare(item, description)}
             onDelete={CalculatedColumnRedux.CalculatedColumnDelete(item)}
             showBold={true}
           />
@@ -121,14 +121,19 @@ export class CalculatedColumnSummaryComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<CalculatedColumnSummaryProps> {
   return {
     CalculatedColumns: state.CalculatedColumn.CalculatedColumns,
     CalculatedColumnErrorMessage: state.System.CalculatedColumnErrorMessage,
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<CalculatedColumnSummaryProps> {
   return {
     onEdit: (calculatedColumn: CalculatedColumn) =>
       dispatch(CalculatedColumnRedux.CalculatedColumnEdit(calculatedColumn)),

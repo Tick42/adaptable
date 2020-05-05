@@ -108,7 +108,6 @@ class AdvancedSearchToolbarControlComponent extends React.Component<
         className="ab-DashboardToolbar__AdvancedSearch"
         headerText={StrategyConstants.AdvancedSearchStrategyFriendlyName}
         glyphicon={StrategyConstants.AdvancedSearchGlyph}
-        onClose={() => this.props.onClose(StrategyConstants.AdvancedSearchStrategyId)}
         onConfigure={() => this.props.onConfigure()}
       >
         {content}
@@ -121,14 +120,19 @@ class AdvancedSearchToolbarControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<AdvancedSearchToolbarControlComponentProps> {
   return {
     CurrentAdvancedSearchName: state.AdvancedSearch.CurrentAdvancedSearch,
     AdvancedSearches: state.AdvancedSearch.AdvancedSearches,
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<AdvancedSearchToolbarControlComponentProps> {
   return {
     onSelectAdvancedSearch: (advancedSearchName: string) =>
       dispatch(AdvancedSearchRedux.AdvancedSearchSelect(advancedSearchName)),
@@ -154,8 +158,6 @@ function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState
           }
         )
       ),
-    onClose: (toolbar: AdaptableDashboardToolbar) =>
-      dispatch(DashboardRedux.DashboardHideToolbar(toolbar)),
     onConfigure: () =>
       dispatch(
         PopupRedux.PopupShowScreen(

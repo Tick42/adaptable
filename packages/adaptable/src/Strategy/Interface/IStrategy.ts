@@ -2,6 +2,8 @@ import { AdaptableColumn } from '../../PredefinedConfig/Common/AdaptableColumn';
 import { AdaptableMenuItem, MenuInfo } from '../../PredefinedConfig/Common/Menu';
 import { AdaptableFunctionName } from '../../PredefinedConfig/Common/Types';
 import { AccessLevel } from '../../PredefinedConfig/EntitlementState';
+import { TeamSharingImportInfo } from '../../PredefinedConfig/TeamSharingState';
+import { AdaptableObject } from '../../PredefinedConfig/Common/AdaptableObject';
 
 /**
  * This is the interface that all Strategies implement (as well as all deriving from AdaptableStrategyBase).
@@ -14,7 +16,6 @@ import { AccessLevel } from '../../PredefinedConfig/EntitlementState';
  * StateManagement
  * Piechart
  * TeamSharing
- * Plus there is one 'special' strategy that the user cannot hide called the HomeStrategy which has important functions that need to be called (e.g. creates Team Sharing and other menu items)
  */
 
 export interface IStrategy {
@@ -24,6 +25,8 @@ export interface IStrategy {
   addColumnMenuItems(column: AdaptableColumn): AdaptableMenuItem[] | undefined;
   addContextMenuItem(menuInfo: MenuInfo): AdaptableMenuItem | undefined;
   setStrategyEntitlement(): void;
+  isStrategyAvailable(): boolean;
+  getTeamSharingAction(): TeamSharingImportInfo<AdaptableObject> | undefined;
   AccessLevel: AccessLevel;
 }
 /**

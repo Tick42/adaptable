@@ -30,7 +30,7 @@ function InitAdaptableDemo() {
   const tradeCount: number = 100;
   const tradeData: any = examplesHelper.getTrades(tradeCount);
   const gridOptions: GridOptions = examplesHelper.getGridOptionsTrade(tradeData);
-
+  //gridOptions.sideBar = 'false';
   const adaptableOptions: AdaptableOptions = {
     primaryKey: 'tradeId',
     userName: 'Demo User',
@@ -44,7 +44,7 @@ function InitAdaptableDemo() {
   };
 
   adaptableOptions.layoutOptions = {
-    autoSizeColumnsInLayout: true,
+    //  autoSizeColumnsInLayout: true,
   };
   adaptableOptions.userInterfaceOptions = {
     showAdaptableToolPanel: true,
@@ -54,10 +54,9 @@ function InitAdaptableDemo() {
 
   api.eventApi.on('AdaptableReady', (info: AdaptableReadyInfo) => {
     // to set a pinned row (in this case the 5th row in our data source)
-    let gridOptions: GridOptions = info.vendorGrid as GridOptions;
-    let tradeRow = tradeData[5];
-    gridOptions.api!.setPinnedTopRowData([tradeRow]);
-
+    //   let gridOptions: GridOptions = info.vendorGrid as GridOptions;
+    //   let tradeRow = tradeData[5];
+    //  gridOptions.api!.setPinnedTopRowData([tradeRow]);
     // to see which is the pinned row then do...
     //  let pinnedRowNode: RowNode = gridOptions.api!.getPinnedTopRow(0);
   });
@@ -65,6 +64,7 @@ function InitAdaptableDemo() {
   api.eventApi.on('SearchChanged', (searchChangedArgs: SearchChangedEventArgs) => {
     //  console.log('search changed');
     //  console.log(searchChangedArgs.data[0].id);
+    //  searchChangedArgs.data[0].id.adaptableApi;
   });
 }
 
@@ -75,13 +75,34 @@ let demoConfig: PredefinedConfig = {
   FormatColumn: {
     FormatColumns: [
       {
-        ColumnId: 'counterparty',
+        ColumnId: 'tradeDate',
+        DisplayFormat: {
+          Formatter: 'DateFormatter',
+          Options: {
+            Pattern: 'yyyyMMdd',
+          },
+        },
+      },
+      {
+        ColumnId: 'bid',
+        CellAlignment: 'Right',
+      },
+      {
+        ColumnId: 'notional',
         Style: {
           FontWeight: 'Bold',
           FontSize: 'XSmall',
           FontStyle: 'Italic',
           ClassName: '',
         },
+        DisplayFormat: {
+          Formatter: 'NumberFormatter',
+          Options: {
+            Parentheses: true,
+            IntegerDigits: 3,
+          },
+        },
+        CellAlignment: 'Center',
       },
       {
         ColumnId: 'country',

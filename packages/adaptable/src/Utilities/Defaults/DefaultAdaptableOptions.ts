@@ -56,6 +56,7 @@ export const DefaultAdaptableOptions: AdaptableOptions = {
   },
   layoutOptions: {
     includeVendorStateInLayouts: true,
+    includeOpenedRowGroups: false,
     autoSaveLayouts: true,
     autoSizeColumnsInLayout: false,
     autoSizeColumnsInDefaultLayout: true,
@@ -103,15 +104,21 @@ export const DefaultAdaptableOptions: AdaptableOptions = {
   },
   userInterfaceOptions: {
     useDefaultVendorGridThemes: true,
+    useCustomMacLikeScrollbars: false,
     showAdaptableToolPanel: false,
     showAdaptableContextMenu: true,
     adaptableToolPanelTitle: GeneralConstants.ADAPTABLE,
   },
   exportOptions: {
-    exportColumnRawValue: null,
+    exportColumnRawValue: undefined,
   },
   stateOptions: {
     applyState: state => state,
     saveState: state => state,
+  },
+  teamSharingOptions: {
+    enableTeamSharing: false,
+    setSharedEntities: undefined,
+    getSharedEntities: undefined,
   },
 };

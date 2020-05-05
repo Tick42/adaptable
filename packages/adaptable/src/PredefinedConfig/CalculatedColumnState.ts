@@ -1,5 +1,6 @@
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
+import { DataType } from './Common/Enums';
 
 /**
  * The Predefined Configuration for the Calculated Column function
@@ -14,18 +15,14 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  * **Further AdapTable Help Resources**
  *
- * [Calculated Column Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360003213038-Special-Column-Functions)
- *
  * [Calculated Column Demo](https://demo.adaptabletools.com/column/aggridcalculatedcolumndemo/)
  *
  * [Calculated Column API](_src_api_calculatedcolumnapi_.calculatedcolumnpi.html)
  *
- * [Calculated Column FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360030078351-Calculated-Column-FAQ)
- *
- * [Calculated Column Help](https://adaptabletools.zendesk.com/hc/en-us/articles/360005113212-Calculated-Columns)
+ * [Calculated Column Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/calculated-column-function.md)
  *
  **/
-export interface CalculatedColumnState extends RunTimeState {
+export interface CalculatedColumnState extends ConfigState {
   /**
    * A collection of Calculated Columns, i.e. columns that show a value which is derived from other values in the row, and which is stored with the user's state.
    *
@@ -48,4 +45,21 @@ export interface CalculatedColumn extends AdaptableObject {
    * The expression (which is not the same as an Adaptable expression) evaluates using the [mathjs library](https://mathjs.org).
    */
   ColumnExpression: string;
+  CalculatedColumnSettings?: CalculatedColumnSettings;
+}
+
+export interface CalculatedColumnSettings {
+  DataType?: 'String' | 'Number' | 'Boolean' | 'Date';
+
+  Filterable?: boolean;
+
+  Resizable?: boolean;
+
+  Groupable?: boolean;
+
+  Sortable?: boolean;
+
+  Pivotable?: boolean;
+
+  Aggregatable?: boolean;
 }

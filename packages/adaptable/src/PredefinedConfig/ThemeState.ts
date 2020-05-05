@@ -1,4 +1,4 @@
-import { RunTimeState } from './RunTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
 
 /**
@@ -25,7 +25,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
  * } as PredefinedConfig;
  * ```
  */
-export interface ThemeState extends RunTimeState {
+export interface ThemeState extends ConfigState {
   /**
    * The name of the currently applied theme or the theme to set at startup.
    *
@@ -57,7 +57,6 @@ export interface ThemeState extends RunTimeState {
    *
    * * the **css class name for the Vendor Grid** that should be applied when the theme runs
    *
-   * To learn how to create a Custom Theme please refer to the [Online Help](https://adaptabletools.zendesk.com/hc/en-us/articles/360025111951-Themes).
    */
   UserThemes?: AdaptableTheme[];
 }

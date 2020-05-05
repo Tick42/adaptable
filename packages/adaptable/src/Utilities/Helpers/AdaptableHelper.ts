@@ -5,10 +5,8 @@ import { StringExtensions } from '../Extensions/StringExtensions';
 import { createUuid } from '../../PredefinedConfig/Uuid';
 import { AdaptableObject } from '../../PredefinedConfig/Common/AdaptableObject';
 import { IAdaptable } from '../../AdaptableInterfaces/IAdaptable';
-import ArrayExtensions from '../Extensions/ArrayExtensions';
 import { AdaptableColumn } from '../../PredefinedConfig/Common/AdaptableColumn';
 import { DefaultAdaptableOptions } from '../Defaults/DefaultAdaptableOptions';
-import { AdaptableFunctionName } from '../../PredefinedConfig/Common/Types';
 import { AdaptableOptions } from '../../AdaptableOptions/AdaptableOptions';
 import { AdaptableEventArgs, AdaptableEventData } from '../../Api/Events/AdaptableEvents';
 import { AdaptableComparerFunction } from '../../PredefinedConfig/Common/AdaptableComparerFunction';
@@ -80,6 +78,11 @@ export function assignadaptableOptions(adaptableOptions: AdaptableOptions): Adap
     {},
     DefaultAdaptableOptions.exportOptions,
     adaptableOptions.exportOptions
+  );
+  returnadaptableOptions.teamSharingOptions = Object.assign(
+    {},
+    DefaultAdaptableOptions.teamSharingOptions,
+    adaptableOptions.teamSharingOptions
   );
 
   const { predefinedConfig } = returnadaptableOptions;
@@ -165,7 +168,7 @@ export function createFDC3Message(type: string, id: any): AdaptableEventArgs {
   };
 }
 
-export function runAdaptableComparerFunctiontestGetFunction(
+export function runAdaptableComparerFunction(
   columnId: string,
   columnValues: any[],
   adaptable: IAdaptable
@@ -216,6 +219,6 @@ export const AdaptableHelper = {
   AdaptableObjectExistsInState,
   CheckadaptableOptions,
   createFDC3Message,
-  runAdaptableComparerFunctiontestGetFunction,
+  runAdaptableComparerFunction,
 };
 export default AdaptableHelper;

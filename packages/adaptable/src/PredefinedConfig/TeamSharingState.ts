@@ -3,7 +3,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
 import { AdaptableFunctionName } from '../types';
 
 /**
- * The Predefined Configuration for the Team Sharing function
+ * The Predefined Configuration for the Team Sharing AdapTable Function
  *
  * Team sharing allows users to share part of their own configuration data with other users (e.g. if one user wants to share a "Pricing View" Layout which has been created with another user).
  *
@@ -11,17 +11,22 @@ import { AdaptableFunctionName } from '../types';
  *
  * To share an item click the share button that appears at the end of the row and this will put the Adaptable Object into a storage location where it can then be downloaded by other team members via the Team Sharing popup.
  *
- * **Note**: Team Sharing is only available if the Configuration Storage mode is Remote Storage; If the mode is set to Local Storage, Team Sharing is disabled.
+ * **Note**: This section is **Internal State** - that means it is NOT provided in Predefined Config and it is not saved into the User's state
  */
 export interface TeamSharingState extends InternalState {
-  Activated: boolean;
   SharedEntities: SharedEntity[];
 }
 
-export interface SharedEntity {
-  entity: AdaptableObject;
-  functionName: AdaptableFunctionName;
-  timestamp: Date;
-  user: string;
-  adaptableId: string;
+export interface SharedEntity extends AdaptableObject {
+  Entity: AdaptableObject;
+  FunctionName: AdaptableFunctionName;
+  Timestamp: number;
+  UserName: string;
+  Description: string;
+}
+
+export interface TeamSharingImportInfo<T extends AdaptableObject> {
+  FunctionEntities: T[];
+  AddAction: (entity: T) => any;
+  EditAction: (entity: T) => any;
 }

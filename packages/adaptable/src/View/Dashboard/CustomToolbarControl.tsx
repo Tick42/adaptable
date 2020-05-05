@@ -38,7 +38,6 @@ class CustomToolbarControlComponent extends React.Component<
         showConfigureButton={false}
         showGlyphIcon={showGlyphicon}
         glyphicon={this.props.CustomToolbar.Glyph}
-        onClose={() => this.props.onClose(this.props.CustomToolbar.Name)}
       >
         <div
           id={contentsDivId}
@@ -50,6 +49,7 @@ class CustomToolbarControlComponent extends React.Component<
             this.props.CustomToolbar.ToolbarButtons.map((button: ToolbarButton, index: number) => {
               let toolbarButtonClickedInfo: ToolbarButtonClickedInfo = {
                 toolbarButton: button,
+                adaptableApi: this.props.Adaptable.api,
               };
               const toolbarButtonClickedEventArgs: ToolbarButtonClickedEventArgs = AdaptableHelper.createFDC3Message(
                 'Toolbar Button Clicked Args',
@@ -89,10 +89,7 @@ function mapStateToProps() {
 }
 
 function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
-  return {
-    onClose: (customToolbarName: string) =>
-      dispatch(DashboardRedux.DashboardHideToolbar(customToolbarName)),
-  };
+  return {};
 }
 
 export const CustomToolbarControl = connect(

@@ -21,7 +21,7 @@ import { SystemStatusState } from '../PredefinedConfig/SystemStatusState';
  *
  *  **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/alertsmessages/aggridsystemstatusdemo/) | [System Status State](_src_predefinedconfig_systemstatusstate_.systemstatusstate.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029895931-Alert-Functions-FAQ) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360002754957-Run-Time-Access)
+ * [Demo Site](https://demo.adaptabletools.com/alertsmessages/aggridsystemstatusdemo/) | [System Status State](_src_predefinedconfig_systemstatusstate_.systemstatusstate.html) | [System Status Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/system-status-function.md)
  *
  */
 export interface SystemStatusApi {
@@ -35,7 +35,7 @@ export interface SystemStatusApi {
    *
    * This will appear in the System Status toolbar, tool panel (and popup).
    *
-   * Additionally it will colour, as appropriate, the *SystemStatus* button (which is an option to display in the Home Toolbar)
+   * Additionally it will colour, as appropriate, the *SystemStatus* button (which is an option to display in the Dashboard)
    *
    * The (optional) `statusFurtherInformation` param allows further details to be provided if required.
    */

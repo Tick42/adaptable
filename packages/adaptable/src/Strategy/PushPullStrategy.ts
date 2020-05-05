@@ -14,6 +14,7 @@ import { AdaptableMenuItem } from '../PredefinedConfig/Common/Menu';
 import { IPushPullStrategy } from './Interface/IPushPullStrategy';
 import { IPushPullReport } from '../PredefinedConfig/IPushPullState';
 import { DataChangedInfo } from '../PredefinedConfig/Common/DataChangedInfo';
+import { ExportDestination } from '../PredefinedConfig/Common/Enums';
 
 export class PushPullStrategy extends AdaptableStrategyBase implements IPushPullStrategy {
   private isSendingData: boolean = false;
@@ -28,6 +29,13 @@ export class PushPullStrategy extends AdaptableStrategyBase implements IPushPull
         this.Id
       );
     }
+  }
+
+  public isStrategyAvailable(): boolean {
+    if (this.adaptable.api.entitlementsApi.isFunctionHiddenEntitlement(this.Id)) {
+      return false;
+    }
+    return this.adaptable.api.iPushPullApi.isIPushPullAvailable();
   }
 
   constructor(adaptable: IAdaptable) {

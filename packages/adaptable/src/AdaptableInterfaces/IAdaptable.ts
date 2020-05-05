@@ -23,7 +23,6 @@ import { IPPStyle } from '../Utilities/Interface/IPPStyle';
 import { AdaptableTheme } from '../PredefinedConfig/ThemeState';
 import { IGlue42Service } from '../Utilities/Services/Interface/IGlue42Service';
 import { IPushPullService } from '../Utilities/Services/Interface/IPushPullService';
-
 import { IReportService } from '../Utilities/Services/Interface/IReportService';
 import { AdaptableApi } from '../Api/AdaptableApi';
 import { DataChangedInfo } from '../PredefinedConfig/Common/DataChangedInfo';
@@ -33,6 +32,9 @@ import { IStrategyService } from '../Utilities/Services/StrategyService';
 import { IFilterService } from '../Utilities/Services/Interface/IFilterService';
 import { ColumnSort } from '../PredefinedConfig/Common/ColumnSort';
 import { GradientColumn } from '../PredefinedConfig/GradientColumnState';
+import { UserFunction } from '../AdaptableOptions/UserFunctions';
+import { Report } from '../PredefinedConfig/ExportState';
+import { FormatColumn } from '../PredefinedConfig/FormatColumnState';
 
 /**
  *  The only interface for Adaptable
@@ -129,6 +131,7 @@ export interface IAdaptable {
   _on(eventName: 'GridRefreshed', callback: () => void): () => void;
   _on(eventName: 'GridFiltered', callback: () => void): () => void;
   _on(eventName: 'GridReloaded', callback: () => void): () => void;
+  _on(eventName: 'SortChanged', callback: (columnSorts: ColumnSort[]) => void): () => void;
   _on(eventName: 'SpecialColumnAdded', callback: () => void): () => void;
   _on(eventName: 'ColumnResized', callback: (colId: string) => void): () => void;
   _on(eventName: 'KeyDown', callback: (keyDownEvent: any) => void): () => void;
@@ -137,7 +140,6 @@ export interface IAdaptable {
   //emit(eventName: string, data?: any): Promise<any>;
 
   // General
-  createFunctionMenu(): void;
   reloadGrid(): void;
   redraw(): void;
   redrawRow(rowNode: any): void;
@@ -148,6 +150,7 @@ export interface IAdaptable {
 
   // DataSource Management
   setDataSource(dataSource: any): void;
+  loadDataSource(dataSource: any): void;
   updateRows(
     dataRows: any[],
     config?: { batchUpdate?: boolean; callback?: (res: any) => void }
@@ -209,11 +212,13 @@ export interface IAdaptable {
   isGroupRowNode(rowNode: any): boolean;
   selectNodes(rowNodes: any[]): void;
   selectNode(rowNode: any): void;
+  getFirstGroupedColumn(): AdaptableColumn | undefined;
 
   //  Sort
   setCustomSort(columnId: string, comparer: Function): void;
   removeCustomSort(columnId: string): void;
   setColumnSort(columnSorts: ColumnSort[]): void;
+  //sortLayout(layout: Layout):void;
 
   // FreeTextColumn
   addFreeTextColumnToGrid(freeTextColumn: FreeTextColumn): void;
@@ -227,6 +232,9 @@ export interface IAdaptable {
 
   // actionColumn
   addActionColumnToGrid(actionColumn: ActionColumn): void;
+
+  // formatolumn
+  applyFormatColumnDisplayFormats(): void;
 
   // Percent Bar
   removePercentBar(percentBar: PercentBar): void;
@@ -249,6 +257,12 @@ export interface IAdaptable {
   clearGridFiltering(): void;
   clearColumnFiltering(columnIds: string[]): void;
 
+  // Reports
+  exportToExcel(report: Report, columns: AdaptableColumn[], data: any[]): void;
+  exportVisibleToClipboard(report: Report): void;
+  exportVisibleToExcel(report: Report): void;
+  exportVisibleToCsv(report: Report): void;
+
   // TEMPORARY : JO
   getCurrentIPPStyle(): IPPStyle;
   getDefaultIPPStyle(): IPPStyle;
@@ -270,6 +284,8 @@ export interface IAdaptable {
 
   // vendor grid related
   isSelectable(): boolean;
+  isGroupable(): boolean;
+  isPivotable(): boolean;
 
   // quick filter
   showQuickFilter(): void;
@@ -280,8 +296,26 @@ export interface IAdaptable {
   setUpRowStyles(): void; // not sure about this...
   clearRowStyles(): void; // not sure about this...
 
+  // User Functions
+  // there is a bug in Typescript
+  // duplicating the definition fixes the issue for now
+  // https://github.com/Microsoft/TypeScript/issues/30071
+  getUserFunctionHandler<T extends UserFunction['type']>(
+    type: T,
+    name: string
+  ): Extract<UserFunction, { type: T }>['handler'] | null;
+  getUserFunctionHandler<T extends UserFunction['type']>(
+    type: T,
+    name: string
+  ): Extract<UserFunction, { type: T }>['handler'] | null;
+
   /**
    * called when you want to destroy the instance & cleanup resources
    */
   destroy(): void;
+
+  expandAllRowGroups(): void;
+  closeAllRowGroups(): void;
+  expandRowGroupsForValues(columnValues: any[]): void;
+  getExpandRowGroupsKeys(): any[];
 }

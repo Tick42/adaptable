@@ -85,14 +85,13 @@ class ColumnFilterToolbarControlComponent extends React.Component<
         <CheckBox
           className="ab-DashboardToolbar__ColumnFilter__active-check"
           disabled={this.props.Adaptable.api.internalApi.isGridInPivotMode()}
-          marginLeft={3}
           fontSize={2}
           checked={this.props.IsQuickFilterActive}
           onChange={(checked: boolean) => {
             checked ? this.props.onShowQuickFilterBar() : this.props.onHideQuickFilterBar();
           }}
         >
-          Quick Filter
+          Show Quick Filter
         </CheckBox>
       </Flex>
     );
@@ -102,7 +101,6 @@ class ColumnFilterToolbarControlComponent extends React.Component<
         className="ab-DashboardToolbar__ColumnFilter"
         headerText={StrategyConstants.ColumnFilterStrategyFriendlyName}
         glyphicon={StrategyConstants.ColumnFilterGlyph}
-        onClose={() => this.props.onClose(StrategyConstants.ColumnFilterStrategyId)}
         onConfigure={() => this.props.onConfigure()}
       >
         {content}
@@ -131,14 +129,19 @@ class ColumnFilterToolbarControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<ColumnFilterToolbarControlComponentProps> {
   return {
     ColumnFilters: state.ColumnFilter.ColumnFilters,
     IsQuickFilterActive: state.Grid.IsQuickFilterActive,
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<ColumnFilterToolbarControlComponentProps> {
   return {
     onClearColumnFilter: (columnFilter: ColumnFilter) =>
       dispatch(ColumnFilterRedux.ColumnFilterClear(columnFilter)),
@@ -146,8 +149,6 @@ function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState
     onClearAllFilters: () => dispatch(ColumnFilterRedux.ColumnFilterClearAll()),
     onHideQuickFilterBar: () => dispatch(GridRedux.QuickFilterBarHide()),
     onShowQuickFilterBar: () => dispatch(GridRedux.QuickFilterBarShow()),
-    onClose: (toolbar: AdaptableDashboardToolbar) =>
-      dispatch(DashboardRedux.DashboardHideToolbar(toolbar)),
     onConfigure: () =>
       dispatch(
         PopupRedux.PopupShowScreen(

@@ -103,7 +103,12 @@ import { PreviewHelper } from '../../Utilities/Helpers/PreviewHelper';
 import { StringExtensions } from '../../Utilities/Extensions/StringExtensions';
 import { ExpressionHelper } from '../../Utilities/Helpers/ExpressionHelper';
 import { AdaptableHelper } from '../../Utilities/Helpers/AdaptableHelper';
-import { IUIConfirmation, InputAction, AdaptableAlert } from '../../Utilities/Interface/IMessage';
+import {
+  IUIConfirmation,
+  InputAction,
+  AdaptableAlert,
+  IUIPrompt,
+} from '../../Utilities/Interface/IMessage';
 import { ChartVisibility } from '../../PredefinedConfig/Common/ChartEnums';
 import { ArrayExtensions } from '../../Utilities/Extensions/ArrayExtensions';
 import IStorageEngine from './Interface/IStorageEngine';
@@ -131,7 +136,11 @@ import { AdaptableState } from '../../PredefinedConfig/AdaptableState';
 import { IStrategyActionReturn } from '../../Strategy/Interface/IStrategyActionReturn';
 import { IPushPullStrategy } from '../../Strategy/Interface/IPushPullStrategy';
 import { IGlue42Strategy } from '../../Strategy/Interface/IGlue42Strategy';
-import { SharedEntity } from '../../PredefinedConfig/TeamSharingState';
+import { SharedEntity, TeamSharingImportInfo } from '../../PredefinedConfig/TeamSharingState';
+import { AdaptableObject } from '../../PredefinedConfig/Common/AdaptableObject';
+import { createUuid } from '../../PredefinedConfig/Uuid';
+import { ICalculatedColumnStrategy } from '../../Strategy/Interface/ICalculatedColumnStrategy';
+import { IFreeTextColumnStrategy } from '../../Strategy/Interface/IFreeTextColumnStrategy';
 
 type EmitterCallback = (data?: any) => any;
 type EmitterAnyCallback = (eventName: string, data?: any) => any;
@@ -235,9 +244,7 @@ const rootReducerWithResetManagement = (state: AdaptableState, action: Redux.Act
       state.ConditionalStyle = undefined;
       state.Chart = undefined;
       state.CustomSort = undefined;
-      state.Dashboard.AvailableToolbars = [];
       state.Dashboard.VisibleButtons = [];
-      state.Dashboard.VisibleToolbars = [];
       state.Dashboard = undefined;
       state.DataSource = undefined;
       state.Entitlements = undefined;
@@ -1932,7 +1939,18 @@ var functionAppliedLogMiddleware = (adaptable: IAdaptable): any =>
             adaptable.AuditLogService.addFunctionAppliedAuditLog(functionAppliedDetails);
             return next(action);
           }
-
+          case LayoutRedux.LAYOUT_SELECT: {
+            const actionTyped = action as LayoutRedux.LayoutSelectAction;
+            let dataSource = state.Layout.Layouts!.find(l => l.Name == actionTyped.LayoutName);
+            let functionAppliedDetails: FunctionAppliedDetails = {
+              name: StrategyConstants.LayoutStrategyId,
+              action: action.type,
+              info: actionTyped.LayoutName,
+              data: dataSource,
+            };
+            adaptable.AuditLogService.addFunctionAppliedAuditLog(functionAppliedDetails);
+            return next(action);
+          }
           default: {
             // not one of the functions we log so nothing to do
             return next(action);
@@ -2213,11 +2231,14 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
             let returnAction = next(action);
             let layoutState = middlewareAPI.getState().Layout;
             let currentLayout = layoutState.Layouts.find(l => l.Name == layoutState.CurrentLayout);
+
             if (currentLayout) {
-              if (currentLayout.AdaptableGridInfo == null) {
+              const isNewLayout: boolean = currentLayout.AdaptableGridInfo == null;
+              if (isNewLayout) {
                 currentLayout.AdaptableGridInfo = {
                   CurrentColumns: currentLayout.Columns,
-                  CurrentColumnSorts: currentLayout.ColumnSorts,
+                  CurrentColumnSorts: adaptable.LayoutService.getSortsForLayout(currentLayout),
+                  ExpandedRowGroupKeys: adaptable.api.gridApi.getExpandRowGroupsKeys(),
                 };
               }
 
@@ -2289,6 +2310,7 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
               layout.AdaptableGridInfo = {
                 CurrentColumns: layout.Columns,
                 CurrentColumnSorts: layout.ColumnSorts,
+                ExpandedRowGroupKeys: adaptable.api.gridApi.getExpandRowGroupsKeys(),
               };
             }
             if (layout.VendorGridInfo == null) {
@@ -2359,24 +2381,28 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
             let state = middlewareAPI.getState();
             let returnAction = next(action);
             let apiReturn: IStrategyActionReturn<boolean> = SmartEditStrategy.CheckCorrectCellSelection();
-
-            if (apiReturn.Alert) {
-              // check if Smart Edit is showing as popup and then close and show error (dont want to do that if from toolbar)
-              let popup = state.Popup.ScreenPopup;
-              if (popup.ComponentName == ScreenPopups.SmartEditPopup) {
-                // We are in SmartEditPopup so let's close it
-                middlewareAPI.dispatch(PopupRedux.PopupHideScreen());
-                // and now show the alert Popup
-                middlewareAPI.dispatch(PopupRedux.PopupShowAlert(apiReturn.Alert));
+            let popup = state.Popup.ScreenPopup;
+            // this is a horrible hack and fix for a weird issue
+            // we really need to do smart edit and bulk update better
+            // but this fixes it for now
+            if (popup.ComponentName != ScreenPopups.ColumnChooserPopup) {
+              if (apiReturn.Alert) {
+                // check if Smart Edit is showing as popup and then close and show error (dont want to do that if from toolbar)
+                if (popup.ComponentName == ScreenPopups.SmartEditPopup) {
+                  // We are in SmartEditPopup so let's close it
+                  middlewareAPI.dispatch(PopupRedux.PopupHideScreen());
+                  // and now show the alert Popup
+                  middlewareAPI.dispatch(PopupRedux.PopupShowAlert(apiReturn.Alert));
+                }
+                middlewareAPI.dispatch(SystemRedux.SmartEditSetValidSelection(false));
+              } else {
+                middlewareAPI.dispatch(SystemRedux.SmartEditSetValidSelection(true));
+                let apiPreviewReturn = SmartEditStrategy.BuildPreviewValues(
+                  state.SmartEdit.SmartEditValue,
+                  state.SmartEdit.MathOperation as MathOperation
+                );
+                middlewareAPI.dispatch(SystemRedux.SmartEditSetPreview(apiPreviewReturn));
               }
-              middlewareAPI.dispatch(SystemRedux.SmartEditSetValidSelection(false));
-            } else {
-              middlewareAPI.dispatch(SystemRedux.SmartEditSetValidSelection(true));
-              let apiPreviewReturn = SmartEditStrategy.BuildPreviewValues(
-                state.SmartEdit.SmartEditValue,
-                state.SmartEdit.MathOperation as MathOperation
-              );
-              middlewareAPI.dispatch(SystemRedux.SmartEditSetPreview(apiPreviewReturn));
             }
             return returnAction;
           }
@@ -2435,18 +2461,22 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
             let state = middlewareAPI.getState();
             let returnAction = next(action);
             let apiReturn: BulkUpdateValidationResult = BulkUpdateStrategy.checkCorrectCellSelection();
-
-            if (apiReturn.Alert) {
-              // check if BulkUpdate is showing as popup
-              let popup = state.Popup.ScreenPopup;
-              if (popup.ComponentName == ScreenPopups.BulkUpdatePopup) {
-                //We close the BulkUpdatePopup
-                middlewareAPI.dispatch(PopupRedux.PopupHideScreen());
-                //We show the Error Popup -- assume that will alwasy be an Error
-                middlewareAPI.dispatch(PopupRedux.PopupShowAlert(apiReturn.Alert));
+            let popup = state.Popup.ScreenPopup;
+            // this is a horrible hack and fix for a weird issue
+            // we really need to do smart edit and bulk update better
+            // but this fixes it for now
+            if (popup.ComponentName != ScreenPopups.ColumnChooserPopup) {
+              if (apiReturn.Alert) {
+                // check if BulkUpdate is showing as popup
+                if (popup.ComponentName == ScreenPopups.BulkUpdatePopup) {
+                  //We close the BulkUpdatePopup
+                  middlewareAPI.dispatch(PopupRedux.PopupHideScreen());
+                  //We show the Error Popup -- assume that will alwasy be an Error
+                  middlewareAPI.dispatch(PopupRedux.PopupShowAlert(apiReturn.Alert));
+                }
               }
+              middlewareAPI.dispatch(SystemRedux.BulkUpdateSetValidSelection(apiReturn));
             }
-            middlewareAPI.dispatch(SystemRedux.BulkUpdateSetValidSelection(apiReturn));
             return returnAction;
           }
 
@@ -2669,214 +2699,137 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
            * TEAM SHARING ACTIONS
            *******************/
 
-          // Use case - an item needs to be shared between teams
+          case TeamSharingRedux.TEAMSHARING_FETCH: {
+            let returnAction = next(action);
+
+            const { adaptableId, teamSharingOptions } = adaptable.adaptableOptions;
+
+            teamSharingOptions
+              .getSharedEntities(adaptableId)
+              .then(sharedEntities => {
+                middlewareAPI.dispatch(TeamSharingRedux.TeamSharingSet(sharedEntities));
+              })
+              .catch(error => {
+                LoggingHelper.LogAdaptableError('TeamSharing get error : ' + error.message);
+              });
+
+            return returnAction;
+          }
           case TeamSharingRedux.TEAMSHARING_SHARE: {
             const actionTyped = action as TeamSharingRedux.TeamSharingShareAction;
             let returnAction = next(action);
-            let xhr = new XMLHttpRequest();
-            xhr.onerror = (ev: any) =>
-              LoggingHelper.LogAdaptableError(
-                'TeamSharing share error :' + ev.message,
-                actionTyped.Entity
-              );
-            xhr.ontimeout = () =>
-              LoggingHelper.LogAdaptableWarning('TeamSharing share timeout', actionTyped.Entity);
-            xhr.onload = () => {
-              if (xhr.readyState == 4) {
-                if (xhr.status != 200) {
-                  LoggingHelper.LogAdaptableError(
-                    'TeamSharing share error : ' + xhr.statusText,
-                    actionTyped.Entity
-                  );
-                  middlewareAPI.dispatch(
-                    PopupRedux.PopupShowAlert({
-                      Header: 'Team Sharing Error',
-                      Msg: "Couldn't share item: " + xhr.statusText,
-                      AlertDefinition: ObjectFactory.CreateInternalAlertDefinitionForMessages(
-                        MessageType.Error
-                      ),
-                    })
-                  );
-                } else {
-                  middlewareAPI.dispatch(
-                    PopupRedux.PopupShowAlert({
-                      Header: 'Team Sharing',
-                      Msg: 'Item Shared Successfully',
-                      AlertDefinition: ObjectFactory.CreateInternalAlertDefinitionForMessages(
-                        MessageType.Info
-                      ),
-                    })
-                  );
-                }
-              }
-            };
-            //we make the request async
-            xhr.open('POST', configServerTeamSharingUrl, true);
-            xhr.setRequestHeader('Content-type', 'application/json');
-            let obj: SharedEntity = {
-              entity: actionTyped.Entity,
-              user: adaptable.adaptableOptions.userName,
-              adaptableId: adaptable.adaptableOptions.adaptableId,
-              functionName: actionTyped.FunctionName,
-              timestamp: new Date(),
-            };
-            xhr.send(JSON.stringify(obj));
+
+            const { adaptableId, teamSharingOptions } = adaptable.adaptableOptions;
+
+            // const Description = prompt('Description', 'No Description');
+
+            teamSharingOptions
+              .getSharedEntities(adaptableId)
+              .then(sharedEntities => {
+                sharedEntities.push({
+                  Uuid: createUuid(),
+                  Entity: actionTyped.Entity,
+                  FunctionName: actionTyped.FunctionName,
+                  Description: actionTyped.Description,
+                  UserName: adaptable.adaptableOptions.userName,
+                  Timestamp: new Date().getTime(),
+                });
+                middlewareAPI.dispatch(TeamSharingRedux.TeamSharingSet(sharedEntities));
+                return teamSharingOptions.setSharedEntities(adaptableId, sharedEntities);
+              })
+              .then(() => {
+                middlewareAPI.dispatch(
+                  PopupRedux.PopupShowAlert({
+                    Header: 'Team Sharing',
+                    Msg: 'Item Shared Successfully',
+                    AlertDefinition: ObjectFactory.CreateInternalAlertDefinitionForMessages(
+                      MessageType.Info
+                    ),
+                  })
+                );
+              })
+              .catch(error => {
+                LoggingHelper.LogAdaptableError(
+                  'TeamSharing share error : ' + error.message,
+                  actionTyped.Entity
+                );
+                middlewareAPI.dispatch(
+                  PopupRedux.PopupShowAlert({
+                    Header: 'Team Sharing Error',
+                    Msg: "Couldn't share item: " + error.message,
+                    AlertDefinition: ObjectFactory.CreateInternalAlertDefinitionForMessages(
+                      MessageType.Error
+                    ),
+                  })
+                );
+              });
+
             return returnAction;
           }
-          case TeamSharingRedux.TEAMSHARING_GET: {
+          case TeamSharingRedux.TEAMSHARING_REMOVE_ITEM: {
             let returnAction = next(action);
-            let xhr = new XMLHttpRequest();
-            xhr.onerror = (ev: any) =>
-              LoggingHelper.LogAdaptableError('TeamSharing get error :' + ev.message);
-            xhr.ontimeout = () => LoggingHelper.LogAdaptableWarning('TeamSharing get timeout');
-            xhr.onload = () => {
-              if (xhr.readyState == 4) {
-                if (xhr.status != 200) {
-                  LoggingHelper.LogAdaptableError('TeamSharing get error : ' + xhr.statusText);
-                } else {
-                  middlewareAPI.dispatch(
-                    TeamSharingRedux.TeamSharingSet(
-                      JSON.parse(xhr.responseText, (key, value) => {
-                        if (key == 'timestamp') {
-                          return new Date(value);
-                        }
-                        return value;
-                      })
-                    )
-                  );
-                }
-              }
-            };
-            //we make the request async
-            xhr.open('GET', configServerTeamSharingUrl, true);
-            xhr.setRequestHeader('Content-type', 'application/json');
-            xhr.send();
+            const actionTyped = action as TeamSharingRedux.TeamSharingRemoveItemAction;
+
+            const { adaptableId, teamSharingOptions } = adaptable.adaptableOptions;
+
+            teamSharingOptions
+              .getSharedEntities(adaptableId)
+              .then(sharedEntities => {
+                const newSharedEntities = sharedEntities.filter(s => s.Uuid !== actionTyped.Uuid);
+                middlewareAPI.dispatch(TeamSharingRedux.TeamSharingSet(newSharedEntities));
+                return teamSharingOptions.setSharedEntities(adaptableId, newSharedEntities);
+              })
+              .then(() => {
+                // middlewareAPI.dispatch(
+                //   PopupRedux.PopupShowAlert({
+                //     Header: 'Team Sharing',
+                //     Msg: 'Item Removed Successfully',
+                //     AlertDefinition: ObjectFactory.CreateInternalAlertDefinitionForMessages(
+                //       MessageType.Info
+                //     ),
+                //   })
+                // );
+              })
+              .catch(error => {
+                LoggingHelper.LogAdaptableError('TeamSharing remove error : ' + error.message);
+                middlewareAPI.dispatch(
+                  PopupRedux.PopupShowAlert({
+                    Header: 'Team Sharing Error',
+                    Msg: "Couldn't remove item: " + error.message,
+                    AlertDefinition: ObjectFactory.CreateInternalAlertDefinitionForMessages(
+                      MessageType.Error
+                    ),
+                  })
+                );
+              });
+
             return returnAction;
           }
           case TeamSharingRedux.TEAMSHARING_IMPORT_ITEM: {
             let returnAction = next(action);
             const actionTyped = action as TeamSharingRedux.TeamSharingImportItemAction;
+            const { FunctionName, Entity } = actionTyped;
             let importAction: Redux.Action;
             let overwriteConfirmation = false;
-            switch (actionTyped.FunctionName) {
-              case StrategyConstants.CellValidationStrategyId:
-                importAction = CellValidationRedux.CellValidationAdd(
-                  actionTyped.Entity as CellValidationRule
-                );
-                break;
-              case StrategyConstants.CalculatedColumnStrategyId: {
-                let calcCol = actionTyped.Entity as CalculatedColumn;
-                let idx = middlewareAPI
-                  .getState()
-                  .CalculatedColumn.CalculatedColumns.findIndex(
-                    x => x.ColumnId == calcCol.ColumnId
-                  );
-                if (idx > -1) {
-                  overwriteConfirmation = true;
-                  importAction = CalculatedColumnRedux.CalculatedColumnEdit(calcCol);
-                } else {
-                  importAction = CalculatedColumnRedux.CalculatedColumnAdd(calcCol);
-                }
-                break;
+
+            const runCase = <T extends AdaptableObject>(
+              teamSharingImportInfo: TeamSharingImportInfo<AdaptableObject>
+            ) => {
+              if (teamSharingImportInfo.FunctionEntities.some(x => x.Uuid === Entity.Uuid)) {
+                overwriteConfirmation = true;
+                importAction = teamSharingImportInfo.EditAction(Entity as T);
+              } else {
+                importAction = teamSharingImportInfo.AddAction(Entity as T);
               }
-              case StrategyConstants.ConditionalStyleStrategyId:
-                importAction = ConditionalStyleRedux.ConditionalStyleAdd(
-                  actionTyped.Entity as ConditionalStyle
-                );
-                break;
-              case StrategyConstants.CustomSortStrategyId: {
-                let customSort = actionTyped.Entity as CustomSort;
-                if (
-                  middlewareAPI
-                    .getState()
-                    .CustomSort.CustomSorts.find(x => x.ColumnId == customSort.ColumnId)
-                ) {
-                  overwriteConfirmation = true;
-                  importAction = CustomSortRedux.CustomSortEdit(customSort);
-                } else {
-                  importAction = CustomSortRedux.CustomSortAdd(customSort);
-                }
-                break;
-              }
-              case StrategyConstants.FormatColumnStrategyId: {
-                let formatColumn = actionTyped.Entity as FormatColumn;
-                if (
-                  middlewareAPI
-                    .getState()
-                    .FormatColumn.FormatColumns.find(x => x.ColumnId == formatColumn.ColumnId)
-                ) {
-                  overwriteConfirmation = true;
-                  importAction = FormatColumnRedux.FormatColumnEdit(formatColumn);
-                } else {
-                  importAction = FormatColumnRedux.FormatColumnAdd(formatColumn);
-                }
-                break;
-              }
-              case StrategyConstants.PlusMinusStrategyId: {
-                let plusMinus = actionTyped.Entity as PlusMinusRule;
-                importAction = PlusMinusRedux.PlusMinusRuleAdd(plusMinus);
-                break;
-              }
-              case StrategyConstants.ShortcutStrategyId: {
-                let shortcut = actionTyped.Entity as Shortcut;
-                let shortcuts: Shortcut[];
-                shortcuts = middlewareAPI.getState().Shortcut.Shortcuts;
-                if (shortcuts) {
-                  if (shortcuts.find(x => x.ShortcutKey == shortcut.ShortcutKey)) {
-                    middlewareAPI.dispatch(ShortcutRedux.ShortcutDelete(shortcut));
-                  }
-                  importAction = ShortcutRedux.ShortcutAdd(shortcut);
-                }
-                break;
-              }
-              case StrategyConstants.UserFilterStrategyId: {
-                let filter = actionTyped.Entity as UserFilter;
-                //For now not too worry about that but I think we'll need to check ofr filter that have same name
-                //currently the reducer checks for UID
-                if (
-                  middlewareAPI.getState().UserFilter.UserFilters.find(x => x.Name == filter.Name)
-                ) {
-                  overwriteConfirmation = true;
-                }
-                importAction = UserFilterRedux.UserFilterAdd(filter);
-                // }
-                break;
-              }
-              case StrategyConstants.AdvancedSearchStrategyId: {
-                let search = actionTyped.Entity as AdvancedSearch;
-                if (
-                  middlewareAPI
-                    .getState()
-                    .AdvancedSearch.AdvancedSearches.find(x => x.Name == search.Name)
-                ) {
-                  overwriteConfirmation = true;
-                }
-                importAction = AdvancedSearchRedux.AdvancedSearchAdd(search);
-                break;
-              }
-              case StrategyConstants.LayoutStrategyId: {
-                let layout = actionTyped.Entity as Layout;
-                let layoutIndex: number = middlewareAPI
-                  .getState()
-                  .Layout.Layouts.findIndex(x => x.Name == layout.Name);
-                if (layoutIndex != -1) {
-                  overwriteConfirmation = true;
-                }
-                importAction = LayoutRedux.LayoutSave(layout);
-                break;
-              }
-              case StrategyConstants.ExportStrategyId: {
-                let report = actionTyped.Entity as Report;
-                let idx = middlewareAPI
-                  .getState()
-                  .Export.Reports.findIndex(x => x.Name == report.Name);
-                if (idx > -1) {
-                  overwriteConfirmation = true;
-                }
-                importAction = ExportRedux.ReportAdd(report);
-                break;
-              }
+            };
+
+            // JW - changed this to put responsibility on each strategy to return what it needs
+            // think will be more likely to remember when we create a new strategy!
+            let teamSharingAction = adaptable.StrategyService.getTeamSharingAction(FunctionName);
+            if (teamSharingAction != undefined) {
+              runCase(teamSharingAction);
             }
+
             if (overwriteConfirmation) {
               let confirmation: IUIConfirmation = {
                 CancelButtonText: 'Cancel Import',
@@ -3049,31 +3002,33 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
             }
 
             //Create all calculated columns before we load the layout
-            middlewareAPI
-              .getState()
-              .CalculatedColumn.CalculatedColumns.forEach((cc: CalculatedColumn) => {
-                adaptable.addCalculatedColumnToGrid(cc);
-              });
+            let calculatedColumnStrategy = <ICalculatedColumnStrategy>(
+              adaptable.strategies.get(StrategyConstants.CalculatedColumnStrategyId)
+            );
+            if (calculatedColumnStrategy) {
+              calculatedColumnStrategy.addCalculatedColumnsToGrid();
+            }
 
             //Create all free text columns before we load the layout
-            middlewareAPI
-              .getState()
-              .FreeTextColumn.FreeTextColumns.forEach((ftc: FreeTextColumn) => {
-                adaptable.addFreeTextColumnToGrid(ftc);
-              });
+            let freeTextColumnStrategy = <IFreeTextColumnStrategy>(
+              adaptable.strategies.get(StrategyConstants.FreeTextColumnStrategyId)
+            );
+            if (freeTextColumnStrategy) {
+              freeTextColumnStrategy.addFreeTextColumnsToGrid();
+            }
 
-            //Create all action columns before we load the layout
-            middlewareAPI.getState().ActionColumn.ActionColumns.forEach((ac: ActionColumn) => {
-              adaptable.addActionColumnToGrid(ac);
-            });
+            //Create any action columns before we load the layout
+            adaptable.api.internalApi.displayActionColumns();
 
             //load the default layout if its current
             if (currentLayout == DEFAULT_LAYOUT) {
               middlewareAPI.dispatch(LayoutRedux.LayoutSelect(currentLayout));
             }
 
-            // create the functions menu (for use in the home toolbar and the toolpanel)
-            adaptable.createFunctionMenu();
+            // do this now so it sets strategy entitlements
+            adaptable.StrategyService.setStrategiesEntitlements();
+            // create the functions menu (for use in the dashboard and the toolpanel)
+            adaptable.StrategyService.createStrategyFunctionMenu();
 
             return returnAction;
           }

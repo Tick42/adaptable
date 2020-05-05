@@ -14,36 +14,35 @@ AdapTable is fully data agnostic and can work with any data set you provide it w
 
 AdapTable is written in TypeScript.  All the necessary definition files are included in the package to enable easy design-time access to all internal classes.
 
-
 ![AdapTable image](./images/adaptable.png)
 
 ## Upgrade Guide
 
 Version 6 of AdapTable has introduced many new functionality changes and upgrades and also some new, exciting, ways of interacting with the product.  
 
-For more information please see the [Version 6 Upgrade Guide](./packages/adaptable/upgrade-guide.md)
+For more information please see the [Version 6 Upgrade Guide](./packages/adaptable/readme/upgrade-guide.md)
 
 ## Using AdapTable
 
 AdapTable comes in 3 variants:
  
-  * **'core'** (vanilla) javascript version
+  * **'core'** (vanilla) JavaScript version
   
-  To use this install `@adaptabletools/adaptable` 
+    To use this install `@adaptabletools/adaptable` 
   
-  > For more info, see the [Adaptable Core readme](./packages/adaptable/README.md)
+    > For more info, see the [Adaptable Core readme](./packages/adaptable/README.md)
   
   * **React Wrapper**
   
-  To use this install `@adaptabletools/adaptable-react-aggrid`
+    To use this install `@adaptabletools/adaptable-react-aggrid`
   
-  > For more info, see the [React Wrapper readme](./packages/adaptable-react-aggrid/README.md)
+    > For more info, see the [React Wrapper readme](./packages/adaptable-react-aggrid/README.md)
   
   * **Angular Wrapper**
   
-  To use this, install `@adaptabletools/adaptable-angular-aggrid`
+    To use this, install `@adaptabletools/adaptable-angular-aggrid`
   
-  > For more info, see the [Angular Wrapper readme](./packages/adaptable-ng-aggrid/README.md)
+    > For more info, see the [Angular Wrapper readme](./packages/adaptable-ng-aggrid/README.md)
   
   Each of these packages has its own initialisation requirements so please read the appropriate documentation
 
@@ -57,81 +56,87 @@ To gain access to this registry please follow these steps:
 
 2. Point your npm client to the correct registry for packages under the '@adaptabletools' scope.
 
-```sh
-npm config set @adaptabletools:registry https://registry.adaptabletools.com
+    ```sh
+    npm config set @adaptabletools:registry https://registry.adaptabletools.com
 
-```
-If you are using yarn then it will be:
-```sh
-yarn config set @adaptabletools:registry https://registry.adaptabletools.com
-```
+    ```
+    
+    If you are using yarn then it will be:
+      
+    ```sh
+    yarn config set @adaptabletools:registry https://registry.adaptabletools.com
+    ```
 
 3. Login to the Adaptable private registry:
 
-```sh
-npm login --registry=https://registry.adaptabletools.com --scope=@adaptabletools
-```
+    ```sh
+    npm login --registry=https://registry.adaptabletools.com --scope=@adaptabletools
+    ```
 
 4. Enter the credentials that were provided to you by the AdapTable support team:
 
-  * login name
-  * email
-  * password
+    * login name
+    * email
+    * password
 
 5. Confirm that you are logged in correctly by using whoami:
 
-```
-npm whoami --registry=https://registry.adaptabletools.com
-```
+    ```
+    npm whoami --registry=https://registry.adaptabletools.com
+    ```
 
-This should display the username you received from use as the current login on the private registry
+    This should display the username you received from use as the current login on the private registry
 
-> note: this does not affect your username/login session on the public npm registry
+    > note: this does not affect your username/login session on the public npm registry
 
 6.  Install the relevant AdapTable package you need.
 
-For core it will be:
+    For core it will be:
 
-```
-npm i @adaptabletools/adaptable
-```
+    ```
+    npm i @adaptabletools/adaptable
+    ```
 
-For the ag-Grid React Wrapper it will be:
+    For the ag-Grid React Wrapper it will be:
 
-```
-npm i @adaptabletools/adaptable-react-aggrid
-```
+    ```
+    npm i @adaptabletools/adaptable-react-aggrid
+    ```
 
-For the ag-Grid Angular Wrapper it will be:
+    For the ag-Grid Angular Wrapper it will be:
 
-```
-npm i @adaptabletools/adaptable-angular-aggrid
-```
+    ```
+    npm i @adaptabletools/adaptable-angular-aggrid
+    ```
 
 7.  Install any Adaptable Plugins as required (see section below for more details).
 
-e.g. to install the charts plugin it will be:
+    e.g. to install the charts plugin it will be:
 
-```
-npm install @adaptabletools/adaptable-plugin-charts
-```
+    ```
+    npm install @adaptabletools/adaptable-plugin-charts
+    ```
 
->  This downloaded contains everything required to run AdapTable and no other downloads are necessary.
->  AdapTable, once running, **does not make any external internet calls nor store any of your data**.
->  Adaptable Tools has no knowledge, or visibility, of anything that you are doing when you use AdapTable.
+    >  This downloaded contains everything required to run AdapTable and no other downloads are necessary.
+    >  AdapTable, once running, **does not make any external internet calls nor store any of your data**.
+    >  Adaptable Tools has no knowledge, or visibility, of anything that you are doing when you use AdapTable.
 
 ## Plugins
 AdapTable since version 6 includes plugins to reduce the download size of the 'core' project and to allow you to select only the functionality you want.  
 
-There are currently two plugins:
+There are currently 3 plugins:
 
 - **Charts** (`@adaptabletools/adaptable-charts-finance`)
 
-> Courtesy of [Infragistics](https://www.infragistics.com/products/ignite-ui-react) - provides Category, Pie, Doughnut, Sparkline and Financial charts.  
+    > Courtesy of [Infragistics](https://www.infragistics.com/products/ignite-ui-react) - provides Category, Pie, Doughnut, Sparkline and Financial charts.  
 
 - **Finance** (`@adaptabletools/adaptable-plugin-finance`)
 
-> Adds additional functionality of benefit to advanced financial users (currently very empty but will be added to over time)
+    > Adds additional functionality of benefit to advanced financial users (currently very empty but will be added to over time)
+
+- **No Code** (`@adaptabletools/adaptable-plugin-nocode-aggrid`)
+
+    > Enables the creation of instances of AdapTable on the fly (using ag-Grid as the underlying vendor grid) by dragging and dropping any Excel or JSON file
 
 Further information is availalbe in the [Plugins ReadMe](./packages/plugins/README.md)
 
@@ -142,6 +147,8 @@ A licence for AdapTable provides access to all product features as well as quart
 Licences can be purchased individually, for a team (minimum 30 end-users), for an organisation or for integration into software for onward sale.
 
 We can make a trial licence available for a short period of time to allow you to try out AdapTable for yourself.
+
+**Note: The AdapTable licence does not include the underlying grid's licence, so if you plan to use AdapTable with a Grid that requires a commercial licence, you must pay for that separately**.
 
 Please contact [`sales@adaptabletools.com`](mailto:sales@adaptabletools.com) for more information.
 
@@ -155,38 +162,36 @@ We have added a few example projects to Github to help you to understand how to 
 
 These include:
 * [Angular Wrapper Example](https://github.com/AdaptableTools/example-adaptable-angular-aggrid)
- 
 * [React Wrapper Example](https://github.com/AdaptableTools/example-adaptable-react-aggrid)
-  
+* [No Code (ag-Grid) Example](https://github.com/AdaptableTools/example-adaptable-nocode-aggrid)
 * [Building Minifed File (with parcel.js) Example](https://github.com/AdaptableTools/example-adaptable-with-parceljs)
-   
 * [ipushpull Example](https://github.com/AdaptableTools/example-adaptable-ipushpull-integration)
- 
  
 ## Help
 
-Further information about AdapTable is available at our [Website](http://www.adaptabletools.com) and our [Help Site](https://adaptabletools.zendesk.com/hc/en-us)
-
 Developers can learn how to access AdapTable programmatically at [AdapTable Developer Documentation](https://api.adaptabletools.com) 
 
-## Other Read Mes
+The other source for Help is our collection of 'Read Me' Docs ([full list here](./packages/adaptable/readme/readme-list.md)).
 
-Other Read Me docs that will be of interest are:
-
+These include:
  - [Version 6 Upgrade Guide](./packages/adaptable/readme/upgrade-guide.md)
-
  - [Adaptable Core](./packages/adaptable/README.md)
-
  - [React Wrapper](./packages/adaptable-react-aggrid/README.md)
-  
- - [Angular Wrapper](./packages/adaptable-ng-aggrid/README.md)
- 
- - [Adaptable Theming and Styling Guide](./packages/adaptable/readme/adaptable-theming-guide.md)
- 
+ - [Angular Wrapper](./packages/adaptable-ng-aggrid/README.md) 
+ - [AdapTable Getting Started Guide](./packages/adaptable/readme/guides/adaptable-getting-started-guide.md)
+ - [AdapTable Theming and Styling Guide](./packages/adaptable/readme/guides/adaptable-theming-guide.md)
+ - [AdapTable State Guide](./packages/adaptable/readme/guides/adaptable-state-guide.md)
+ - [AdapTable Filtering Guide](./packages/adaptable/readme/guides/adaptable-filtering-guide.md)
+ - [AdapTable Expression Guide](./packages/adaptable/readme/guides/adaptable-expression-guide.md)
+ - [AdapTable Functions Guide](./packages/adaptable/readme/guides/adaptable-functions-guide.md)
  - [Plugins](./packages/plugins/README.md)
  
- Read the [full list of the AdapTable ReadMe docs](./packages/adaptable/readme/readme-list.md).
+> Previously the main source of AdapTable Help was our [Zendesk Pages](https://adaptabletools.zendesk.com/hc/en-us/articles/360007083017-Help-) but these have been replaced by these 'Read Me' docs and the Developer Documentation that is automatically produced and therefore always up to date.
+ 
+## More Information
+
+General information about Adaptable Tools is available at our [Website](http://www.adaptabletools.com) 
 
 ## Support
 
-For all support enquiries please email [`support@adaptabletools.com`](mailto:support@adaptabletools.com) or [raise a ticket](https://adaptabletools.zendesk.com/hc/en-us/requests/new).
+For all support enquiries please email [`support@adaptabletools.com`](mailto:support@adaptabletools.com) or [raise a Support Ticket](https://adaptabletools.zendesk.com/hc/en-us/requests/new).

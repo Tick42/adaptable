@@ -143,7 +143,6 @@ class BulkUpdateToolbarControlComponent extends React.Component<
         className="ab-DashboardToolbar__BulkUpdate"
         headerText={StrategyConstants.BulkUpdateStrategyFriendlyName}
         glyphicon={StrategyConstants.BulkUpdateGlyph}
-        onClose={() => this.props.onClose(StrategyConstants.BulkUpdateStrategyId)}
         onConfigure={() => this.props.onConfigure()}
       >
         {content}
@@ -199,7 +198,10 @@ class BulkUpdateToolbarControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(
+  state: AdaptableState,
+  ownProps: any
+): Partial<BulkUpdateToolbarControlComponentProps> {
   return {
     BulkUpdateValue: state.BulkUpdate.BulkUpdateValue,
     BulkUpdateValidationResult: state.System.BulkUpdateValidationResult,
@@ -207,7 +209,9 @@ function mapStateToProps(state: AdaptableState, ownProps: any) {
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<BulkUpdateToolbarControlComponentProps> {
   return {
     onBulkUpdateValueChange: (value: string) =>
       dispatch(BulkUpdateRedux.BulkUpdateChangeValue(value)),
@@ -215,8 +219,6 @@ function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState
     onApplyBulkUpdate: () => dispatch(BulkUpdateRedux.BulkUpdateApply(false)),
     onConfirmWarningCellValidation: (confirmation: IUIConfirmation) =>
       dispatch(PopupRedux.PopupShowConfirmation(confirmation)),
-    onClose: (toolbar: AdaptableDashboardToolbar) =>
-      dispatch(DashboardRedux.DashboardHideToolbar(toolbar)),
     onConfigure: () =>
       dispatch(
         PopupRedux.PopupShowScreen(

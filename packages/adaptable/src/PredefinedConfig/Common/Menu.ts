@@ -2,6 +2,9 @@ import * as Redux from 'redux';
 import { GridCell } from '../Selection/GridCell';
 import { AdaptableColumn } from './AdaptableColumn';
 import { AdaptableFunctionName } from './Types';
+import { AdaptableApi } from '../../Api/AdaptableApi';
+import { SelectedCellInfo } from '../Selection/SelectedCellInfo';
+import { SelectedRowInfo } from '../Selection/SelectedRowInfo';
 
 /*
 Note for devs:  Adaptable provides 3 menus:
@@ -31,7 +34,7 @@ Like with the Column Menu,the Context menu is created EACH TIME that it is opene
  *
  * It is used in 3 places:
  *
- * - **Function Menu**: the menu at the left of the Home Toolbar (with a home icon) and at the top of Adaptable Tool Panel that shows all the available functions.  Clicking a menu item will open the popup for that Function.
+ * - **Function Menu**: the menu at the left of the Dashboard Header (with a home icon) and at the top of Adaptable Tool Panel that shows all the available functions.  Clicking a menu item will open the popup for that Function.
  *
  * - **Column Header Menu**: the menu that appears in the Column Header.  We add our menu items after those provided by the vendor grid.
  *
@@ -96,4 +99,19 @@ export interface MenuInfo {
    * The value of the primary key column in the current row
    */
   PrimaryKeyValue: any;
+
+  /**
+   * The main Adaptable Api object - included here as a convenience to make any api calls
+   */
+  AdaptableApi: AdaptableApi;
+
+  /**
+   * The currently selected cells in the grid
+   */
+  SelectedCellInfo: SelectedCellInfo;
+
+  /**
+   * The currently selected rows in the grid
+   */
+  SelectedRowInfo: SelectedRowInfo;
 }

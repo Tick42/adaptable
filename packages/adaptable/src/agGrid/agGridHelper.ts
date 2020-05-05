@@ -35,7 +35,6 @@ import { ExportStrategy } from '../Strategy/ExportStrategy';
 import { FlashingCellStrategyagGrid } from './Strategy/FlashingCellsStrategyagGrid';
 import { FormatColumnStrategyagGrid } from './Strategy/FormatColumnStrategyagGrid';
 import { FreeTextColumnStrategy } from '../Strategy/FreeTextColumnStrategy';
-import { HomeStrategy } from '../Strategy/HomeStrategy';
 import { LayoutStrategy } from '../Strategy/LayoutStrategy';
 import { ColumnCategoryStrategy } from '../Strategy/ColumnCategoryStrategy';
 import { PercentBarStrategy } from '../Strategy/PercentBarStrategy';
@@ -73,14 +72,20 @@ import { IAdaptable } from '../AdaptableInterfaces/IAdaptable';
 import { PushPullStrategy } from '../Strategy/PushPullStrategy';
 import { Glue42Strategy } from '../Strategy/Glue42Strategy';
 import { GradientColumnStrategy } from '../Strategy/GradientColumnStrategy';
+import { ActionColumnStrategy } from '../Strategy/ActionColumnStrategy';
 import { CustomSort } from '../PredefinedConfig/CustomSortState';
-import { AdaptableComparerFunction } from '../PredefinedConfig/Common/AdaptableComparerFunction';
+import {
+  AdaptableComparerFunction,
+  AdaptableNodeComparerFunction,
+} from '../PredefinedConfig/Common/AdaptableComparerFunction';
 import { ColumnSort } from '../PredefinedConfig/Common/ColumnSort';
 import ObjectFactory from '../Utilities/ObjectFactory';
 import { GridInfoStrategy } from '../Strategy/GridInfoStrategy';
 import { CustomSortStrategy } from '../Strategy/CustomSortStrategy';
 import { HideColumnStrategy } from '../Strategy/HideColumnStrategy';
 import { SelectColumnStrategy } from '../Strategy/SelectColumnStrategy';
+import { SelectedRowInfo } from '../PredefinedConfig/Selection/SelectedRowInfo';
+import { AG_GRID_GROUPED_COLUMN } from '../Utilities/Constants/GeneralConstants';
 
 /**
  * Adaptable ag-Grid implementation is getting really big and unwieldy
@@ -106,7 +111,9 @@ export class agGridHelper {
   public setUpStrategies(): Map<AdaptableFunctionName, IStrategy> {
     const strategies = new Map<AdaptableFunctionName, IStrategy>();
     const adaptable = this.adaptable as Adaptable;
+    strategies.set(StrategyConstants.DashboardStrategyId, new DashboardStrategy(adaptable));
     strategies.set(StrategyConstants.AlertStrategyId, new AlertStrategyagGrid(adaptable));
+    strategies.set(StrategyConstants.ActionColumnStrategyId, new ActionColumnStrategy(adaptable));
     strategies.set(
       StrategyConstants.AdvancedSearchStrategyId,
       new AdvancedSearchStrategy(adaptable)
@@ -130,7 +137,6 @@ export class agGridHelper {
       new ConditionalStyleStrategyagGrid(adaptable)
     );
     strategies.set(StrategyConstants.CustomSortStrategyId, new CustomSortStrategy(adaptable));
-    strategies.set(StrategyConstants.DashboardStrategyId, new DashboardStrategy(adaptable));
     strategies.set(StrategyConstants.DataSourceStrategyId, new DataSourceStrategy(adaptable));
     strategies.set(StrategyConstants.ExportStrategyId, new ExportStrategy(adaptable));
     strategies.set(
@@ -150,7 +156,6 @@ export class agGridHelper {
       StrategyConstants.GradientColumnStrategyId,
       new GradientColumnStrategy(adaptable)
     );
-    strategies.set(StrategyConstants.HomeStrategyId, new HomeStrategy(adaptable));
     strategies.set(StrategyConstants.LayoutStrategyId, new LayoutStrategy(adaptable));
     strategies.set(
       StrategyConstants.ColumnCategoryStrategyId,
@@ -493,6 +498,7 @@ export class agGridHelper {
     let selectionChangedInfo: SelectionChangedInfo = {
       selectedCellInfo: this.adaptable.api.gridApi.getGridState().SelectedCellInfo,
       selectedRowInfo: this.adaptable.api.gridApi.getGridState().SelectedRowInfo,
+      adaptableApi: this.adaptable.api,
     };
     const selectionChangedArgs: SelectionChangedEventArgs = AdaptableHelper.createFDC3Message(
       'Selection Changed Args',
@@ -527,6 +533,7 @@ export class agGridHelper {
         isSingleSelectedColumn = ArrayExtensions.CorrectLength(selectedCellInfo.Columns, 1);
       }
     }
+    let selectedRowInfo: SelectedRowInfo = this.adaptable.api.gridApi.getSelectedRowInfo();
 
     return {
       IsSelectedCell: isSelectedCell,
@@ -536,6 +543,11 @@ export class agGridHelper {
       IsGroupedNode: params.node ? params.node.group : false,
       IsSingleSelectedColumn: isSingleSelectedColumn,
       PrimaryKeyValue: primaryKeyValue,
+      AdaptableApi: this.adaptable.api,
+
+      SelectedCellInfo: selectedCellInfo,
+
+      SelectedRowInfo: selectedRowInfo,
     };
   }
 
@@ -553,15 +565,23 @@ export class agGridHelper {
     };
   }
 
-  public createAgGridMenuDefFromUsereMenu(x: UserMenuItem, menuInfo: MenuInfo): MenuItemDef {
+  public createAgGridMenuDefFromUsereMenu(
+    x: UserMenuItem,
+    menuInfo: MenuInfo,
+    type: 'contextMenu' | 'columnMenu'
+  ): MenuItemDef {
+    const fn = this.adaptable.getUserFunctionHandler(
+      type === 'contextMenu' ? 'UserMenuItemClickedFunction' : 'UserMenuItemClickedFunction',
+      x.UserMenuItemClickedFunction
+    );
     return {
       name: x.Label,
-      action: () => x.UserMenuItemClickedFunction(menuInfo),
+      action: () => fn(menuInfo),
       icon: x.Icon,
       subMenu: ArrayExtensions.IsNullOrEmpty(x.SubMenuItems)
         ? undefined
         : x.SubMenuItems!.map(s => {
-            return this.createAgGridMenuDefFromUsereMenu(s, menuInfo);
+            return this.createAgGridMenuDefFromUsereMenu(s, menuInfo, type);
           }),
     };
   }
@@ -728,6 +748,26 @@ export class agGridHelper {
     return DataType.Unknown;
   }
 
+  public getAgGridDataType(dataType: DataType): string {
+    switch (dataType) {
+      case DataType.Boolean:
+        return 'abColDefBoolean';
+      case DataType.Date:
+        return 'abColDefDate';
+      case DataType.Number:
+        return 'abColDefNumber';
+      case DataType.NumberArray:
+        return 'abColDefNumberArray';
+      case DataType.Object:
+        return 'abColDefObject';
+      case DataType.String:
+        return 'abColDefString';
+      case DataType.All:
+      case DataType.Unknown:
+        return 'abColDefCustom';
+    }
+  }
+
   public isModulePresent(moduleName: string): boolean {
     let modules: Module[] = ModuleRegistry.getRegisteredModules();
     let moduleNames: string[] = modules.map(m => m.moduleName);
@@ -737,7 +777,7 @@ export class agGridHelper {
     ]);
   }
 
-  public createGroupedColumnCustomSort(colId: string): void {
+  public createGroupedColumnCustomSort(): void {
     const groupedColumn: Column = this.gridOptions.columnApi
       .getAllColumns()
       .find(c => c.isRowGroupActive() == true);
@@ -746,7 +786,6 @@ export class agGridHelper {
         .getAllCustomSort()
         .find(cs => cs.ColumnId == groupedColumn.getColId());
       if (customSort) {
-        // check that not already applied
         if (
           !this.adaptable.api.gridApi
             .getColumnSorts()
@@ -756,13 +795,16 @@ export class agGridHelper {
             StrategyConstants.CustomSortStrategyId
           ) as CustomSortStrategy;
           const groupCustomSort: CustomSort = ObjectFactory.CreateEmptyCustomSort();
-          groupCustomSort.ColumnId = colId;
+          groupCustomSort.ColumnId = AG_GRID_GROUPED_COLUMN;
           groupCustomSort.SortedValues = customSort.SortedValues;
 
           const customSortComparerFunction: AdaptableComparerFunction = customSort.CustomSortComparerFunction
-            ? customSort.CustomSortComparerFunction
+            ? this.adaptable.getUserFunctionHandler(
+                'CustomSortComparerFunction',
+                customSort.CustomSortComparerFunction
+              )
             : customSortStrategy.getComparerFunction(groupCustomSort);
-          this.adaptable.setCustomSort(colId, customSortComparerFunction);
+          this.adaptable.setCustomSort(AG_GRID_GROUPED_COLUMN, customSortComparerFunction);
         }
       }
     }
@@ -797,5 +839,55 @@ export class agGridHelper {
         this.adaptable.api.dataSourceApi.clearDataSource();
       }
     }
+  }
+
+  public runAdaptableNodeComparerFunction(): AdaptableNodeComparerFunction {
+    let adaptable = this.adaptable;
+    return function compareItemsOfCustomSort(nodeA: any, nodeB: any): number {
+      let columnValues: any[] = [];
+      let firstGroupedColumn: AdaptableColumn = adaptable.getFirstGroupedColumn();
+      if (firstGroupedColumn) {
+        // see if its a custom sort
+        let customSort: CustomSort = adaptable.api.customSortApi.getCustomSortByColumn(
+          firstGroupedColumn.ColumnId
+        );
+        if (customSort) {
+          if (ArrayExtensions.IsNotNullOrEmpty(customSort.SortedValues)) {
+            columnValues = customSort.SortedValues;
+          } else {
+            const customSortComparerFunction: AdaptableComparerFunction = adaptable.getUserFunctionHandler(
+              'CustomSortComparerFunction',
+              customSort.CustomSortComparerFunction
+            );
+            return customSortComparerFunction(nodeA.key, nodeB.key, nodeA, nodeB);
+          }
+        }
+      }
+      let firstElementValueString = nodeA.key;
+      let secondElementValueString = nodeB.key;
+
+      let indexFirstElement = columnValues.indexOf(firstElementValueString);
+      let containsFirstElement = indexFirstElement >= 0;
+      let indexSecondElement = columnValues.indexOf(secondElementValueString);
+      let containsSecondElement = indexSecondElement >= 0;
+      //if none of the element are in the list we jsut return normal compare
+      if (!containsFirstElement && !containsSecondElement) {
+        if (firstElementValueString == secondElementValueString) {
+          return 0;
+        }
+        return firstElementValueString < secondElementValueString ? -1 : 1;
+      }
+      //if first item not in the list make sure we put it after the second item
+      if (!containsFirstElement) {
+        return 1;
+      }
+      //if second item not in the list make sure we put it after the first item
+      if (!containsSecondElement) {
+        return -1;
+      }
+
+      //return the comparison from the list if the two items are in the list
+      return indexFirstElement - indexSecondElement;
+    };
   }
 }

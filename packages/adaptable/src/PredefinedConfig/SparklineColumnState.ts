@@ -1,4 +1,4 @@
-import { DesignTimeState } from './DesignTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
 
 /**
@@ -10,7 +10,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  *  **Further AdapTable Help Resources**
  *
- * [Demo Site](https://demo.adaptabletools.com/column/aggridsparklinecolumnsdemo/) | [API](_src_api_sparklinecolumnapi_.sparklinecolumnapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360002449478-Sparkline-Column-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360002449498-Sparkline-Column-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360003213038-Special-Column-Functions)
+ * [Demo Site](https://demo.adaptabletools.com/column/aggridsparklinecolumnsdemo/) | [API](_src_api_sparklinecolumnapi_.sparklinecolumnapi.html) | [Sparkline Column Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/charts/sparkline-column-function.md)
  *
  * **Sparkline Column Predefined Config Example**
  *
@@ -40,7 +40,7 @@ import { AdaptableObject } from './Common/AdaptableObject';
  * - 'Values' - which sets a min and max value, makes the Sparkline type 'Line' and shows the tooltip
  *
  */
-export interface SparklineColumnState extends DesignTimeState {
+export interface SparklineColumnState extends ConfigState {
   /**
    * The list of columns you want to represent as `SparklineColumn`
    *

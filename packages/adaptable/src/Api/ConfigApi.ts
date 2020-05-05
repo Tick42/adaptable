@@ -20,7 +20,7 @@ import { CalculatedColumnState } from '../PredefinedConfig/CalculatedColumnState
 import { BulkUpdateState } from '../PredefinedConfig/BulkUpdateState';
 import { AlertState } from '../PredefinedConfig/AlertState';
 import { AdvancedSearchState } from '../PredefinedConfig/AdvancedSearchState';
-import { RunTimeState } from '../PredefinedConfig/RunTimeState';
+import { ConfigState } from '../PredefinedConfig/ConfigState';
 import { PlusMinusState } from '../PredefinedConfig/PlusMinusState';
 import { ActionColumnState } from '../PredefinedConfig/ActionColumnState';
 import { ApplicationState } from '../PredefinedConfig/ApplicationState';
@@ -41,6 +41,8 @@ import { UserInterfaceState } from '../PredefinedConfig/UserInterfaceState';
 import { AdaptableStateKey } from '../PredefinedConfig/Common/Types';
 import { IPushPullState } from '../PredefinedConfig/IPushPullState';
 import { Glue42State } from '../PredefinedConfig/Glue42State';
+import { AdaptableSearchState } from '../types';
+import { AdaptableSortState } from './Events/SearchChanged';
 
 export interface ConfigApi {
   configInit(): void;
@@ -64,16 +66,19 @@ export interface ConfigApi {
    *
    * @param state
    */
-  configloadUserState(state: { [s: string]: RunTimeState }): void;
+  configloadUserState(state: { [s: string]: ConfigState }): void;
 
   /**
    * Some of the state retrieved by this function will be internal state that is required by the System but not relevant to users so be careful - it is preferable to use the configGetAllUserState method which will only retrieve run-time state that can be amended by users (and is persisted into local storage or remote config).
    */
   configGetAllState(): AdaptableState;
 
-  configGetAllUserState(): RunTimeState[];
+  configGetAllUserState(): ConfigState[];
 
-  configGetUserStateByStateKey(stateKey: AdaptableStateKey, returnJson: boolean): RunTimeState;
+  configGetUserStateByStateKey(
+    stateKey: AdaptableStateKey,
+    returnJson: boolean
+  ): ConfigState | string;
 
   configGetActionColumnState(returnJson: boolean): ActionColumnState;
   configGetAdvancedSearchState(returnJson: boolean): AdvancedSearchState;
@@ -114,4 +119,7 @@ export interface ConfigApi {
   configGetUpdatedRowState(returnJson: boolean): UpdatedRowState;
   configGetUserFilterState(returnJson: boolean): UserFilterState;
   configGetUserInterfaceState(returnJson: boolean): UserInterfaceState;
+
+  configGetAdaptableSearchState(): AdaptableSearchState;
+  configGetAdaptableSortState(): AdaptableSortState;
 }

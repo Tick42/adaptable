@@ -4,7 +4,12 @@ import * as ScreenPopups from '../Utilities/Constants/ScreenPopups';
 import { IAdaptable } from '../AdaptableInterfaces/IAdaptable';
 import { AdaptableColumn } from '../PredefinedConfig/Common/AdaptableColumn';
 import { CustomSort } from '../PredefinedConfig/CustomSortState';
-import { AdaptableComparerFunction } from '../PredefinedConfig/Common/AdaptableComparerFunction';
+import {
+  AdaptableComparerFunction,
+  AdaptableNodeComparerFunction,
+} from '../PredefinedConfig/Common/AdaptableComparerFunction';
+import * as CustomSortRedux from '../Redux/ActionsReducers/CustomSortRedux';
+import { TeamSharingImportInfo } from '../PredefinedConfig/TeamSharingState';
 import { AdaptableMenuItem } from '../PredefinedConfig/Common/Menu';
 import { StrategyParams } from '../View/Components/SharedProps/StrategyViewPopupProps';
 import { ICustomSortStrategy } from './Interface/ICustomSortStrategy';
@@ -67,17 +72,28 @@ export class CustomSortStrategy extends AdaptableStrategyBase implements ICustom
   applyCustomSorts() {
     this.CustomSorts.forEach(customSort => {
       const customSortComparerFunction: AdaptableComparerFunction = customSort.CustomSortComparerFunction
-        ? customSort.CustomSortComparerFunction
+        ? this.adaptable.getUserFunctionHandler(
+            'CustomSortComparerFunction',
+            customSort.CustomSortComparerFunction
+          )
         : this.getComparerFunction(customSort);
       this.adaptable.setCustomSort(customSort.ColumnId, customSortComparerFunction);
     });
   }
 
   public getComparerFunction(customSort: CustomSort): AdaptableComparerFunction {
-    return AdaptableHelper.runAdaptableComparerFunctiontestGetFunction(
+    return AdaptableHelper.runAdaptableComparerFunction(
       customSort.ColumnId,
       customSort.SortedValues,
       this.adaptable
     );
+  }
+
+  public getTeamSharingAction(): TeamSharingImportInfo<CustomSort> {
+    return {
+      FunctionEntities: this.adaptable.api.customSortApi.getAllCustomSort(),
+      AddAction: CustomSortRedux.CustomSortAdd,
+      EditAction: CustomSortRedux.CustomSortEdit,
+    };
   }
 }

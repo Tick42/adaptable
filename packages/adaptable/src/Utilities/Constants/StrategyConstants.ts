@@ -1,6 +1,7 @@
 import { AdaptableFunctionName } from '../../PredefinedConfig/Common/Types';
 
 // Strategy Ids used in Config so have made it a type of AdaptableFunctionName
+export const ActionColumnStrategyId: AdaptableFunctionName = 'ActionColumn';
 export const AdvancedSearchStrategyId: AdaptableFunctionName = 'AdvancedSearch';
 export const AlertStrategyId: AdaptableFunctionName = 'Alert';
 export const BulkUpdateStrategyId: AdaptableFunctionName = 'BulkUpdate';
@@ -22,7 +23,6 @@ export const FlashingCellsStrategyId: AdaptableFunctionName = 'FlashingCells';
 export const FormatColumnStrategyId: AdaptableFunctionName = 'FormatColumn';
 export const FreeTextColumnStrategyId: AdaptableFunctionName = 'FreeTextColumn';
 export const Glue42StrategyId: AdaptableFunctionName = 'Glue42';
-export const HomeStrategyId: AdaptableFunctionName = 'Home';
 export const IPushPullStrategyId: AdaptableFunctionName = 'IPushPull';
 export const LayoutStrategyId: AdaptableFunctionName = 'Layout';
 export const PercentBarStrategyId: AdaptableFunctionName = 'PercentBar';
@@ -48,6 +48,7 @@ export const UpdatedRowStrategyId: AdaptableFunctionName = 'UpdatedRow';
 export const UserFilterStrategyId: AdaptableFunctionName = 'UserFilter';
 
 // Strategy Names - only used internally
+export const ActionColumnStrategyFriendlyName: string = 'Action Column';
 export const AdvancedSearchStrategyFriendlyName: string = 'Advanced Search';
 export const AlertStrategyFriendlyName: string = 'Alert';
 export const BulkUpdateStrategyFriendlyName: string = 'Bulk Update';
@@ -94,6 +95,7 @@ export const ToolPanelStrategyFriendlyName: string = 'Tool Panel';
 export const UserFilterStrategyFriendlyName: string = 'User Filter';
 
 // Strategy Glyphs
+export const ActionColumnGlyph: string = 'advanced-search';
 export const AdvancedSearchGlyph: string = 'advanced-search';
 export const AlertGlyph: string = 'alert';
 export const BulkUpdateGlyph: string = 'bulk-update';
@@ -117,7 +119,6 @@ export const FreeTextColumnGlyph: string = 'freetext-column';
 export const Glue42Glyph: string = 'ipushpull';
 export const HideColumnGlyph: string = 'hide-column';
 export const IPushPullGlyph: string = 'ipushpull';
-export const FunctionsGlyph: string = 'home';
 export const LayoutGlyph: string = 'layout';
 export const PercentBarGlyph: string = 'percent-bar';
 export const GradientColumnGlyph: string = 'gradient-column';
@@ -142,6 +143,8 @@ export const UserFilterGlyph: string = 'user-filter';
 
 export function getIdForStrategyFriendlyName(functionName: string): AdaptableFunctionName {
   switch (functionName) {
+    case ActionColumnStrategyFriendlyName:
+      return ActionColumnStrategyId;
     case AdvancedSearchStrategyFriendlyName:
       return AdvancedSearchStrategyId;
     case AlertStrategyFriendlyName:
@@ -233,6 +236,8 @@ export function getIdForStrategyFriendlyName(functionName: string): AdaptableFun
 
 export function getFriendlyNameForStrategyId(functionName: AdaptableFunctionName): string {
   switch (functionName) {
+    case ActionColumnStrategyId:
+      return ActionColumnStrategyFriendlyName;
     case AdvancedSearchStrategyId:
       return AdvancedSearchStrategyFriendlyName;
     case AlertStrategyId:
@@ -326,6 +331,8 @@ export function getFriendlyNameForStrategyId(functionName: AdaptableFunctionName
 
 export function getGhyphiconForStrategyId(functionName: AdaptableFunctionName): string {
   switch (functionName) {
+    case ActionColumnStrategyId:
+      return ActionColumnGlyph;
     case AdvancedSearchStrategyId:
       return AdvancedSearchGlyph;
     case AlertStrategyId:

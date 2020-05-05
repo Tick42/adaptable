@@ -18,6 +18,8 @@ import { ExamplesHelper } from '../../../../ExamplesHelper';
 import Adaptable from '../../../../../../agGrid';
 import finance from '../../../../../../../plugins/finance/src';
 
+import { AllEnterpriseModules } from '@ag-grid-enterprise/all-modules';
+
 var api: AdaptableApi;
 
 function InitAdaptableDemo() {
@@ -31,9 +33,33 @@ function InitAdaptableDemo() {
     userName: 'Demo User',
     adaptableId: 'Basic Demo',
 
-    vendorGrid: gridOptions,
+    vendorGrid: {
+      ...gridOptions,
+      modules: AllEnterpriseModules,
+    },
     predefinedConfig: demoConfig,
     plugins: [finance()],
+    userFunctions: [
+      {
+        type: 'CellSummaryOperationFunction',
+        name: 'OldestOperatioFunction',
+        handler(operationParam) {
+          let dateValues: Date[] = [];
+          operationParam.selectedCellInfo.Columns.filter(c => c.DataType === 'Date').forEach(dc => {
+            let gridCells = operationParam.selectedCellInfo.GridCells.filter(
+              gc => gc.columnId == dc.ColumnId
+            ).map(gc => gc.rawValue);
+            dateValues.push(...gridCells);
+          });
+          if (dateValues.length > 0) {
+            const sortedDates = dateValues.sort((a, b) => {
+              return new Date(a).getTime() - new Date(b).getTime();
+            });
+            return new Date(sortedDates[0]).toLocaleDateString();
+          }
+        },
+      },
+    ],
   };
 
   adaptableOptions.layoutOptions = {
@@ -53,11 +79,22 @@ function InitAdaptableDemo() {
 
 let demoConfig: PredefinedConfig = {
   Dashboard: {
-    VisibleToolbars: ['Layout', 'Export', 'SystemStatus'],
+    VisibleToolbars: ['Layout', 'CellSummary', 'Export', 'SystemStatus'],
     MinimisedHomeToolbarButtonStyle: {
       Variant: 'text',
       Tone: 'success',
     }, //
+  },
+  CellSummary: {
+    Revision: 3,
+    CellSummaryOperationDefinitions: [
+      {
+        OperationName: 'TheOldest',
+        OperationFunction: 'OldestOperatioFunction',
+      },
+    ],
+
+    SummaryOperation: 'Min',
   },
   ToolPanel: {
     VisibleToolPanels: ['Export', 'Layout', 'SystemStatus', 'ColumnFilter'],
@@ -80,7 +117,7 @@ let demoConfig: PredefinedConfig = {
         GroupedColumns: [],
       },
     ],
-    CurrentLayout: 'fixing a bug',
+    //  CurrentLayout: 'fixing a bug',
   },
 };
 

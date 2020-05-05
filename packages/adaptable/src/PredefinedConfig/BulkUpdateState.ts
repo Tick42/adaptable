@@ -1,4 +1,4 @@
-import { RunTimeState } from './/RunTimeState';
+import { ConfigState } from './/ConfigState';
 /**
  * The Predefined Configuration for the Bulk Update function
  *
@@ -6,18 +6,14 @@ import { RunTimeState } from './/RunTimeState';
  *
  * **Further AdapTable Help Resources**
  *
- * [Bulk Update Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360028638032-Bulk-Update-Videos)
- *
  * [Bulk Update Demo](https://demo.adaptabletools.com/edit/aggridbulkupdatedemo/)
  *
  * [Bulk Update Adaptable API](https://api.adaptabletools.com/interfaces/_src_api_bulkupdateapi_.bulkupdateapi.html)
  *
- * [Bulk Update FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360029742872-Bulk-Update-FAQ)
- *
- * [Bulk Update Help](https://adaptabletools.zendesk.com/hc/en-us/articles/360002754698-Edit-Functions)
+ * [Bulk Update Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/bulk-update-function.md)
  *
  **/
-export interface BulkUpdateState extends RunTimeState {
+export interface BulkUpdateState extends ConfigState {
   /**
    * What the initial value in the Bulk Update toolbar will be when the application starts.
    *

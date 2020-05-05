@@ -1,6 +1,7 @@
 import * as PopupRedux from '../../Redux/ActionsReducers/PopupRedux';
 import * as SystemRedux from '../../Redux/ActionsReducers/SystemRedux';
 import * as GridRedux from '../../Redux/ActionsReducers/GridRedux';
+import * as DashboardRedux from '../../Redux/ActionsReducers/DashboardRedux';
 import { ApiBase } from './ApiBase';
 import { InternalApi } from '../InternalApi';
 import { IUIConfirmation, AdaptableAlert } from '../../Utilities/Interface/IMessage';
@@ -26,6 +27,11 @@ import { DataChangedInfo } from '../../PredefinedConfig/Common/DataChangedInfo';
 import StringExtensions from '../../Utilities/Extensions/StringExtensions';
 import { USER_NAME, ADAPTABLE_ID } from '../../Utilities/Constants/GeneralConstants';
 import { grid } from 'styled-system';
+import LoggingHelper from '../../Utilities/Helpers/LoggingHelper';
+import { DashboardTab } from '../../PredefinedConfig/DashboardState';
+import ArrayExtensions from '../../Utilities/Extensions/ArrayExtensions';
+import { THIS_YEAR_SYSTEM_FILTER } from '../../Utilities/Services/FilterService';
+import { ActionColumn } from '../../PredefinedConfig/ActionColumnState';
 
 export class InternalApiImpl extends ApiBase implements InternalApi {
   public startLiveReport(
@@ -147,10 +153,6 @@ export class InternalApiImpl extends ApiBase implements InternalApi {
     this.dispatchAction(GridRedux.GridAddColumn(AdaptableColumn));
   }
 
-  public setColumnSorts(columnSorts: ColumnSort[]): void {
-    this.dispatchAction(GridRedux.GridSetSort(columnSorts));
-  }
-
   public getUpdatedRowInfos(): any[] {
     return this.getSystemState().UpdatedRowInfos;
   }
@@ -207,6 +209,14 @@ export class InternalApiImpl extends ApiBase implements InternalApi {
     mimicPromise();
   }
 
+  public displayActionColumns(): void {
+    if (this.isCorrectlyEntitled('ActionColumn', 'ReadOnly')) {
+      this.adaptable.api.actionColumnApi.getAllActionColumn().forEach((ac: ActionColumn) => {
+        this.adaptable.addActionColumnToGrid(ac);
+      });
+    }
+  }
+
   private createDataChangedInfoFromGridCell(gridCell: GridCell): DataChangedInfo {
     let currentValue = this.adaptable.getDisplayValue(gridCell.primaryKeyValue, gridCell.columnId);
     let currentRowNode = this.adaptable.getRowNodeForPrimaryKey(gridCell.primaryKeyValue);
@@ -233,6 +243,20 @@ export class InternalApiImpl extends ApiBase implements InternalApi {
 
   setLastAppliedShortCut(gridCell: GridCell | undefined): void {
     this.dispatchAction(SystemRedux.SetLastAppliedShortcut(gridCell));
+  }
+
+  setDefaultDashboardTab(): void {
+    const dashboardTabs:
+      | DashboardTab[]
+      | undefined = this.adaptable.api.dashboardApi.getDashboardState().Tabs;
+    const toolbars: string[] | undefined = this.adaptable.api.dashboardApi.getDashboardState()
+      .VisibleToolbars;
+    if (ArrayExtensions.IsNull(dashboardTabs) && ArrayExtensions.IsNotNull(toolbars)) {
+      LoggingHelper.LogAdaptableInfo(
+        'Creating a default Dashboard tab with Toolbars: ' + toolbars.join(', ')
+      );
+      this.dispatchAction(DashboardRedux.DashboardCreateDefaultTab());
+    }
   }
 
   // General way to get to store from inside Adaptable...

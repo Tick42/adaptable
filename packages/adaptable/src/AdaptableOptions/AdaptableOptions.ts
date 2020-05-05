@@ -13,6 +13,8 @@ import { UserInterfaceOptions } from './UserInterfaceOptions';
 import { AdaptablePlugin } from './AdaptablePlugin';
 import { SearchOptions } from './SearchOptions';
 import { ExportOptions } from './ExportOptions';
+import { UserFunctions } from './UserFunctions';
+import { TeamSharingOptions } from './TeamSharingOptions';
 
 /**
  * `AdaptableOptions` provides all the layout, DataGrid, config and other information required to ensure a full, rich user experience.
@@ -25,28 +27,32 @@ import { ExportOptions } from './ExportOptions';
  *
  * Any property that is not supplied by the user when populating the object, will use the default value (which is listed here for each property).
  *
- * The contents of `AdaptableOptions` are:
+ * All properties are optional with the exception of `primaryKey` and `vendorGrid`
  *
- *  | Option  	                                                                                          | Mandatory   | Details                                     	                |
- *  |----------------	                                                                                    |-----------  |---------------------------------------------	                |
- *  | [adaptableId](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#adaptableid)                | No	        | A unique ID for this instance of AdapTable	                  |
- *  | [predefinedConfig](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#predefinedconfig)      | No	        | User State shipped with AdapTable instance for first use      |
- *  | [primaryKey](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#primarykey)                  | Yes	        | Name of a column guaranteed to contain unique contents        |
- *  | [userName](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#username)                      | No	        | The current AdapTable user (useful for Audit purposes)      	|
- *  | [vendorGrid](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#vendorgrid)                  | Yes	        | Underlying vendor grid object (e.g. *GridOptions* for ag-Grid)|
- *  | [auditOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#auditoptions)              | No	        | Audit Log related options                                   	|
- *  | [chartOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#chartoptions)               | No	        | Chart-based options (used when using chart plugin)           	|
- *  | [configServerOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#configserveroptions)| No	        | Options related to Config Server (external state management)  |
- *  | [editOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#editoptions)                | No	        | Editing (and server-editing) related options                  |
- *  | [exportOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#exportoptions)            | No	        | Export and reporting related options                          |
- *  | [filterOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#filteroptions)            | No	        | Options relating to filtering functionality in AdapTable      |
- *  | [generalOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#generaloptions)          | No	        | General set of Options (e.g. for managing Primary Keys        |
- *  | [layoutOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#layoutoptions)            | No	        | Layout (Views) related Options                                |
- *  | [queryOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#queryoptions)              | No	        | Options when running a Query ( [Expression](https://api.adaptabletools.com/modules/_predefinedconfig_common_expression_.html) ) in AdapTable |
- *  | [searchOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#searchoptions)            | No	        | Search-related options (e.g. for managing Server searching)   |
- *  | [stateOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#stateoptions)              | No	        | Series of functions to allow you to manage AdapTable State    |
- *  | [userInterfaceOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#userinterfaceoptions)| No	      | User Interface related functions (e.g. menus, toolbars)       |
- *  | [plugins](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#plugins)                        | No	        | Options used by the AdapTable plugins (e.g. charting, finance)|
+ * The current contents of `AdaptableOptions` are:
+ *
+ *  | Option  	                                                                                          | Details                                     	                |
+ *  |----------------	                                                                                    |---------------------------------------------	                |
+ *  | [adaptableId](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#adaptableid)                 | A unique ID for this instance of AdapTable	                  |
+ *  | [predefinedConfig](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#predefinedconfig)       | User State shipped with AdapTable instance for first use      |
+ *  | [primaryKey](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#primarykey)                 | Name of a column guaranteed to contain unique contents        |
+ *  | [userName](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#username)                       | The current AdapTable user (useful for Audit purposes)      	|
+ *  | [vendorGrid](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#vendorgrid)                  | Underlying vendor grid object (e.g. *GridOptions* for ag-Grid)|
+ *  | [auditOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#auditoptions)               | Audit Log related options                                   	|
+ *  | [chartOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#chartoptions)                | Chart-based options (used when using chart plugin)           	|
+ *  | [configServerOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#configserveroptions) | Options related to (the now deprecated) Config Server   |
+ *  | [editOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#editoptions)                 | Editing (and server-editing) related options                  |
+ *  | [exportOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#exportoptions)             | Export and reporting related options                          |
+ *  | [filterOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#filteroptions)             | Options relating to filtering functionality in AdapTable      |
+ *  | [generalOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#generaloptions)           | General set of Options (e.g. for managing Primary Keys        |
+ *  | [layoutOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#layoutoptions)             | Layout (Views) related Options                                |
+ *  | [queryOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#queryoptions)               | Options when running a Query ( [Expression](https://api.adaptabletools.com/modules/_predefinedconfig_common_expression_.html) ) in AdapTable |
+ *  | [searchOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#searchoptions)             | Search-related options (e.g. for managing Server searching)   |
+ *  | [stateOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#stateoptions)               | Series of functions to allow you to manage AdapTable State    |
+ *  | [teamSharingOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#teamsharingoptions)   | Enables 'Team Sharing' of AdapTable objects among colleagues |
+ *  | [userFunctions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#userfunctions)             | Implementations of User Functions which are referenced in Config |
+ *  | [userInterfaceOptions](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#userinterfaceoptions)| User Interface related functions (e.g. menus, toolbars)       |
+ *  | [plugins](_src_adaptableoptions_adaptableoptions_.adaptableoptions.html#plugins)                         | Options used by the AdapTable plugins (e.g. charting, finance)|
  *
  */
 export interface AdaptableOptions {
@@ -57,7 +63,7 @@ export interface AdaptableOptions {
    *
    * **Note** it cannot contain a '.' (as this value is used to name styles which raises issues if it contains a full stop).
    *
-   * The value provided here is also that used to name the *Home Toolbar* (the toolbar that appears on the left of the Dashboard).
+   * The value provided here is also that used in the Dashboard Header.
    *
    * **Default Value: adaptable_id**
    */
@@ -67,8 +73,6 @@ export interface AdaptableOptions {
    * User State (a.ka. `predefinedConfig`) set at design-time and shipped with AdapTable for first use.
    *
    * Contains a mixture of objects and properties.
-   *
-   * Only used when Config Server is not enabled.
    *
    * Can be either an *PredefinedConfig* object or a url to the file which contains the config.
    *
@@ -242,6 +246,20 @@ export interface AdaptableOptions {
   stateOptions?: StateOptions;
 
   /**
+   * Options for managing 'Team Sharing'
+   *
+   * This allows users to create Adaptable Objects and share with colleagues
+   *
+   * Includes 2 functions:
+   *
+   * - *getSharedEntities*: retrieves any available Shared Entities for the user to download
+   *
+   * - *setSharedEntities*: saves (essentially uploads) Shared Entities so they can be re-used by other members of the team
+   *
+   */
+  teamSharingOptions?: TeamSharingOptions;
+
+  /**
    * Options for managing the User Interface elements of AdapTable.
    *
    * Includes options for themes, menus, tool panels etc.
@@ -261,4 +279,18 @@ export interface AdaptableOptions {
    *
    */
   plugins?: AdaptablePlugin[];
+
+  /**
+   * The actual implementations of User Functions that users reference in Predefined Config.
+   *
+   * Predefined Config is stored as JSON - and often remotely - which means that it is not possible to store function implementations (as they are code and not strings, so cannot be serialised).
+   *
+   * Accordingly, the pattern we use in such cases is as follows:
+   *
+   * 1. The section in Predefined Config (e.g. CellSummary / OperationFunction) provides the **name** of the function
+   *
+   * 2. The `userFunctions` section of [AdaptableOptions](../modules/_src_adaptableoptions_userfunctions_.html#userfunction) contains the **implementation code** itself.
+   *
+   */
+  userFunctions?: UserFunctions;
 }

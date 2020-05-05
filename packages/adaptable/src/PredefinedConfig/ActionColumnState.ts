@@ -1,18 +1,33 @@
-import { DesignTimeState } from './DesignTimeState';
+import { ConfigState } from './ConfigState';
 import { AdaptableObject } from './Common/AdaptableObject';
+import { BaseUserFunction } from '../AdaptableOptions/UserFunctions';
 
 /**
  * The Predefined Configuration for Action Columns
  *
  * An [Action Column](_src_predefinedconfig_actioncolumnstate_.actioncolumn.html) is a special column which dynamically displays a button.
  *
- * You are able, optionally, to specify for each row, if and how the button will render.
+ * In the Action Column Predefined Config 2 optional functions can be referenced (with the implementations provided in in the [User Functions](https://api.adaptabletools.com/modules/_src_adaptableoptions_userfunctions_.html) section of Adaptable Options).
+ *
+ * - *RenderFunction*: provides details of what the button will look like.  If not provided then a standard button is shown
+ *
+ *  - *ShouldRenderPredicate*: a function which will evaluate for each row if the button should be rendered
  *
  * When the button is clicked, Adaptable fires an `ActionColumnClicked` event (see [Event Api](https://api.adaptabletools.com/interfaces/_src_api_eventapi_.eventapi.html)) which contains full details of the column and the row.
  *
- * **Further AdapTable Help Resources**
+ *  --------------
  *
- * [Demo Site](https://demo.adaptabletools.com/column/aggridactioncolumnsdemo/) | [API](_src_api_actioncolumnapi_.actioncolumnapi.html) | [FAQ](https://adaptabletools.zendesk.com/hc/en-us/articles/360002209498-Action-Column-FAQ) | [Videos](https://adaptabletools.zendesk.com/hc/en-us/articles/360002204277-Action-Column-Videos) | [User Guide](https://adaptabletools.zendesk.com/hc/en-us/articles/360003213038-Special-Column-Functions)
+ *  **Further AdapTable Help Resources**
+ *
+ * - [Action Column Demo](https://demo.adaptabletools.com/column/aggridactioncolumnsdemo/)
+ *
+ * - [Action Column API](_src_api_actioncolumnapi_.actioncolumnapi.html)
+ *
+ * - [Action Column Function Read Me](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/functions/action-column-function.md)
+ *
+ * - [Action Column Video](https://youtu.be/y0cDvtdmSKM)
+ *
+ *  --------------
  *
  * **Action Column Predefined Config Example**
  *
@@ -22,39 +37,55 @@ import { AdaptableObject } from './Common/AdaptableObject';
  *
  * We also provide our own `RenderFunction` implementation which renders the column differently for rows where the currency is 'USD'.
  *
- * ```ts
+ *
+ *  ```ts
+ *
+ * // Predefined Config
  * export default {
  * ActionColumn: {
  *  ActionColumns: [
  *   {
- *      ColumnId: 'Delete Trade',
- *      ShouldRenderPredicate: (params: ActionColumnRenderParams) => {
- *          return params.rowData.tradeDate < Date.now();
- *        },
- *      RenderFunction: (params: ActionColumnRenderParams) => {
- *          return params.rowData.currency === 'USD'
- *            ? '<button style="color:blue; font-weight:bold">Delete Trade</button>'
- *            : '<button style="color:red; font-weight:bold">Delete Trade</button>';
- *        },
- *   },
- *  ],
+ *     {
+ *        ColumnId: 'Action',
+ *        ButtonText: 'Click',
+ *        ShouldRenderPredicate: 'action',
+ *        RenderFunction: 'action',
+ *      },
+ *   ]
  *  },
  * } as PredefinedConfig;
  *
- *  --------------
+ *  // Adaptable Options
+ * const adaptableOptions: AdaptableOptions = {
+ * ......
+ *  userFunctions: [
+ *     {
+ *       type: 'ActionColumnRenderFunction',
+ *        name: 'action',
+ *        handler(params) {
+ *          let data: number = params.rowData.notional;
+ *          return data > 50
+ *            ? '<button class="doublebutton">Double</button>'
+ *            : '<button class="treblebutton">Treble</button>';
+ *       },
+ *     },
+ *     {
+ *        type: 'ActionColumnShouldRenderPredicate',
+ *        name: 'action',
+ *        handler(params) {
+ *          return params.rowData.counterparty != 'BAML';
+ *        },
+ *      },
+ *     ],
  *
- * // we listen to the ActionColumnClicked event (via the eventAPI in Adaptable API) and
- * // delete the row using the deleteGridData method in gridAPI (also in Adaptable API)
- *  api.eventApi.on('ActionColumnClicked', (args: ActionColumnClickedEventArgs) => {
- *    const actionColumnClickedInfo: ActionColumnClickedInfo = args.data[0].id;
- *    const rowData: any = actionColumnClickedInfo.rowData;
- *    api.gridApi.deleteGridData([rowData]);
- * });
+ *  // we listen to the `ActionColumnClicked` event (via the eventAPI in Adaptable API) and then act accordingly
+ *    api.eventApi.on('ActionColumnClicked', (args: ActionColumnClickedEventArgs) => {
+ *      // do stuff...
+ *  });
  *
- *  --------------
  * ```
  */
-export interface ActionColumnState extends DesignTimeState {
+export interface ActionColumnState extends ConfigState {
   /**
    * An array of `ActionColumn` which Adaptable will dynamically render.
    */
@@ -97,7 +128,7 @@ export interface ActionColumn extends AdaptableObject {
    *
    * If this property is not set, then a regular button will appear in the column with the caption of the `ButtonText` property.
    */
-  RenderFunction?: (params: ActionColumnRenderParams) => string;
+  RenderFunction?: string;
 
   /**
    * A Predicate function returning a boolean value indicating whether the Action Column should display a button.
@@ -108,7 +139,18 @@ export interface ActionColumn extends AdaptableObject {
    *
    * If this property is not set, or if the function returns true, then the cell **will render** (using either the `ButtonText` or `RenderFuntion` value).
    */
-  ShouldRenderPredicate?: (params: ActionColumnRenderParams) => boolean;
+  ShouldRenderPredicate?: string;
+}
+
+export interface ActionColumnRenderFunction extends BaseUserFunction {
+  type: 'ActionColumnRenderFunction';
+  name: string;
+  handler: (params: ActionColumnRenderParams) => string;
+}
+export interface ActionColumnShouldRenderPredicate extends BaseUserFunction {
+  type: 'ActionColumnShouldRenderPredicate';
+  name: string;
+  handler: (params: ActionColumnRenderParams) => boolean;
 }
 
 /**

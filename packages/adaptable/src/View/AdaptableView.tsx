@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import * as Redux from 'redux';
 import { Provider, connect, ConnectedComponent } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
@@ -47,8 +47,9 @@ class AdaptableView extends React.Component<AdaptableViewProps, {}> {
   render() {
     return (
       <div>
-        <Dashboard Adaptable={this.props.Adaptable} />
-
+        {this.props.Adaptable.StrategyService.isStrategyAvailable('Dashboard') && (
+          <Dashboard Adaptable={this.props.Adaptable} />
+        )}
         {/* The chart widget - it will decide where it will display
                 Either modally (if we set ShowModal in our Predefiend Config for Chart State)
                 Or in a div otherwise (if a div then the Chart screen will work out WHICH div...) */}
@@ -84,7 +85,6 @@ class AdaptableView extends React.Component<AdaptableViewProps, {}> {
           onClose={this.props.onClosePromptPopup}
           onConfirm={this.props.onConfirmPromptPopup}
           ShowPopup={this.props.PopupState.PromptPopup.ShowPromptPopup}
-          Adaptable={this.props.Adaptable}
         />
 
         <AdaptablePopupConfirmation
@@ -116,7 +116,7 @@ class AdaptableView extends React.Component<AdaptableViewProps, {}> {
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(state: AdaptableState, ownProps: any): Partial<AdaptableViewProps> {
   return {
     PopupState: state.Popup,
     SystemState: state.System,
@@ -125,7 +125,9 @@ function mapStateToProps(state: AdaptableState, ownProps: any) {
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<AdaptableViewProps> {
   return {
     onCloseScreenPopup: () => dispatch(PopupRedux.PopupHideScreen()),
     onCloseAlertPopup: () => dispatch(PopupRedux.PopupHideAlert()),
@@ -141,10 +143,7 @@ function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState
   };
 }
 
-let AdaptableWrapper: ConnectedComponent<typeof AdaptableView, any> = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AdaptableView);
+let AdaptableWrapper = connect(mapStateToProps, mapDispatchToProps)(AdaptableView);
 
 export const AdaptableApp = ({ Adaptable }: { Adaptable: IAdaptable }) => (
   <Provider store={Adaptable.AdaptableStore.TheStore}>

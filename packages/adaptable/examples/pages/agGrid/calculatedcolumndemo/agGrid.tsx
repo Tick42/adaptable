@@ -44,6 +44,15 @@ let demoConfig: PredefinedConfig = {
         ColumnExpression: 'Col("notional") * 2',
         ColumnId: 'Dob Notional',
       },
+      {
+        ColumnExpression:
+          'Col("notional") > 1300 ? "High" : Col("notional") > 1100 ? "Medium": "Low"',
+        ColumnId: 'Comment',
+        CalculatedColumnSettings: {
+          Groupable: false,
+          Sortable: false,
+        },
+      },
     ],
   },
   Layout: {

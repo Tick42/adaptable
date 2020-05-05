@@ -5,9 +5,17 @@ import { AdaptableState } from '../PredefinedConfig/AdaptableState';
  *
  * By default, AdaptableState is persisted in the local storage of the user browser, under the `adaptableId` key.
  *
- * (Or if you are using [Config Server](_src_adaptableoptions_configserveroptions_.configserveroptions.html) in the location specified by the [configServerUrl Server](_src_adaptableoptions_configserveroptions_.configserveroptions.html#configserverurl) property).
- *
  * The various state-management functions provided here allow you to change this default behaviour, and also to add custom properties in the persisted state.
+ *
+ * Note: this is the recommended way to manage remote storage in preference to [Config Server](_src_adaptableoptions_configserveroptions_.configserveroptions.html) as it provides far more flexibility and control.
+ *
+ * --------------
+ *
+ *  **Further AdapTable Help Resources**
+ *
+ * [Demo Site](https://demo.adaptabletools.com/adaptablestate/aggridstatefunctionsdemo) | [Adaptable State ReadMe](https://github.com/AdaptableTools/adaptable/blob/master/packages/adaptable/readme/guides/adaptable-state-guide.md)
+ *
+ *  --------------
  *
  * The 4 functions you can provide your own implementations for are:
  *
@@ -43,11 +51,9 @@ export interface StateOptions {
   /**
    * Allows the customization of state loading.
    *
-   * By default, it reads the state that was persisted from localStorage (at the `adaptableId` key) and returns it.
+   * By default, AdapTable will read the state that was persisted from localStorage (at the `adaptableId` key) and returns it.
    *
-   * (If Remote Config Server has been set up, then the default implementation fetches the config server url and returns the resulting object).
-   *
-   * If defined, most likely it is used in conjunction with `stateOptions.persistState`, which is the other side of the persistence mechanism.
+   * If this function is defined, most likely it will be used in conjunction with `stateOptions.persistState`, which is the other side of the persistence mechanism.
    *
    * For example, `loadState` could be used to load adaptable state from the browser window object or from a remote location altogether.
    *
@@ -95,7 +101,7 @@ export interface StateOptions {
    *
    * **Default implementation: (state) => state**
    */
-  saveState?: (state: AdaptableState) => Partial<AdaptableState>;
+  saveState?: (state: AdaptableState) => any;
 
   /**
    * Allows hooking into AdaptableState hydration - useful when `saveState` was specified and added new custom properties, which will again be accessible into the `applyState` function.
@@ -141,7 +147,7 @@ export interface StateOptions {
  */
 export interface AdaptablePersistStateFunction {
   (
-    state: Partial<AdaptableState>,
+    state: any,
     { adaptableId, userName, url }: { adaptableId: string; userName: string; url?: string }
   ): Promise<any>;
 }

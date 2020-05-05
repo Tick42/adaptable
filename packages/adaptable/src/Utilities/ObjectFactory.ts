@@ -121,7 +121,22 @@ export function CreateEmptyCategoryChartDefinition(): CategoryChartDefinition {
 }
 
 export function CreateEmptyCalculatedColumn(): CalculatedColumn {
-  return { Uuid: createUuid(), ColumnId: EMPTY_STRING, ColumnExpression: EMPTY_STRING };
+  return {
+    Uuid: createUuid(),
+    ColumnId: EMPTY_STRING,
+    ColumnExpression: EMPTY_STRING,
+    // need to create some defaults - which we will change later
+
+    CalculatedColumnSettings: {
+      DataType: 'Number',
+      Filterable: true,
+      Resizable: true,
+      Groupable: true,
+      Sortable: true,
+      Pivotable: true,
+      Aggregatable: true,
+    },
+  };
 }
 
 export function CreateEmptyPlusMinusRule(): PlusMinusRule {
@@ -453,6 +468,8 @@ export function CreateEmptyFormatColumn(): FormatColumn {
     Uuid: createUuid(),
     ColumnId: EMPTY_STRING,
     Style: CreateEmptyStyle(),
+    DisplayFormat: undefined,
+    CellAlignment: undefined,
   };
 }
 
@@ -496,6 +513,7 @@ export function CreateDefaultLayout(
     AdaptableGridInfo: {
       CurrentColumns: columnIds,
       CurrentColumnSorts: columnSorts,
+      ExpandedRowGroupKeys: undefined,
     },
   };
 }

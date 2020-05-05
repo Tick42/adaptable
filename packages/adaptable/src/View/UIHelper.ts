@@ -237,6 +237,10 @@ export function isValidUserChartContainer(
   return false;
 }
 
+export function IsEmptyStyle(style: AdaptableStyle): boolean {
+  return !IsNotEmptyStyle(style);
+}
+
 export function IsNotEmptyStyle(style: AdaptableStyle): boolean {
   return (
     style.BackColor != null ||
@@ -320,7 +324,6 @@ export function getStyleForStatusColour(statusColour: StatusColour): CSSProperti
 
 export function getStyleForMessageType(messageType: MessageType): CSSProperties {
   let result: any;
-
   switch (messageType) {
     case MessageType.Info:
       result = {
@@ -503,6 +506,7 @@ export const UIHelper = {
   getModalContainer,
   getChartContainer,
   isValidUserChartContainer,
+  IsEmptyStyle,
   IsNotEmptyStyle,
   getMessageTypeByStatusColour,
   getGlyphByMessageType,

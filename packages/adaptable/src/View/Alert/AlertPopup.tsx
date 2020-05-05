@@ -27,14 +27,15 @@ import { ColumnHelper } from '../../Utilities/Helpers/ColumnHelper';
 import { AlertDefinition } from '../../PredefinedConfig/AlertState';
 import { AdaptableObject } from '../../PredefinedConfig/Common/AdaptableObject';
 import EmptyContent from '../../components/EmptyContent';
-import SimpleButton from '../../components/SimpleButton';
-import { AdaptableFunctionName } from '../../PredefinedConfig/Common/Types';
 
 interface AlertPopupProps extends StrategyViewPopupProps<AlertPopupComponent> {
   AlertDefinitions: AlertDefinition[];
   onAddAlert: (Alert: AlertDefinition) => AlertRedux.AlertDefinitionAddAction;
   onEditAlert: (Alert: AlertDefinition) => AlertRedux.AlertDefinitionEditAction;
-  onShare: (entity: AdaptableObject) => TeamSharingRedux.TeamSharingShareAction;
+  onShare: (
+    entity: AdaptableObject,
+    description: string
+  ) => TeamSharingRedux.TeamSharingShareAction;
 }
 
 class AlertPopupComponent extends React.Component<AlertPopupProps, EditableConfigEntityState> {
@@ -83,7 +84,7 @@ class AlertPopupComponent extends React.Component<AlertPopupProps, EditableConfi
           Columns={this.props.Columns}
           UserFilters={this.props.UserFilters}
           onEdit={() => this.onEdit(alertDefinition)}
-          onShare={() => this.props.onShare(alertDefinition)}
+          onShare={description => this.props.onShare(alertDefinition, description)}
           TeamSharingActivated={this.props.TeamSharingActivated}
           onDeleteConfirm={AlertRedux.AlertDefinitionDelete(alertDefinition)}
           onChangeMessageType={(alertDef, messageType) =>
@@ -196,18 +197,22 @@ class AlertPopupComponent extends React.Component<AlertPopupProps, EditableConfi
   }
 }
 
-function mapStateToProps(state: AdaptableState, ownProps: any) {
+function mapStateToProps(state: AdaptableState, ownProps: any): Partial<AlertPopupProps> {
   return {
     AlertDefinitions: state.Alert.AlertDefinitions,
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<AlertPopupProps> {
   return {
     onAddAlert: (alert: AlertDefinition) => dispatch(AlertRedux.AlertDefinitionAdd(alert)),
     onEditAlert: (alert: AlertDefinition) => dispatch(AlertRedux.AlertDefinitionEdit(alert)),
-    onShare: (entity: AdaptableObject) =>
-      dispatch(TeamSharingRedux.TeamSharingShare(entity, StrategyConstants.AlertStrategyId)),
+    onShare: (entity: AdaptableObject, description: string) =>
+      dispatch(
+        TeamSharingRedux.TeamSharingShare(entity, StrategyConstants.AlertStrategyId, description)
+      ),
   };
 }
 
