@@ -49,9 +49,13 @@ async function InitAdaptableDemo() {
     auditTickingDataUpdates: {
       auditToConsole: true,
     },
+    // no userFunctions?
   };
 
   const adaptableApi = Adaptable.init(adaptableOptions);
+
+  //
+  // adaptableApi.glue42Api.getGlue42State()!.Glue.interop
 
   if (useTickingData) {
     tickingDataHelper.useTickingDataagGrid(gridOptions, adaptableApi, 1000, tradeCount);
@@ -67,7 +71,9 @@ const generateMenuItem = (symbol: any) => {
         name = `${symbol.displayValue} details`;
         action = () => {
           return () => {
-            console.log(symbol);
+            // adaptableApi....
+
+            demoConfig!.Glue42!.Glue().then((g: any) => console.log(g.interop.methods()));
           };
         };
       }
