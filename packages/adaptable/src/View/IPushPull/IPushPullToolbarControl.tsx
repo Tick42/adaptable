@@ -251,7 +251,6 @@ class IPushPullToolbarControlComponent extends React.Component<
       <PanelDashboard
         className="ab-DashboardToolbar__IPushPull"
         headerText={StrategyConstants.IPushPullStrategyFriendlyName}
-        glyphicon={StrategyConstants.IPushPullGlyph}
         showConfigureButton={false} // later : isIPushPullRunning
         onConfigure={() => this.props.onConfigure()}
       >
@@ -320,7 +319,7 @@ class IPushPullToolbarControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState) {
+function mapStateToProps(state: AdaptableState): Partial<IPushPullToolbarControlComponentProps> {
   return {
     CurrentLiveIPushPullReport: state.IPushPull.CurrentLiveIPushPullReport,
     Reports: state.Export.Reports,
@@ -330,7 +329,9 @@ function mapStateToProps(state: AdaptableState) {
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<IPushPullToolbarControlComponentProps> {
   return {
     onIPushPullSendSnapshot: (iPushPullReport: IPushPullReport) =>
       dispatch(IPushPullRedux.IPushPullSendSnapshot(iPushPullReport)),

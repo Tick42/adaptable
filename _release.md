@@ -1,3 +1,15 @@
+## 6.2.1-canary8
+
+Post merge
+
+## 6.2.1-canary7
+
+Fixing components for build process
+
+## 6.2.1-canary6
+
+Small updates. 
+
 ## 6.2.1-canary5
 
 No code and ipushpull small updates.

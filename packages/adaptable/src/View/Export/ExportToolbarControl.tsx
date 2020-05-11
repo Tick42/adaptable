@@ -231,7 +231,6 @@ class ExportToolbarControlComponent extends React.Component<
       <PanelDashboard
         className="ab-DashboardToolbar__Export"
         headerText={StrategyConstants.ExportStrategyFriendlyName}
-        glyphicon={StrategyConstants.ExportGlyph}
         onConfigure={() => this.props.onConfigure()}
       >
         {content}
@@ -251,16 +250,18 @@ class ExportToolbarControlComponent extends React.Component<
   }
 }
 
-function mapStateToProps(state: AdaptableState) {
+function mapStateToProps(state: AdaptableState): Partial<ExportToolbarControlComponentProps> {
   return {
     CurrentReport: state.Export.CurrentReport,
     Reports: state.Export.Reports,
     SystemReports: state.System.SystemReports,
-    LiveReports: state.System.CurrentLiveReports,
+    //   LiveReports: state.System.CurrentLiveReports,
   };
 }
 
-function mapDispatchToProps(dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>) {
+function mapDispatchToProps(
+  dispatch: Redux.Dispatch<Redux.Action<AdaptableState>>
+): Partial<ExportToolbarControlComponentProps> {
   return {
     onApplyExport: (report: Report, exportDestination: ExportDestination) =>
       dispatch(ExportRedux.ExportApply(report, exportDestination)),
