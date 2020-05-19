@@ -178,6 +178,7 @@ export class Glue42Service implements IGlue42Service {
   }
 
   getContextFromSelectedRow(row: GridRow) {
+    console.log(row);
     let ctx: any = {};
     const selectedNode = {
       id: row.rowNode.id,

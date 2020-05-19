@@ -30,7 +30,7 @@ async function InitAdaptableDemo() {
   const adaptableOptions: AdaptableOptions = {
     primaryKey: 'tradeId',
     userName: 'Demo User',
-    adaptableId: 'glue42 Demo',
+    adaptableId: 'Glue42 Excel Demo',
     vendorGrid: {
       ...gridOptions,
       modules: [MenuModule, RangeSelectionModule],
@@ -48,13 +48,24 @@ async function InitAdaptableDemo() {
   const adaptableApi = Adaptable.init(adaptableOptions);
 
   if (useTickingData) {
-    tickingDataHelper.useTickingDataagGrid(gridOptions, adaptableApi, 1000, tradeCount);
+    tickingDataHelper.useTickingDataagGrid(
+      adaptableOptions.vendorGrid,
+      adaptableApi,
+      1000,
+      tradeCount
+    );
   }
 }
 
 let demoConfig: PredefinedConfig = {
   Dashboard: {
-    VisibleToolbars: ['Glue42'],
+    Tabs: [
+      {
+        Name: 'Glue Demo',
+        Toolbars: ['Glue42', 'Alert', 'CellSummary'],
+      },
+    ],
+    VisibleButtons: ['CellValidation'],
   },
   Glue42: {
     Glue: glue42Desktop, // this is the glue object

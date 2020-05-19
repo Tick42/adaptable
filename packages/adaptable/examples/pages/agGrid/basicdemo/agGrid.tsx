@@ -40,8 +40,13 @@ function InitAdaptableDemo() {
       ...gridOptions,
       modules: AllEnterpriseModules,
     },
+    filterOptions: {
+      useVendorFilterFormStyle: true,
+    },
     predefinedConfig: {
       Dashboard: {
+        Revision: 141,
+        CanFloat: false,
         Tabs: [
           {
             Name: 'General',

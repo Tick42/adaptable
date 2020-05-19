@@ -106,7 +106,7 @@ export class ExamplesHelper {
     return newDate;
   }
 
-  protected addDays(date: Date, days: number): Date {
+  public addDays(date: Date, days: number): Date {
     return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
   }
 
@@ -339,11 +339,11 @@ export class ExamplesHelper {
   }
 
   // [0, 1)
-  protected generateRandomDouble(): number {
+  public generateRandomDouble(): number {
     return Math.random();
   }
 
-  protected getStatus(): string {
+  public getStatus(): string {
     const randomNumber = this.generateRandomInt(1, 3);
     if (randomNumber == 1) {
       return 'Completed';
@@ -356,7 +356,7 @@ export class ExamplesHelper {
     }
     return '';
   }
-  protected getRandomHardcode(): number | undefined {
+  public getRandomHardcode(): number | undefined {
     let randomNumber = this.generateRandomInt(1, 10);
     if (randomNumber == 1) {
       return undefined;
@@ -364,7 +364,7 @@ export class ExamplesHelper {
     return randomNumber;
   }
 
-  protected generateRandomNullableDouble(): number {
+  public generateRandomNullableDouble(): number {
     let myValue = this.generateRandomDouble();
     const randomInt = this.generateRandomInt(1, 10);
     if (randomInt > 7) {
@@ -378,7 +378,7 @@ export class ExamplesHelper {
     return myValue;
   }
 
-  protected generateRandomNullableString(myString: string): string | null {
+  public generateRandomNullableString(myString: string): string | null {
     const randomInt = this.generateRandomInt(1, 10);
     if (randomInt > 7) {
       return null;
@@ -390,37 +390,37 @@ export class ExamplesHelper {
     return this.roundTo4Dp(this.generateRandomInt(10, 150) + this.generateRandomDouble());
   }
 
-  protected getMeaningfulPositiveNegativeDouble(): number {
+  public getMeaningfulPositiveNegativeDouble(): number {
     return this.roundTo4Dp(this.generateRandomInt(-150, 150) + this.generateRandomDouble());
   }
 
-  protected getMeaningfulPositiveNegativeInteger(seed: number): number {
+  public getMeaningfulPositiveNegativeInteger(seed: number): number {
     return this.generateRandomInt(-seed, seed);
   }
 
-  protected removeDecimalPoints(val: number): number {
+  public removeDecimalPoints(val: number): number {
     return Math.round(val * 1) / 1;
   }
 
-  protected roundTo4Dp(val: number): number {
+  public roundTo4Dp(val: number): number {
     return Math.round(val * 10000) / 10000;
   }
 
-  protected roundTo2Dp(val: number): number {
+  public roundTo2Dp(val: number): number {
     return Math.round(val * 100) / 100;
   }
 
-  protected getMeaningfulDoubleInRange(min: number, max: number): number {
+  public getMeaningfulDoubleInRange(min: number, max: number): number {
     return this.roundTo4Dp(this.generateRandomInt(min, max) + this.generateRandomDouble());
   }
 
-  protected getMeaningfulDoubleTest(): number {
+  public getMeaningfulDoubleTest(): number {
     return (
       Math.round((100 + this.generateRandomDouble()) * 10) / 10 + this.generateRandomDouble() / 1000
     );
   }
 
-  protected generateRandomDateAndTime(minDays: number, maxDays: number): Date {
+  public generateRandomDateAndTime(minDays: number, maxDays: number): Date {
     const currentDate = new Date(); // Fix it
     const start = this.addDays(currentDate, minDays);
     const end = this.addDays(currentDate, maxDays);
@@ -433,7 +433,7 @@ export class ExamplesHelper {
     // return toDateTimeString(date);
   }
 
-  protected toDateTimeString(date: Date) {
+  public toDateTimeString(date: Date) {
     const options = {
       weekday: 'long',
       year: 'numeric',
@@ -445,17 +445,17 @@ export class ExamplesHelper {
     return date.toLocaleTimeString('en-us', options);
   }
 
-  protected generateCounterparty(): string {
+  public generateCounterparty(): string {
     const counterparties = this.getCounterparties();
     return counterparties[this.generateRandomInt(0, counterparties.length - 1)];
   }
 
-  protected generateCurrency(): string {
+  public generateCurrency(): string {
     const currencies = this.getCurrencies();
     return currencies[this.generateRandomInt(0, currencies.length - 1)];
   }
 
-  protected getIsin(index: number): string {
+  public getIsin(index: number): string {
     const isins: string[] = [
       'US046353AB45',
       'FR0010326975',
@@ -498,7 +498,7 @@ export class ExamplesHelper {
     return isins[index];
   }
 
-  protected getTicker(index: number): string {
+  public getTicker(index: number): string {
     const tickers: string[] = [
       'AZN',
       'BOUY',
@@ -562,7 +562,7 @@ export class ExamplesHelper {
     return notionals;
   }
 
-  protected getBidOfferSpreads(): number[] {
+  public getBidOfferSpreads(): number[] {
     const bidOfferSpreads = [
       0.1,
       0.15,
@@ -586,7 +586,7 @@ export class ExamplesHelper {
     return bidOfferSpreads;
   }
 
-  protected getCounterparties(): string[] {
+  public getCounterparties(): string[] {
     const counterparties = [
       'Goldman Sachs',
       'Soc Gen',
@@ -614,26 +614,45 @@ export class ExamplesHelper {
     return counterparties;
   }
 
-  protected getCurrencies(): string[] {
+  public getCurrencies(): string[] {
     const currencies = ['EUR', 'USD', 'GBP', 'CHF', 'CAD', 'AUD', 'ZAR'];
     return currencies;
   }
 
-  protected getCurrenciesOtherThanOne(currency: string): string[] {
+  public getCurrenciesOtherThanOne(currency: string): string[] {
     return this.getCurrencies().filter(c => c == currency);
   }
 
-  protected getBuySell(): string[] {
+  public getBuySell(): string[] {
     const buySell = ['Buy', 'Sell'];
     return buySell;
   }
 
-  protected getDealType(): string[] {
+  public getDealType(): string[] {
     const dealType = ['Swap', 'Spot', 'Forward'];
     return dealType;
   }
 
-  protected getCountries(): string[] {
+  public getCountries(): string[] {
+    const newcountries = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      //    '8',
+      //     '9',
+      //     '10',
+      //    '11',
+      //    '12',
+      //    '13',
+      //    '14',
+      //    '15',
+    ];
+    return newcountries;
+
     const countries = [
       //  'Argentina',
       'Australia',
@@ -662,12 +681,12 @@ export class ExamplesHelper {
     return countries;
   }
 
-  protected getAmounts(): number[] {
+  public getAmounts(): number[] {
     const amounts = [1000, 1500, 2000, 2500, 3000];
     return amounts;
   }
 
-  protected getMoodysRatings(): string[] {
+  public getMoodysRatings(): string[] {
     const moodysRatings = [
       'Aaa',
       'Aa1',
@@ -694,7 +713,7 @@ export class ExamplesHelper {
     return moodysRatings;
   }
 
-  protected getSimilarNumber(originalNumber: number): number {
+  public getSimilarNumber(originalNumber: number): number {
     const direction = this.generateRandomInt(1, 2);
     //  let randomDouble = this.generateRandomDouble();
     const returnValue =
@@ -705,7 +724,7 @@ export class ExamplesHelper {
   }
 
   // for s&P and Fitch we got one of 3 ratings based off the moodys rating
-  protected getRatingFromMoodyRating(moodysRating: string): string {
+  public getRatingFromMoodyRating(moodysRating: string): string {
     switch (moodysRating) {
       case 'Aaa':
         return this.getRandomItem(['AAA', 'AA+']);
@@ -753,7 +772,7 @@ export class ExamplesHelper {
     return '';
   }
 
-  protected getNames(): string[] {
+  public getNames(): string[] {
     const names: string[] = [
       'Stacee Dreiling',
       'Cecil Staab',
@@ -781,6 +800,11 @@ export class ExamplesHelper {
 
   public getGridOptionsTrade(rowData: any): GridOptions {
     return {
+      defaultColDef: {
+        //   valueGetter: (params: any) => {
+        //      return 'hello';
+        //   },
+      },
       columnDefs: this.getTradeSchema(),
       rowData,
       enableRangeSelection: true,
@@ -1017,7 +1041,8 @@ export class ExamplesHelper {
   }
 
   public getTradeSchema(): ColDef[] {
-    var schema: any[] = [];
+    var schema: ColDef[] = [];
+
     schema.push({
       headerName: 'Trade Id',
       field: 'tradeId',
@@ -1033,8 +1058,23 @@ export class ExamplesHelper {
       cellRenderer: 'agAnimateShowChangeCellRenderer',
     });
     schema.push({
+      headerName: 'Country-Stars',
+      //    colId: 'hello',
+      editable: false,
+      filter: true,
+      enableRowGroup: true,
+      valueGetter: (params: any) => {
+        return params.data && params.data.stars && params.data.country
+          ? //   ? params.data.stars + ' - ' + params.data.country
+            params.data.stars * 12
+          : undefined;
+      },
+      type: 'abColDefNumber',
+    });
+    schema.push({
       headerName: 'Notional',
       field: 'notional',
+      colId: 'notional',
       enableValue: true,
       editable: true,
       sortable: true,
@@ -1051,6 +1091,7 @@ export class ExamplesHelper {
         footerValueGetter: '"All Notionals (" + x + ")"',
       },
     });
+
     schema.push({
       headerName: 'Ask',
       field: 'ask',
@@ -1083,6 +1124,9 @@ export class ExamplesHelper {
       enableValue: true,
       enablePivot: true,
       //  valueFormatter: this.raduFormatter,
+      //   valueGetter: (params: any) => {
+      //     return 'Hello';
+      //   },
       valueFormatter: (params: any) => {
         return params.value ? params.value.toLocaleString() : undefined;
       },
@@ -1095,6 +1139,7 @@ export class ExamplesHelper {
       // resizable: true,
       //  tooltipComponent: 'percentBarTooltip',
     });
+
     schema.push({
       headerName: 'Country',
       field: 'country',
@@ -1306,6 +1351,7 @@ export class ExamplesHelper {
       type: 'abColDefNumber',
       enableRowGroup: true,
     });
+
     return schema;
   }
 
@@ -1855,7 +1901,7 @@ export class ExamplesHelper {
     }
   };
 
-  private stringToDate(date: any, format: any, delimiter: any) {
+  public stringToDate(date: any, format: any, delimiter: any) {
     var formatLowerCase = format.toLowerCase();
     var formatItems = formatLowerCase.split(delimiter);
     var dateItems = date.split(delimiter);
@@ -1872,9 +1918,9 @@ export class ExamplesHelper {
     return formatedDate;
   }
 
-  private shortDateFormatter = new Intl.DateTimeFormat('en-GB');
+  public shortDateFormatter = new Intl.DateTimeFormat('en-GB');
 
-  public shortDateFormatteragGrid = (params: any) => {
+  public shortDateFormatteragGrid = (params: any): any => {
     try {
       if (params.value) {
         return this.shortDateFormatter.format(params.value);
@@ -1888,27 +1934,27 @@ export class ExamplesHelper {
     return null;
   };
 
-  private timeFormatter = (params: any) => {
+  public timeFormatter = (params: any) => {
     //   return params.value.format('HH:mm');
     return params.value ? params.value.toLocaleTimeString() : null;
   };
 
-  private fourDecimalPlaceFormatter = (params: any) => {
+  public fourDecimalPlaceFormatter = (params: any): any => {
     return params.value ? this.roundTo4Dp(params.value) : null;
   };
-  public twoDecimalPlaceFormatter = (params: any) => {
+  public twoDecimalPlaceFormatter = (params: any): any => {
     return params.value ? this.roundTo2Dp(params.value) : null;
   };
 
-  private currencyPlaceFormatter = (params: any) => {
+  public currencyPlaceFormatter = (params: any): any => {
     return params.value ? '£' + this.twoDecimalPlaceFormatter(params) : null;
   };
 
-  private raduFormatter = (params: any) => {
+  public raduFormatter = (params: any) => {
     return params.value ? params.value.toLocaleString() : null;
   };
 
-  private statusComparator = (a: string, b: string) => {
+  public statusComparator = (a: string, b: string) => {
     var requiredOrder = ['Pending', 'Completed', 'Rejected'];
     return requiredOrder.indexOf(a) - requiredOrder.indexOf(b);
   };
