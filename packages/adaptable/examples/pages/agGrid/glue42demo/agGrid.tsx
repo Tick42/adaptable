@@ -72,7 +72,7 @@ let demoConfig: PredefinedConfig = {
     Glue4Office: glue42office, // this is the Glue4Office object
     Username: 'kparushev',
     Password: 'demopassword', // put in .env file
-    Channels: true,
+    Channels: false,
     Contexts: true,
   },
   FlashingCell: {

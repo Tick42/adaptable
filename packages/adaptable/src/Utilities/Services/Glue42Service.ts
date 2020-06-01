@@ -122,11 +122,12 @@ export class Glue42Service implements IGlue42Service {
       this.glueInstance = await glue(glue42Config.initialization);
       (window as any).glue = this.glueInstance;
 
-      this.glueInstance.channels.subscribe((data: any, ctx: any) => {
-        this.updateSelectionOnContextChange(ctx);
-      });
-
-      this.updateContextOnSelectionChange();
+      if (glue42Config.channels) {
+        this.glueInstance.channels.subscribe((data: any, ctx: any) => {
+          this.updateSelectionOnContextChange(ctx);
+        });
+        this.updateContextOnSelectionChange();
+      }
 
       // Avoid a circular assignment:
       const glue4OfficeConfig: any = cloneDeep(glue42Config.initialization);
@@ -213,6 +214,44 @@ export class Glue42Service implements IGlue42Service {
       console.log('Not on a channel');
     }
   }
+  async submitDataWhenExcelIsInitialized(
+    data: any[],
+    gridColumns: AdaptableColumn[],
+    primaryKeys: any[]
+  ) {
+    let exportColumns: any[] = data[0];
+    let exportData: any[] = this.createData(data, exportColumns);
+    let sentRows: any[] = Helper.cloneObject(exportData);
+
+    //Work around a mistaken definition
+    const rowTrigger = 'row' as any;
+    const updateTrigger = [rowTrigger];
+    const syncOptions: any = {
+      workbook: 'Glue42 Excel Integration Demo',
+      worksheet: 'Data Sheet',
+      updateTrigger,
+      clearGrid: false,
+    };
+    if (this.excelSyncTimeout) {
+      syncOptions.timeoutMs = this.excelSyncTimeout;
+    }
+
+    const sheetData: any = {
+      columnConfig: this.createColumns(data),
+      data: exportData,
+      options: syncOptions,
+    };
+
+    if (!this.sheet) {
+      this.sheet = await this.glue4ExcelInstance.openSheet(sheetData);
+      this.sheet.onChanged(
+        this.getSheetChangeHandler(gridColumns, sentRows, exportColumns, primaryKeys)
+      );
+    } else {
+      console.log(this.sheet);
+      this.sheet.update(sheetData.data);
+    }
+  }
 
   async exportData(data: any[], gridColumns: AdaptableColumn[], primaryKeys: any[]) {
     if (!this.glueInstance) {
@@ -223,37 +262,18 @@ export class Glue42Service implements IGlue42Service {
       if (!this.isExcelStatus.isResolved) {
         try {
           if (this.glueInstance.appManager) {
+            const unsub = this.glueInstance.agm.methodAdded((method: any) => {
+              if (method.name === 'T42.ExcelPad.ShowGrid') {
+                this.submitDataWhenExcelIsInitialized(data, gridColumns, primaryKeys);
+                unsub();
+              }
+            });
             await this.glueInstance.appManager.application('excel').start();
           }
         } catch (error) {}
+      } else {
+        this.submitDataWhenExcelIsInitialized(data, gridColumns, primaryKeys);
       }
-
-      let exportColumns: any[] = data[0];
-      let exportData: any[] = this.createData(data, exportColumns);
-      let sentRows: any[] = Helper.cloneObject(exportData);
-
-      //Work around a mistaken definition
-      const rowTrigger = 'row' as any;
-      const updateTrigger = [rowTrigger];
-      const syncOptions: any = {
-        workbook: 'Glue42 Excel Integration Demo',
-        worksheet: 'Data Sheet',
-        updateTrigger,
-      };
-      if (this.excelSyncTimeout) {
-        syncOptions.timeoutMs = this.excelSyncTimeout;
-      }
-
-      const sheetData: any = {
-        columnConfig: this.createColumns(data),
-        data: exportData,
-        options: syncOptions,
-      };
-
-      const sheet = await this.glue4ExcelInstance.openSheet(sheetData);
-      sheet.onChanged(
-        this.getSheetChangeHandler(gridColumns, sentRows, exportColumns, primaryKeys)
-      );
     } catch (error) {
       console.error(error);
     }
@@ -430,7 +450,6 @@ export class Glue42Service implements IGlue42Service {
             msg: 'Excel is running',
             isResolved: true,
           };
-
           return;
         }
 

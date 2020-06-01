@@ -57,7 +57,7 @@ export class GlueExampleHelper {
     const quantity = this.examplesHelper.generateRandomInt(20, 100); //this.getRandomItem(this.getAmounts()),
     // price
     const priceDiff =
-      ((this.examplesHelper.generateRandomBool ? 1 : -1) *
+      ((this.examplesHelper.generateRandomBool() ? 1 : -1) *
         this.examplesHelper.generateRandomInt(0, 5)) /
       100;
     const price = instrument.refPrice + instrument.refPrice * priceDiff;

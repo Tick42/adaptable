@@ -42,6 +42,15 @@ async function InitAdaptableDemo() {
       modules: [MenuModule, RangeSelectionModule],
     },
     predefinedConfig: demoConfig,
+    userFunctions: [
+      {
+        type: 'UserMenuItemClickedFunction',
+        name: 'name',
+        handler: (menuInfo: MenuInfo) => {
+          console.log('hey!');
+        },
+      },
+    ],
   };
 
   adaptableOptions.predefinedConfig = demoConfig;
@@ -53,9 +62,6 @@ async function InitAdaptableDemo() {
   };
 
   const adaptableApi = Adaptable.init(adaptableOptions);
-
-  //
-  // adaptableApi.glue42Api.getGlue42State()!.Glue.interop
 
   if (useTickingData) {
     tickingDataHelper.useTickingDataagGrid(gridOptions, adaptableApi, 1000, tradeCount);
@@ -115,9 +121,12 @@ let demoConfig: PredefinedConfig = {
     Contexts: true,
   },
   UserInterface: {
-    ContextMenuItems: (menuinfo: MenuInfo) => {
-      return generateItems(menuinfo.RowNode.data.interopSymbols);
-    },
+    ContextMenuItems: [
+      {
+        Label: 'hey',
+        UserMenuItemClickedFunction: 'name',
+      },
+    ],
   },
   FlashingCell: {
     FlashingCells: [
