@@ -2738,7 +2738,7 @@ var adaptableadaptableMiddleware = (adaptable: IAdaptable): any =>
            * TEAM SHARING ACTIONS
            *******************/
 
-          case TeamSharingRedux.TEAMSHARING_FETCH: {
+          case TeamSharingRedux.TEAMSHARING_GET: {
             let returnAction = next(action);
 
             const { adaptableId, teamSharingOptions } = adaptable.adaptableOptions;
@@ -3193,6 +3193,7 @@ export function getFunctionAppliedReduxActions(): string[] {
     CalculatedColumnRedux.CALCULATEDCOLUMN_ADD,
     CalculatedColumnRedux.CALCULATEDCOLUMN_EDIT,
     CalculatedColumnRedux.CALCULATEDCOLUMN_DELETE,
+    LayoutRedux.LAYOUT_SELECT,
   ];
 }
 

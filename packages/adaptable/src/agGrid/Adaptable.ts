@@ -1854,7 +1854,10 @@ export class Adaptable implements IAdaptable {
       filter: true,
       sortable: true,
       resizable: true,
-      cellEditor: 'agLargeTextCellEditor',
+      cellEditor:
+        freeTextColumn.TextEditor && freeTextColumn.TextEditor == 'Large'
+          ? 'agLargeTextCellEditor'
+          : 'agTextCellEditor',
       type: 'abColDefString',
       valueSetter: (params: ValueSetterParams) => {
         return (params.data[freeTextColumn.ColumnId] = params.newValue);
@@ -3005,11 +3008,6 @@ export class Adaptable implements IAdaptable {
       const colDef: ColDef = vendorGridColumn.getColDef();
       colDef.cellRenderer = cellRendererFunc;
 
-      // change the style from number-cell temporarily?
-      if (colDef.cellClass == 'number-cell') {
-        colDef.cellClass = 'number-cell-changed';
-      }
-
       if (pcr.ShowToolTip != null && pcr.ShowToolTip == true) {
         colDef.tooltipField = colDef.field;
         // for now NOT using this PercentBarTooltip but we can add it later and will be powwerful.
@@ -3813,6 +3811,10 @@ import "@adaptabletools/adaptable/themes/${themeName}.css"`);
       }
     }
     return null;
+  }
+
+  canExportToExcel(): boolean {
+    return this.agGridHelper.isModulePresent('excel-export');
   }
 
   exportToExcel(report: Report, columns: AdaptableColumn[], data: any[]) {

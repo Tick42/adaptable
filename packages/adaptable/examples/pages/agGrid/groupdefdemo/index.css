@@ -16,14 +16,3 @@ html {
   /* --ab-color-defaultbackground: red; */
 }
 
-.demo-brown {
-  background-color: brown;
-}
-.demo-purple {
-  background-color: purple;
-  color: white;
-}
-.demo-grey {
-  background-color: lightgrey;
-  color: black;
-}
