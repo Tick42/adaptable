@@ -45,12 +45,15 @@ async function InitAdaptableDemo() {
     userFunctions: [
       {
         type: 'UserMenuItemClickedFunction',
-        name: 'name',
-        handler: (menuInfo: MenuInfo) => {
+        name: 'myFunc',
+        handler() {
           console.log('hey!');
         },
       },
     ],
+    userInterfaceOptions: {
+      showAdaptableContextMenu: () => true,
+    },
   };
 
   adaptableOptions.predefinedConfig = demoConfig;
@@ -58,7 +61,6 @@ async function InitAdaptableDemo() {
     auditTickingDataUpdates: {
       auditToConsole: true,
     },
-    // no userFunctions?
   };
 
   const adaptableApi = Adaptable.init(adaptableOptions);
@@ -67,46 +69,6 @@ async function InitAdaptableDemo() {
     tickingDataHelper.useTickingDataagGrid(gridOptions, adaptableApi, 1000, tradeCount);
   }
 }
-
-const generateMenuItem = (symbol: any) => {
-  let name;
-  let action = () => {};
-  switch (symbol.symbol) {
-    case 'Client':
-      {
-        name = `${symbol.displayValue} details`;
-        action = () => {
-          return () => {
-            // adaptableApi....
-
-            demoConfig!.Glue42!.Glue().then((g: any) => console.log(g.interop.methods()));
-          };
-        };
-      }
-      break;
-    case 'Trade':
-      {
-        name = `Trade ${symbol.displayValue}`;
-        action = () => {
-          return () => {
-            console.log(symbol);
-          };
-        };
-      }
-      break;
-    default:
-      break;
-  }
-  return {
-    Label: name,
-    UserMenuItemClickedFunction: action(),
-  };
-};
-
-const generateItems = (symbols: any[]): any[] => {
-  const values = symbols.map(symbol => generateMenuItem(symbol));
-  return values;
-};
 
 let demoConfig: PredefinedConfig = {
   Dashboard: {
@@ -123,8 +85,8 @@ let demoConfig: PredefinedConfig = {
   UserInterface: {
     ContextMenuItems: [
       {
-        Label: 'hey',
-        UserMenuItemClickedFunction: 'name',
+        Label: 'some item',
+        UserMenuItemClickedFunction: 'myFunc',
       },
     ],
   },

@@ -122,9 +122,9 @@ export class Glue42Service implements IGlue42Service {
       this.glueInstance = await glue(glue42Config.initialization);
       (window as any).glue = this.glueInstance;
 
-      if (glue42Config.channels) {
+      if (this.glueInstance.channels) {
         this.glueInstance.channels.subscribe((data: any, ctx: any) => {
-          this.updateSelectionOnContextChange(ctx);
+          this.updateSelectionOnContextChange(data);
         });
         this.updateContextOnSelectionChange();
       }
@@ -154,9 +154,9 @@ export class Glue42Service implements IGlue42Service {
     });
   }
 
-  updateSelectionOnContextChange(ctx: any) {
+  updateSelectionOnContextChange(data: any) {
     this.adaptable.forAllRowNodesDo(node => {
-      if (this.matchesContextPair(node.data, node.data.incomingContextChangePairs, ctx.data)) {
+      if (this.matchesContextPair(node.data, node.data.incomingContextChangePairs, data)) {
         node.setSelected(true, true);
       }
     });
@@ -166,11 +166,11 @@ export class Glue42Service implements IGlue42Service {
     for (const key in pairsToMatch) {
       const valueOfCurrentKey = pairsToMatch[key];
       if (typeof valueOfCurrentKey === 'string') {
-        if (nodeData[valueOfCurrentKey] !== context[key]) {
+        if (!context[key] || nodeData[valueOfCurrentKey] !== context[key]) {
           return false;
         }
       } else {
-        if (!this.matchesContextPair(nodeData, pairsToMatch[key], context[key])) {
+        if (!context[key] || !this.matchesContextPair(nodeData, pairsToMatch[key], context[key])) {
           return false;
         }
       }
@@ -185,7 +185,7 @@ export class Glue42Service implements IGlue42Service {
       id: row.rowNode.id,
       data: row.rowData,
     };
-    ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = selectedNode;
+    // ctx[`${this.glueInstance.config.application}.${this.sheetName}.currentRow`] = selectedNode;
 
     ctx = {
       ...ctx,
@@ -196,7 +196,7 @@ export class Glue42Service implements IGlue42Service {
   }
 
   generateContextPairs(contextPairs: any, nodeData: any): any {
-    return Object.keys(contextPairs).reduce((acc, cur) => {
+    const ctx = Object.keys(contextPairs).reduce((acc, cur) => {
       if (typeof contextPairs[cur] === 'string') {
         acc[cur] = nodeData[contextPairs[cur]];
       } else {
@@ -204,6 +204,9 @@ export class Glue42Service implements IGlue42Service {
       }
       return acc;
     }, {} as any);
+
+    console.log(ctx);
+    return ctx;
   }
 
   updateChannelContext(ctx: any) {
