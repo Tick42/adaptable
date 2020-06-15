@@ -45,9 +45,17 @@ async function InitAdaptableDemo() {
     userFunctions: [
       {
         type: 'UserMenuItemClickedFunction',
-        name: 'myFunc',
-        handler() {
-          console.log('hey!');
+        name: 'openChart',
+        handler(menuInfo: MenuInfo) {
+          console.log(menuInfo.RowNode.data['bbg_symbol']);
+
+          const ctx = {
+            ticker: menuInfo.RowNode.data['bbg_symbol'],
+          };
+
+          (menuInfo.AdaptableApi.glue42Api as any).adaptable.Glue42Service.glueInstance.appManager
+            .application('instrument-chart-no-channels')
+            .start(ctx);
         },
       },
     ],
@@ -85,8 +93,8 @@ let demoConfig: PredefinedConfig = {
   UserInterface: {
     ContextMenuItems: [
       {
-        Label: 'some item',
-        UserMenuItemClickedFunction: 'myFunc',
+        Label: 'Open Chart',
+        UserMenuItemClickedFunction: 'openChart',
       },
     ],
   },
